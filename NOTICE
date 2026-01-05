@@ -1,0 +1,14 @@
+SimpleAssetAssistant
+Copyright 2026 Oleksiy Afanasov
+
+This project is licensed under the Apache License, Version 2.0.
+
+SimpleAssetAssistant is a lightweight .NET-based asset management core
+for tracking asset activity, holdings, and aggregated portfolio insights
+across multiple platforms.
+
+If this project influenced your work, reuse, or architectural decisions,
+attribution is appreciated but not required.
+
+Original project:
+https://github.com/PortiForce/SimpleAssetAssistant
