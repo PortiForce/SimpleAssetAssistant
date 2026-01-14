@@ -1,0 +1,101 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Identity", "Core\Portiforce.SimpleAssetAssistant.Core.Identity\Portiforce.SimpleAssetAssistant.Core.Identity.csproj", "{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Assets", "Core\Portiforce.SimpleAssetAssistant.Core.Assets\Portiforce.SimpleAssetAssistant.Core.Assets.csproj", "{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Activities", "Core\Portiforce.SimpleAssetAssistant.Core.Activities\Portiforce.SimpleAssetAssistant.Core.Activities.csproj", "{D08DB0AB-846F-4A43-AB1B-4D0128051501}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{2FC42C76-6BA7-4006-946D-400D1A11B647}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Presentation.WebApi", "Presentation\Portiforce.SimpleAssetAssistant.Presentation.WebApi\Portiforce.SimpleAssetAssistant.Presentation.WebApi.csproj", "{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core", "Core\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj", "{DE17966E-D143-4E97-820A-33131934AD52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projections", "Projections", "{6E31B63C-4567-4993-B7CE-536BA29E276C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Projections.Core", "Projections\Portiforce.SimpleAssetAssistant.Projections.Core\Portiforce.SimpleAssetAssistant.Projections.Core.csproj", "{7A42093C-AE03-41D7-AAD3-5FE655146768}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{A11A108D-FB20-4BDA-BA01-A466DA27CE09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.csproj", "{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.Persistence", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.Persistence\Portiforce.SimpleAssetAssistant.Infrastructure.Persistence.csproj", "{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.Identity", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.Identity\Portiforce.SimpleAssetAssistant.Infrastructure.Identity.csproj", "{31C583C8-67A1-42BD-B4CE-A03422AF9B47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Application", "Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj", "{89855405-B39D-C740-EEA1-837E5ABF3FAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D08DB0AB-846F-4A43-AB1B-4D0128051501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D08DB0AB-846F-4A43-AB1B-4D0128051501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D08DB0AB-846F-4A43-AB1B-4D0128051501}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D08DB0AB-846F-4A43-AB1B-4D0128051501}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE17966E-D143-4E97-820A-33131934AD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE17966E-D143-4E97-820A-33131934AD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE17966E-D143-4E97-820A-33131934AD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE17966E-D143-4E97-820A-33131934AD52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
+		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
+		{D08DB0AB-846F-4A43-AB1B-4D0128051501} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687} = {2FC42C76-6BA7-4006-946D-400D1A11B647}
+		{DE17966E-D143-4E97-820A-33131934AD52} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
+		{7A42093C-AE03-41D7-AAD3-5FE655146768} = {6E31B63C-4567-4993-B7CE-536BA29E276C}
+		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
+		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
+		{31C583C8-67A1-42BD-B4CE-A03422AF9B47} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
+		{89855405-B39D-C740-EEA1-837E5ABF3FAD} = {A11A108D-FB20-4BDA-BA01-A466DA27CE09}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="UseCases\Client\NewFolder\**" />
+    <Compile Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Client\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <None Remove="UseCases\Client\NewFolder\**" />
+    <None Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entitlements\Guards\" />
+    <Folder Include="UseCases\Client\Tenant\Actions\Responses\" />
+    <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
+    <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />
+    <Folder Include="UseCases\Profile\Account\Actions\Commands\" />
+    <Folder Include="UseCases\Profile\Account\Actions\Queries\" />
+    <Folder Include="UseCases\Profile\Account\Actions\Responses\" />
+    <Folder Include="UseCases\Profile\Account\Handlers\Commands\" />
+    <Folder Include="UseCases\Profile\Account\Handlers\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Portiforce.SimpleAssetAssistant.Core.Activities\Portiforce.SimpleAssetAssistant.Core.Activities.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SimpleAssetAssistant.Core.Assets\Portiforce.SimpleAssetAssistant.Core.Assets.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SimpleAssetAssistant.Core.Identity\Portiforce.SimpleAssetAssistant.Core.Identity.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj" />
+  </ItemGroup>
+
+</Project>

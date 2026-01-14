@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portiforce.SimpleAssetAssistant.Core.Assets\Portiforce.SimpleAssetAssistant.Core.Assets.csproj" />
+    <ProjectReference Include="..\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
+</Project>
