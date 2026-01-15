@@ -4,8 +4,8 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Commands;
 
-public sealed record CreateTenantCommand(
-	string Name,
-	string AdminEmail,
-	string Plan
-) : ICommand<BaseCreateCommandResponse<TenantId>>;
+public sealed record UpdateTenantSettingsCommand(
+	TenantId Id,
+	string DefaultCurrency,
+	bool EnforceTwoFactor
+) : ICommand<BaseCommandResponse>;

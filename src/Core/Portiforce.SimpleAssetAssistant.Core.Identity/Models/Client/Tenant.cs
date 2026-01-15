@@ -1,19 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client;
 
-public sealed class Tenant : IEntity<TenantId>, IAggregateRoot
+public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 {
 	private Tenant(
 		TenantId id,
 		string name,
 		TenantState state,
 		TenantPlan tenantPlan,
-		TenantSettings settings)
+		TenantSettings settings) :base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -22,23 +23,23 @@ public sealed class Tenant : IEntity<TenantId>, IAggregateRoot
 
 		name = NormalizeAndValidateTenantName(name);
 
-		Id = id;
 		Name = name;
 		State = state;
 		Plan = tenantPlan;
 		Settings = settings ?? throw new ValidationException("TenantSettings is required.");
 	}
 
-	public TenantId Id { get; }
 	public string Name { get; private set; }
 	public TenantState State { get; private set; }
 	public TenantSettings Settings { get; private set; }
 	public TenantPlan Plan { get; private set; } = TenantPlan.Demo;
 
+	private readonly HashSet<AssetId> _restrictedAssets = new();
+
 	/// <summary>
 	/// Company/tenant related country specific list of restricted assets
 	/// </summary>
-	public HashSet<AssetId> RestrictedAssets {get; private set; }
+	public IReadOnlySet<AssetId> RestrictedAssets => _restrictedAssets;
 
 	public static Tenant Create(
 		string name,
@@ -86,18 +87,18 @@ public sealed class Tenant : IEntity<TenantId>, IAggregateRoot
 		Plan = plan;
 	}
 
-	public bool UpdateRestrictedAssetList(AssetId assetId, bool isRestricted)
+	public void UpdateRestrictedAssetList(AssetId assetId, bool isRestricted)
 	{
 		EnsureEditable();
 
 		// todo : consider RestrictionAction enum instead of bool (if necessary)
 		if (isRestricted)
 		{
-			return RestrictedAssets.Add(assetId);
+			_restrictedAssets.Add(assetId);
 		}
 		else
 		{
-			return RestrictedAssets.Remove(assetId);
+			_restrictedAssets.Remove(assetId);
 		}
 	}
 

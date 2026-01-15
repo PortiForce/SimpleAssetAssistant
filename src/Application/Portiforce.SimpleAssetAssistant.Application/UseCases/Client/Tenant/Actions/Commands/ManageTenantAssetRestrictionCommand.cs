@@ -1,5 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Enums;
-using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
@@ -8,5 +7,5 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Act
 public sealed record ManageTenantAssetRestrictionCommand(
 	TenantId TenantId,
 	AssetId AssetId,
-	RestrictionAction Action
+	bool  IsRestricted
 ) : ICommand<BaseCommandResponse>;

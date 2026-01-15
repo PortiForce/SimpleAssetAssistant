@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
 
-public sealed class ExternalIdentity
+public sealed class ExternalIdentity : Entity<Guid>
 {
 	private ExternalIdentity(
 		Guid id,

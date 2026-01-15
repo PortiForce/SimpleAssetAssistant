@@ -1,5 +1,9 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Queries;
+﻿using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
+using Portiforce.SimpleAssetAssistant.Application.Models.DTOs.Client.Tenant;
+using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 
-internal class GetTenantListRequest
-{
-}
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Queries;
+
+public sealed record GetTenantListRequest(PageRequest PageRequest)
+	: IQuery<PagedResult<TenantListItemDto>>;
+
