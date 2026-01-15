@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record ServiceActivity : ReasonedActivity
+public sealed record ServiceActivity(ActivityId Id) : ReasonedActivity(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Service;
 
@@ -18,7 +18,8 @@ public sealed record ServiceActivity : ReasonedActivity
 		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
 		ExternalMetadata externalMetadata,
-		ServiceType serviceType = ServiceType.Custody)
+		ServiceType serviceType = ServiceType.Custody,
+		ActivityId? id = null)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Service, reason);
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
@@ -27,7 +28,7 @@ public sealed record ServiceActivity : ReasonedActivity
 		LegGuards.EnsureFeeLegsAreValid(legs);
 		LegGuards.EnsureOneSidedOutflow(legs);
 
-		return new ServiceActivity
+		return new ServiceActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
 			PlatformAccountId = platformAccountId,

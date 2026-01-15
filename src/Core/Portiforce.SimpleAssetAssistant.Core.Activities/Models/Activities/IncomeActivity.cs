@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record IncomeActivity : ReasonedActivity
+public sealed record IncomeActivity(ActivityId Id) : ReasonedActivity(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Income;
 
@@ -15,7 +15,8 @@ public sealed record IncomeActivity : ReasonedActivity
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata,
+		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Income, reason);
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
@@ -24,7 +25,7 @@ public sealed record IncomeActivity : ReasonedActivity
 		LegGuards.EnsureFeeLegsAreValid(legs);
 		LegGuards.EnsureOneSidedInflow(legs);
 
-		return new IncomeActivity
+		return new IncomeActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
 			PlatformAccountId = platformAccountId,

@@ -7,7 +7,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record TradeActivity : ExecutableActivity
+public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Trade;
 
@@ -29,7 +29,8 @@ public sealed record TradeActivity : ExecutableActivity
 		TradeExecutionType executionType,
 		IReadOnlyList<AssetMovementLeg> legs,
 		FuturesDescriptor? futures,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata,
+		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Trade, reason);
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
@@ -52,8 +53,8 @@ public sealed record TradeActivity : ExecutableActivity
 
 		}
 
-		return new TradeActivity
-			{
+		return new TradeActivity(id ?? ActivityId.New())
+		{
 				TenantId = tenantId,
 				PlatformAccountId = platformAccountId,
 				OccurredAt = occurredAt,

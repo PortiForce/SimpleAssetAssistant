@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record TransferActivity : AssetActivityBase
+public sealed record TransferActivity(ActivityId Id) : AssetActivityBase(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Transfer;
 
@@ -24,7 +24,8 @@ public sealed record TransferActivity : AssetActivityBase
 		IReadOnlyList<AssetMovementLeg> legs,
 		string? reference,
 		string? counterparty,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata,
+		ActivityId? id)
 	{
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
@@ -32,7 +33,7 @@ public sealed record TransferActivity : AssetActivityBase
 		LegGuards.EnsureFeeLegsAreValid(legs);
 		LegGuards.EnsureTransferShape(direction, legs);
 		
-		return new TransferActivity
+		return new TransferActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
 			PlatformAccountId = platformAccountId,
