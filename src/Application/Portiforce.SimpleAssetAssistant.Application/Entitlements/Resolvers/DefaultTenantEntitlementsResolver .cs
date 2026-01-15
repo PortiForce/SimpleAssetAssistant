@@ -1,5 +1,5 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Contracts.Resolvers;
-using Portiforce.SimpleAssetAssistant.Application.Entitlements;
+﻿using Portiforce.SimpleAssetAssistant.Application.Entitlements;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Entitlements.Resolvers;

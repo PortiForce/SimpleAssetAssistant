@@ -5,7 +5,7 @@ VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Identity", "Core\Portiforce.SimpleAssetAssistant.Core.Identity\Portiforce.SimpleAssetAssistant.Core.Identity.csproj", "{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Core", "01 - Core", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Assets", "Core\Portiforce.SimpleAssetAssistant.Core.Assets\Portiforce.SimpleAssetAssistant.Core.Assets.csproj", "{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}"
 EndProject
@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projections", "Projections"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Projections.Core", "Projections\Portiforce.SimpleAssetAssistant.Projections.Core\Portiforce.SimpleAssetAssistant.Projections.Core.csproj", "{7A42093C-AE03-41D7-AAD3-5FE655146768}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{A11A108D-FB20-4BDA-BA01-A466DA27CE09}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Application", "02 - Application", "{A11A108D-FB20-4BDA-BA01-A466DA27CE09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.csproj", "{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}"
 EndProject

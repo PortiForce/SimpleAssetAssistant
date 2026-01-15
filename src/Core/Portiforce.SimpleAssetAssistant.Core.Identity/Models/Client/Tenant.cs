@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client;
 
-public sealed class Tenant
+public sealed class Tenant : IEntity<TenantId>, IAggregateRoot
 {
 	private Tenant(
 		TenantId id,
@@ -34,6 +34,11 @@ public sealed class Tenant
 	public TenantState State { get; private set; }
 	public TenantSettings Settings { get; private set; }
 	public TenantPlan Plan { get; private set; } = TenantPlan.Demo;
+
+	/// <summary>
+	/// Company/tenant related country specific list of restricted assets
+	/// </summary>
+	public HashSet<AssetId> RestrictedAssets {get; private set; }
 
 	public static Tenant Create(
 		string name,
@@ -79,6 +84,21 @@ public sealed class Tenant
 		EnsureEditable();
 
 		Plan = plan;
+	}
+
+	public bool UpdateRestrictedAssetList(AssetId assetId, bool isRestricted)
+	{
+		EnsureEditable();
+
+		// todo : consider RestrictionAction enum instead of bool (if necessary)
+		if (isRestricted)
+		{
+			return RestrictedAssets.Add(assetId);
+		}
+		else
+		{
+			return RestrictedAssets.Remove(assetId);
+		}
 	}
 
 	private void EnsureEditable()

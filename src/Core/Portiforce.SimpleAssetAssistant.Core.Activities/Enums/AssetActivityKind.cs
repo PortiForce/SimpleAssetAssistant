@@ -7,5 +7,10 @@ public enum AssetActivityKind : byte
 	Transfer = 3,
 	Income = 4,
 	Burn = 5,
-	Service = 6
+	Service = 6,
+
+	/// <summary>
+	/// custom user correction of asset data
+	/// </summary>
+	UserCorrection = 7
 }

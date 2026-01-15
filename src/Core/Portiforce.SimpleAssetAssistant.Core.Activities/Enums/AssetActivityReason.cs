@@ -14,5 +14,7 @@ public enum AssetActivityReason : byte
 
 	ServiceFee = 40,
 
-	Burn = 50
+	Burn = 50,
+
+	UserCorrectionWrongData = 60
 }

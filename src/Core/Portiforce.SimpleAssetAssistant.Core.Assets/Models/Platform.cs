@@ -2,19 +2,21 @@
 
 using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Assets.Models;
 
-public sealed class Platform
+public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 {
 	private Platform(
 		PlatformId id,
 		string name,
 		string code,
 		PlatformKind kind,
-		PlatformState state)
+		PlatformState state): base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -31,14 +33,12 @@ public sealed class Platform
 			throw new ValidationException("Platform Code is required.");
 		}
 
-		Id = id;
 		Name = name.Trim();
 		Code = code.Trim();
 		Kind = kind;
 		State = state;
 	}
-
-	public PlatformId Id { get; }
+	
 	public string Name { get; private set; }
 	public string Code { get; private set; }
 	public PlatformKind Kind { get; }

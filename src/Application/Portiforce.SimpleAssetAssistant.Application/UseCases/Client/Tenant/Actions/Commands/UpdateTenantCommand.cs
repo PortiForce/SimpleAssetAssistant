@@ -1,5 +1,13 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Commands;
+﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
-internal class UpdateTenantCommand
-{
-}
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Commands;
+
+public sealed record UpdateTenantCommand(
+	TenantId Id,
+	string Email,
+	TenantPlan Plan, 
+	TenantState State
+) : ICommand<BaseModifyCommandResponse<TenantId>>;

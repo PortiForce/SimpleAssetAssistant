@@ -1,10 +1,11 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public abstract record AssetActivityBase
+public abstract record AssetActivityBase: IAggregateRoot
 {
 	public abstract AssetActivityKind Kind { get; }
 

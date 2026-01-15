@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
 
-public sealed class Account
+public sealed class Account : IEntity<AccountId>, IAggregateRoot
 {
 	private Account(
 		AccountId id,

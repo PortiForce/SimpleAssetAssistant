@@ -20,9 +20,10 @@ param(
     [string] $RootPath,
 
     # Logical category folders to scan under $RootPath
-    # Core model: [string[]] $CategoryFolders = @("Enums","Interfaces","Models","Primitives","Rules"),
+   	# Core model: 
+	[string[]] $CategoryFolders = @("Enums","Interfaces","Models","Primitives","Rules"),
 	# Application model:
-	[string[]] $CategoryFolders = @("Contracts","Entitlements","Tech","UseCases"),
+	# [string[]] $CategoryFolders = @("Interfaces","Entitlements", "Exceptions", "Models", "Responses", "Tech","UseCases"),
 
     # Output extension: txt, tzt, md, etc.
     [string] $OutExtension = "txt",
