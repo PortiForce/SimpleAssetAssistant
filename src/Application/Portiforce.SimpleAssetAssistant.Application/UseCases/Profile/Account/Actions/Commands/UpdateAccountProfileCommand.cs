@@ -1,0 +1,13 @@
+﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Actions.Commands;
+
+public sealed record UpdateAccountProfileCommand(
+	AccountId Id,
+	string Alias,
+	string? PhoneNumber,
+	string Locale,
+	string DefaultCurrency
+) : ICommand<BaseModifyCommandResponse<AccountId>>;

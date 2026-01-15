@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record ExchangeActivity : ExecutableActivity
+public sealed record ExchangeActivity(ActivityId Id) : ExecutableActivity(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Exchange;
 
@@ -18,7 +18,8 @@ public sealed record ExchangeActivity : ExecutableActivity
 		AssetActivityReason reason,
 		ExchangeType exchangeType,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata,
+		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Exchange, reason);
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
@@ -27,7 +28,7 @@ public sealed record ExchangeActivity : ExecutableActivity
 		LegGuards.EnsureFeeLegsAreValid(legs);
 		LegGuards.EnsureTradeOrExchangeShape(legs);
 
-		return new ExchangeActivity
+		return new ExchangeActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
 			PlatformAccountId = platformAccountId,

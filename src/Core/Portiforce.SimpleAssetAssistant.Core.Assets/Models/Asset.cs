@@ -2,13 +2,15 @@
 
 using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Assets.Models;
 
-public sealed class Asset
+public sealed class Asset : Entity<AssetId>, IAggregateRoot
 {
 	private readonly HashSet<AssetCode> _synonyms = new();
 
@@ -17,7 +19,7 @@ public sealed class Asset
 		AssetCode code,
 		AssetKind kind,
 		string? name,
-		byte nativeDecimals)
+		byte nativeDecimals) : base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -37,14 +39,12 @@ public sealed class Asset
 			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
 		}
 
-		Id = id;
 		Code = code;
 		Kind = kind;
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 		NativeDecimals = nativeDecimals;
 	}
 
-	public AssetId Id { get; }
 	public AssetCode Code { get; }
 	public AssetKind Kind { get; }
 

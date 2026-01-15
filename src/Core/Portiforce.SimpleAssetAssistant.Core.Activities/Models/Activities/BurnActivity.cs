@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record BurnActivity : ReasonedActivity
+public sealed record BurnActivity(ActivityId Id) : ReasonedActivity(Id)
 {
 	public override AssetActivityKind Kind => AssetActivityKind.Burn;
 
@@ -15,7 +15,8 @@ public sealed record BurnActivity : ReasonedActivity
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata,
+		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Burn, reason);
 		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
@@ -24,7 +25,7 @@ public sealed record BurnActivity : ReasonedActivity
 		LegGuards.EnsureFeeLegsAreValid(legs);
 		LegGuards.EnsureOneSidedOutflow(legs);
 
-		return new BurnActivity
+		return new BurnActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
 			PlatformAccountId = platformAccountId,

@@ -17,11 +17,21 @@
 
   <ItemGroup>
     <Folder Include="Entitlements\Guards\" />
+    <Folder Include="UseCases\Activity\Actions\Responses\" />
+    <Folder Include="UseCases\Activity\Handlers\Commands\" />
+    <Folder Include="UseCases\Activity\Handlers\Queries\" />
+    <Folder Include="UseCases\Asset\Actions\Responses\" />
+    <Folder Include="UseCases\Asset\Handlers\Commands\" />
+    <Folder Include="UseCases\Asset\Handlers\Queries\" />
     <Folder Include="UseCases\Client\Tenant\Actions\Responses\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />
-    <Folder Include="UseCases\Profile\Account\Actions\Commands\" />
-    <Folder Include="UseCases\Profile\Account\Actions\Queries\" />
+    <Folder Include="UseCases\PlatformAccount\Actions\Responses\" />
+    <Folder Include="UseCases\PlatformAccount\Handlers\Commands\" />
+    <Folder Include="UseCases\PlatformAccount\Handlers\Queries\" />
+    <Folder Include="UseCases\Platform\Actions\Responses\" />
+    <Folder Include="UseCases\Platform\Handlers\Commands\" />
+    <Folder Include="UseCases\Platform\Handlers\Queries\" />
     <Folder Include="UseCases\Profile\Account\Actions\Responses\" />
     <Folder Include="UseCases\Profile\Account\Handlers\Commands\" />
     <Folder Include="UseCases\Profile\Account\Handlers\Queries\" />

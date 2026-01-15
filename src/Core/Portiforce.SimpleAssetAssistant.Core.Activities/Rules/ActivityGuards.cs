@@ -24,6 +24,8 @@ public static class ActivityGuards
 
 			AssetActivityKind.Burn => reason is AssetActivityReason.Burn,
 
+			AssetActivityKind.UserCorrection => reason is AssetActivityReason.UserCorrectionWrongData,
+
 			// Transfer is not a ReasonedActivity in your current model.
 			AssetActivityKind.Transfer => false,
 

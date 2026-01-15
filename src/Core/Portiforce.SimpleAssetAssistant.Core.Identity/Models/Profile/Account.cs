@@ -1,12 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Interfaces;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
 
-public sealed class Account
+public sealed class Account : Entity<AccountId>, IAggregateRoot
 {
 	private Account(
 		AccountId id,
@@ -16,7 +18,7 @@ public sealed class Account
 		AccountState state,
 		AccountTier tier,
 		ContactInfo? contact,
-		AccountSettings settings)
+		AccountSettings settings): base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -30,7 +32,6 @@ public sealed class Account
 
 		alias = NormalizeAndValidateAlias(alias);
 
-		Id = id;
 		TenantId = tenantId;
 		Alias = alias;
 
@@ -42,7 +43,6 @@ public sealed class Account
 		Settings = settings ?? throw new ValidationException("AccountSettings is required.");
 	}
 
-	public AccountId Id { get; }
 	public TenantId TenantId { get; }
 	public string Alias { get; }
 

@@ -1,6 +1,6 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
-namespace Portiforce.SimpleAssetAssistant.Application.Contracts.Guards;
+namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Guards;
 
 public interface IQuotaGuard
 {
