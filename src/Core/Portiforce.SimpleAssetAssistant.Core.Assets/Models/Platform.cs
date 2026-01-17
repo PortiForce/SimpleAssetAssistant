@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
-using Portiforce.SimpleAssetAssistant.Core.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -20,17 +18,17 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 	{
 		if (id.IsEmpty)
 		{
-			throw new ValidationException("PlatformId must be defined.");
+			throw new DomainValidationException("PlatformId must be defined.");
 		}
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("Platform Name is required.");
+			throw new DomainValidationException("Platform Name is required.");
 		}
 
 		if (string.IsNullOrWhiteSpace(code))
 		{
-			throw new ValidationException("Platform Code is required.");
+			throw new DomainValidationException("Platform Code is required.");
 		}
 
 		Name = name.Trim();
@@ -49,9 +47,9 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 		string code,
 		PlatformKind kind,
 		PlatformState state = PlatformState.Active,
-		PlatformId? id = null)
+		PlatformId id = default)
 		=> new(
-			id is { IsEmpty: false } ? id.Value : PlatformId.New(),
+			id.IsEmpty ? PlatformId.New() : id,
 			name,
 			code,
 			kind,
@@ -63,7 +61,7 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("Platform Name is required.");
+			throw new DomainValidationException("Platform Name is required.");
 		}
 
 		if (name.Trim().Length > LimitationRules.Lengths.NameMaxLength)
@@ -83,7 +81,7 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 	{
 		if (IsReadonly())
 		{
-			throw new ValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
+			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
 		}
 	}
 

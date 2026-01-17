@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Futures;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
@@ -25,7 +25,7 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 		PlatformAccountId platformAccountId,
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
-		MarketKind kind,
+		MarketKind marketKind,
 		TradeExecutionType executionType,
 		IReadOnlyList<AssetMovementLeg> legs,
 		FuturesDescriptor? futures,
@@ -33,23 +33,21 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Trade, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureTradeOrExchangeShape(legs);
 
-		if (kind == MarketKind.Futures)
+		if (marketKind == MarketKind.Futures)
 		{
-			LegGuards.EnsureFuturesAllocation(kind, legs);
+			LegGuards.EnsureFuturesAllocation(marketKind, legs);
 			if (futures is null)
 			{
-				throw new ValidationException("Futures models should not be empty for Futures trade");
+				throw new DomainValidationException("Futures models should not be empty for Futures trade");
 			}
 		}
-		else if (kind == MarketKind.Spot && futures is not null)
+		else if (marketKind == MarketKind.Spot && futures is not null)
 		{
-			throw new ValidationException("Futures models should be null for Spot trade");
+			throw new DomainValidationException("Futures models should be null for Spot trade");
 
 		}
 
@@ -58,7 +56,7 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 				TenantId = tenantId,
 				PlatformAccountId = platformAccountId,
 				OccurredAt = occurredAt,
-				MarketKind = kind,
+				MarketKind = marketKind,
 				ExecutionType = executionType,
 				Reason = reason,
 				Legs = legs,

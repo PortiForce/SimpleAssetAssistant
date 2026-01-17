@@ -16,7 +16,9 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 		Id = id;
 	}
 
-	// Required for EF Core or serialization where constructor might be bypassed
+	/// <summary>
+	///  For serializers / tooling. Domain invariants enforced by factories/methods.
+	/// </summary>
 	protected Entity() { }
 
 	public override bool Equals(object? obj)
@@ -61,7 +63,11 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 
 	public override int GetHashCode()
 	{
-		// ReSharper disable once NonReadonlyMemberInGetHashCode
+		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		{
+			return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+		}
+
 		return EqualityComparer<TId>.Default.GetHashCode(Id);
 	}
 

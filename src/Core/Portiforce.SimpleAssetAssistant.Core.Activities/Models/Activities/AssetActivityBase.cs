@@ -6,7 +6,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public abstract record AssetActivityBase(ActivityId Id) : EntityRecord<ActivityId>(Id), IAggregateRoot
+public abstract record AssetActivityBase(ActivityId Id) : FactRecord<ActivityId>(Id), IAggregateRoot
 {
 	public abstract AssetActivityKind Kind { get; }
 

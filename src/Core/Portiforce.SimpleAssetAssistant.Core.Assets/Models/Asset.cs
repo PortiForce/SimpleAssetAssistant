@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
@@ -23,15 +22,15 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		if (id.IsEmpty)
 		{
-			throw new ValidationException("AssetId must be defined.");
+			throw new DomainValidationException("AssetId must be defined.");
 		}
 		if (string.IsNullOrWhiteSpace(code.Value))
 		{
-			throw new ValidationException("AssetCode must be defined."); 
+			throw new DomainValidationException("AssetCode must be defined.");
 		}
 		if (nativeDecimals > 18)
 		{
-			throw new ValidationException("NativeDecimals must be <= 18.");
+			throw new DomainValidationException("NativeDecimals must be <= 18.");
 		}
 
 		if (name is {Length: > LimitationRules.Lengths.NameMaxLength})
@@ -60,9 +59,9 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		AssetKind kind,
 		string? name = null,
 		byte nativeDecimals = 4,
-		AssetId? id = null)
+		AssetId id = default)
 		=> new(
-			id is { IsEmpty: false } ? id.Value : AssetId.New(),
+			id.IsEmpty ? AssetId.New() : id,
 			code,
 			kind,
 			name,
@@ -112,7 +111,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		if (IsReadonly())
 		{
-			throw new ValidationException($"It is not possible to update Readonly entity, state: {EntityState}, id: {Id}");
+			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {EntityState}, id: {Id}");
 		}
 	}
 

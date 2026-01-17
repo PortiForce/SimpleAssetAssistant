@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
@@ -22,12 +21,12 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 	{
 		if (id.IsEmpty)
 		{
-			throw new ValidationException("AccountId must be defined.");
+			throw new DomainValidationException("AccountId must be defined.");
 		}
 
 		if (tenantId.IsEmpty)
 		{
-			throw new ValidationException("TenantId must be defined.");
+			throw new DomainValidationException("TenantId must be defined.");
 		}
 
 		alias = NormalizeAndValidateAlias(alias);
@@ -40,7 +39,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Tier = tier;
 
 		Contact = contact;
-		Settings = settings ?? throw new ValidationException("AccountSettings is required.");
+		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
 	public TenantId TenantId { get; }
@@ -61,12 +60,12 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		AccountTier tier = AccountTier.Demo,
 		ContactInfo? contact = null,
 		AccountSettings? settings = null,
-		AccountId? id = null)
+		AccountId id = default)
 	{
 		settings ??= AccountSettings.Default();
 
 		return new Account(
-			id is {IsEmpty: false} ? id.Value : AccountId.New(),
+			id.IsEmpty ? AccountId.New() : id,
 			tenantId,
 			alias,
 			role,
@@ -109,14 +108,14 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 	public void UpdateSettings(AccountSettings settings)
 	{
 		EnsureEditable();
-		Settings = settings ?? throw new ValidationException("AccountSettings is required.");
+		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
 	private void EnsureEditable()
 	{
 		if (State is AccountState.Disabled or AccountState.Deleted)
 		{
-			throw new ValidationException($"Account is not editable in state: {State}. AccountId: {Id}");
+			throw new DomainValidationException($"Account is not editable in state: {State}. AccountId: {Id}");
 		}
 	}
 
@@ -124,7 +123,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 	{
 		if (string.IsNullOrWhiteSpace(alias))
 		{
-			throw new ValidationException("Alias is required.");
+			throw new DomainValidationException("Alias is required.");
 		}
 
 		alias = alias.Trim().ToLowerInvariant();
@@ -134,14 +133,14 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 
 		if (alias.Length < min || alias.Length > max)
 		{
-			throw new ValidationException($"Alias must be {min}..{max} characters.");
+			throw new DomainValidationException($"Alias must be {min}..{max} characters.");
 		}
 
 		foreach (char c in alias)
 		{
 			if (!char.IsLetterOrDigit(c) && c is not '_' and not '-')
 			{
-				throw new ValidationException("Alias can only contain letters, digits, '_' and '-'.");
+				throw new DomainValidationException("Alias can only contain letters, digits, '_' and '-'.");
 			}
 		}
 

@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -22,27 +21,27 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 	{
 		if (id.IsEmpty)
 		{
-			throw new ValidationException("PlatformAccountId must be defined.");
+			throw new DomainValidationException("PlatformAccountId must be defined.");
 		}
 
 		if (tenantId.IsEmpty)
 		{
-			throw new ValidationException("TenantId must be defined.");
+			throw new DomainValidationException("TenantId must be defined.");
 		}
 
 		if (accountId.IsEmpty)
 		{
-			throw new ValidationException("AccountId must be defined.");
+			throw new DomainValidationException("AccountId must be defined.");
 		}
 
 		if (platformId.IsEmpty)
 		{
-			throw new ValidationException("PlatformId must be defined.");
+			throw new DomainValidationException("PlatformId must be defined.");
 		}
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("PlatformAccount Name is required.");
+			throw new DomainValidationException("PlatformAccount Name is required.");
 		}
 		name = name.Trim();
 
@@ -81,9 +80,9 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		PlatformAccountState state = PlatformAccountState.Active,
 		string? externalAccountId = null,
 		string? externalUserId = null,
-		PlatformAccountId? id = null)
+		PlatformAccountId id = default)
 		=> new(
-			id is { IsEmpty: false } ? id.Value : PlatformAccountId.New(),
+			id.IsEmpty ? PlatformAccountId.New() : id,
 			tenantId,
 			accountId,
 			platformId,
@@ -98,7 +97,7 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("PlatformAccount Name is required.");
+			throw new DomainValidationException("PlatformAccount Name is required.");
 		}
 
 		name = name.Trim();
@@ -130,7 +129,7 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 	{
 		if (State is PlatformAccountState.ReadOnly or PlatformAccountState.PendingDeletion or PlatformAccountState.Deleted)
 		{
-			throw new ValidationException($"It is not possible to update readonly entity, state: {State}, id: {Id}");
+			throw new DomainValidationException($"It is not possible to update readonly entity, state: {State}, id: {Id}");
 		}
 	}
 }

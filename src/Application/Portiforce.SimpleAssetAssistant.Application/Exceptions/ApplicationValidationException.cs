@@ -2,11 +2,11 @@
 
 namespace Portiforce.SimpleAssetAssistant.Application.Exceptions
 {
-	public class ValidationException : Exception
+	public class ApplicationValidationException : Exception
 	{
 		public List<string> Errors { get; set; } = [];
 
-		public ValidationException(ValidationResult validationResult)
+		public ApplicationValidationException(ValidationResult validationResult)
 		{
 			//foreach (var validationResultError in validationResult.Errors)
 			//{

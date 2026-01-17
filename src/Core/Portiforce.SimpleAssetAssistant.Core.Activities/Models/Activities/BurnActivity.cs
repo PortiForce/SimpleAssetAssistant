@@ -19,10 +19,8 @@ public sealed record BurnActivity(ActivityId Id) : ReasonedActivity(Id)
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Burn, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureOneSidedOutflow(legs);
 
 		return new BurnActivity(id ?? ActivityId.New())

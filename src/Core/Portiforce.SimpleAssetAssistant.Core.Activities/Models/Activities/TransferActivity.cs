@@ -27,12 +27,9 @@ public sealed record TransferActivity(ActivityId Id) : AssetActivityBase(Id)
 		ExternalMetadata externalMetadata,
 		ActivityId? id)
 	{
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
-
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureTransferShape(direction, legs);
-		
+
 		return new TransferActivity(id ?? ActivityId.New())
 		{
 			TenantId = tenantId,
