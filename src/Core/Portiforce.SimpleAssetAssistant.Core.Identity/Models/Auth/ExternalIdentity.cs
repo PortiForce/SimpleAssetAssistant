@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -6,35 +6,33 @@ using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
 
-public sealed class ExternalIdentity : Entity<Guid>
+public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 {
 	private ExternalIdentity(
-		Guid id,
+		ExternalIdentityId id,
 		AccountId accountId,
 		AuthProvider provider,
 		string providerSubject,
-		bool isPrimary)
+		bool isPrimary) : base(id)
 	{
-		if (id == Guid.Empty)
+		if (id.IsEmpty)
 		{
-			throw new ValidationException("ExternalIdentity.Id must be defined.");
+			throw new DomainValidationException("ExternalIdentity.Id must be defined.");
 		}
 
 		if (accountId.IsEmpty)
 		{
-			throw new ValidationException("AccountId must be defined.");
+			throw new DomainValidationException("AccountId must be defined.");
 		}
 
 		string providerSubjectValue = NormalizeAndValidateProviderSubject(providerSubject);
 
-		Id = id;
 		AccountId = accountId;
 		Provider = provider;
 		ProviderSubject = providerSubjectValue;
 		IsPrimary = isPrimary;
 	}
 
-	public Guid Id { get; }
 	public AccountId AccountId { get; }
 	public AuthProvider Provider { get; }
 	public string ProviderSubject { get; }
@@ -46,9 +44,9 @@ public sealed class ExternalIdentity : Entity<Guid>
 		AuthProvider provider,
 		string providerSubject,
 		bool isPrimary = false,
-		Guid? id = null)
+		ExternalIdentityId id = default)
 		=> new(
-			id ?? Guid.CreateVersion7(),
+			id.IsEmpty ? ExternalIdentityId.New() : id,
 			accountId,
 			provider,
 			providerSubject,
@@ -61,13 +59,13 @@ public sealed class ExternalIdentity : Entity<Guid>
 	{
 		if (string.IsNullOrWhiteSpace(providerSubject))
 		{
-			throw new ValidationException("ProviderSubject is required.");
+			throw new DomainValidationException("ProviderSubject is required.");
 		}
 
 		// Google 'sub' is short, passkey subjects can vary
 		if (providerSubject.Length > LimitationRules.Lengths.ProviderSubjectMaxLength)
 		{
-			throw new ValidationException($"ProviderSubject is too long (max {LimitationRules.Lengths.ProviderSubjectMaxLength}).");
+			throw new DomainValidationException($"ProviderSubject is too long (max {LimitationRules.Lengths.ProviderSubjectMaxLength}).");
 		}
 
 		return providerSubject.Trim();

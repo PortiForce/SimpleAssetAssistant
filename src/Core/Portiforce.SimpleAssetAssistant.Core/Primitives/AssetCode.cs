@@ -1,4 +1,6 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
+﻿using Portiforce.SimpleAssetAssistant.Core.StaticResources;
+
+namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
 public readonly record struct AssetCode
 {
@@ -34,9 +36,9 @@ public readonly record struct AssetCode
 	private static bool IsValid(string code)
 	{
 		// Pragmatic rules:
-		// - 2–10 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
+		// - 2–16 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
 		// - Allow letters, digits, dot, dash
-		if (code.Length < 2 || code.Length > 10)
+		if (code.Length < LimitationRules.Lengths.Asset.CodeMinLength || code.Length > LimitationRules.Lengths.Asset.CodeMaxLength)
 		{
 			return false;
 		}

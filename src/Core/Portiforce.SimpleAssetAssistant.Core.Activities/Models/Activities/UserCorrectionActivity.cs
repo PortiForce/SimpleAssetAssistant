@@ -19,11 +19,8 @@ public sealed record UserCorrectionActivity(ActivityId Id) : ReasonedActivity(Id
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.UserCorrection, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
-		LegGuards.EnsureOneSidedOutflow(legs);
+		LegGuards.EnforceCommonRules(legs);
 
 		return new UserCorrectionActivity(id ?? ActivityId.New())
 		{

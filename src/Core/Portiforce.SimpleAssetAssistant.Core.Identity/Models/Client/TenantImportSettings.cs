@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client;
@@ -19,7 +19,7 @@ public sealed record TenantImportSettings
 
 		if (maxFileSizeMb > LimitationRules.Lengths.Tenant.MaxFileSizeMb)
 		{
-			throw new ValidationException(
+			throw new DomainValidationException(
 				$"Max file size for upload is limited to {LimitationRules.Lengths.Tenant.MaxFileSizeMb} mb");
 		}
 

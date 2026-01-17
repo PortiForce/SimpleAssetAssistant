@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
@@ -18,7 +18,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 	{
 		if (id.IsEmpty)
 		{
-			throw new ValidationException("TenantId must be defined.");
+			throw new DomainValidationException("TenantId must be defined.");
 		}
 
 		name = NormalizeAndValidateTenantName(name);
@@ -26,7 +26,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		Name = name;
 		State = state;
 		Plan = tenantPlan;
-		Settings = settings ?? throw new ValidationException("TenantSettings is required.");
+		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
 	}
 
 	public string Name { get; private set; }
@@ -46,9 +46,9 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		TenantSettings? settings = null,
 		TenantState state = TenantState.Provisioning,
 		TenantPlan plan = TenantPlan.Demo,
-		TenantId? id = null)
+		TenantId id = default)
 		=> new(
-			id is { IsEmpty: false } ? id.Value : TenantId.New(),
+			id.IsEmpty ? TenantId.New() : id,
 			name,
 			state,
 			plan,
@@ -60,13 +60,13 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("Tenant name is required.");
+			throw new DomainValidationException("Tenant name is required.");
 		}
 
 		name = name.Trim();
 		if (name.Length is < 2 or > 100)
 		{
-			throw new ValidationException("Tenant name must be 2..100 characters.");
+			throw new DomainValidationException("Tenant name must be 2..100 characters.");
 		}
 
 		Name = name;
@@ -106,7 +106,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 	{
 		if (State is TenantState.Deleted)
 		{
-			throw new ValidationException($"Tenant is deleted and cannot be changed. TenantId: {Id}");
+			throw new DomainValidationException($"Tenant is deleted and cannot be changed. TenantId: {Id}");
 		}
 	}
 
@@ -114,7 +114,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 	{
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			throw new ValidationException("Tenant name is required.");
+			throw new DomainValidationException("Tenant name is required.");
 		}
 
 		int min = LimitationRules.Lengths.Tenant.MinNameLength;
@@ -123,7 +123,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		name = name.Trim();
 		if (name.Length < min || name.Length > max)
 		{
-			throw new ValidationException($"Tenant name must be {min}..{max} characters.");
+			throw new DomainValidationException($"Tenant name must be {min}..{max} characters.");
 		}
 
 		return name;

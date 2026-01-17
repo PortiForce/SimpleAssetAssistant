@@ -15,9 +15,8 @@ public static class LimitationRules
 
 		public static class Asset
 		{
-			public const int DescriptionMaxLength = 500;
-			public const int CodeMaxLength = 12;
-			public const int SynonymMaxLength = 12;
+			public const int CodeMinLength = 2;
+			public const int CodeMaxLength = 16;
 		}
 
 		public static class Tenant

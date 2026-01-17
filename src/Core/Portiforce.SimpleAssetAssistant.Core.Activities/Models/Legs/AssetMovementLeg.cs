@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
@@ -29,17 +29,17 @@ public sealed record AssetMovementLeg
 	{
 		if (amount == Quantity.Zero)
 		{
-			throw new ValidationException("Amount should be a positive value for a leg");
+			throw new DomainValidationException("Amount should be a positive value for a leg");
 		}
 
 		if (assetId.IsEmpty)
 		{
-			throw new ValidationException("AssetId should be defined value for a leg");
+			throw new DomainValidationException("AssetId should be defined value for a leg");
 		}
 
 		if (role == MovementRole.Fee && direction != MovementDirection.Outflow)
 		{
-			throw new ValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
+			throw new DomainValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
 		}
 
 		var leg = new AssetMovementLeg

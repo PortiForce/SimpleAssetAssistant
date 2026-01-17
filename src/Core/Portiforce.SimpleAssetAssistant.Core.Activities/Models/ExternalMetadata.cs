@@ -1,4 +1,6 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+
+namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models;
 
 public sealed record ExternalMetadata 
 {
@@ -8,6 +10,16 @@ public sealed record ExternalMetadata
 		string? fingerprint = null,
 		string? notes = null)
 	{
+		if (string.IsNullOrWhiteSpace(source))
+		{
+			throw new DomainValidationException("Source is required.");
+		}
+
+		if (string.IsNullOrWhiteSpace(externalId) && string.IsNullOrWhiteSpace(fingerprint))
+		{
+			throw new DomainValidationException("Either externalId or fingerprint are required.");
+		}
+
 		Source = source;
 		ExternalId = externalId;
 		Fingerprint = fingerprint;

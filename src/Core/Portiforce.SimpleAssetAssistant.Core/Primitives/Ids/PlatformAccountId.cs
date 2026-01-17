@@ -1,18 +1,49 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+﻿using Portiforce.SimpleAssetAssistant.Core.Extensions;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Internal;
+
+namespace Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 public readonly record struct PlatformAccountId(Guid Value)
 {
-	public static PlatformAccountId New() => new(Guid.CreateVersion7());
+	public static PlatformAccountId New() => new(GuidIdUtil.New());
 	public static PlatformAccountId Empty => new(Guid.Empty);
 	public static PlatformAccountId From(Guid value) => new(value);
+	public bool IsEmpty => Value == Guid.Empty;
+	public override string ToString() => GuidIdUtil.ToString(Value);
 
-	public static bool TryParse(string? raw, out PlatformAccountId id)
+	/// <summary>
+	/// Parse requires non-empty GUID to avoid silently accepting "00000000-..."
+	/// </summary>
+	/// <param name="raw">string to parse</param>
+	/// <returns>entity Identifier</returns>
+	/// <exception cref="FormatException">In case provided value is not recognized as not empty Guid</exception>
+	public static PlatformAccountId Parse(string raw)
 	{
-		id = Empty;
-		return Guid.TryParse(raw, out var g) && (id = From(g)) is var _;
+		if (Guid.TryParse(raw, out var g) && g != Guid.Empty)
+		{
+			return From(g);
+		}
+
+		throw new FormatException(
+			$"Value is not a valid non-empty {nameof(PlatformAccountId)} GUID. Input (truncated): '{raw.Truncate()}'");
 	}
 
-	public bool IsEmpty => Value == Guid.Empty;
+	/// <summary>
+	/// Attempts to parse the specified string representation of a platform account identifier.
+	/// </summary>
+	/// <param name="raw">The string to parse as a platform account  identifier. Can be null.</param>
+	/// <param name="id">When this method returns, contains the parsed <see cref="PlatformAccountId"/> value if the parse operation succeeded, or
+	/// <see cref="Empty"/> if it failed.</param>
+	/// <returns><see langword="true"/> if the string was successfully parsed; otherwise, <see langword="false"/>.</returns>
+	public static bool TryParse(string? raw, out PlatformAccountId id)
+	{
+		if (GuidIdUtil.TryParse(raw, out var g))
+		{
+			id = From(g);
+			return true;
+		}
 
-	public override string ToString() => Value.ToString();
+		id = Empty;
+		return false;
+	}
 }

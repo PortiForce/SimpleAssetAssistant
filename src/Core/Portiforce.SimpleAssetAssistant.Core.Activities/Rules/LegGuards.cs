@@ -1,19 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
-using Portiforce.SimpleAssetAssistant.Core.Primitives;
-using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 
 public static class LegGuards
 {
+	public static void EnforceCommonRules(IReadOnlyList<AssetMovementLeg> legs)
+	{
+		EnsureNotNullOrEmpty(legs);
+		EnsureFeeLegsAreValid(legs);
+		EnsureAllLegAmountsPositive(legs);
+	}
+
 	public static void EnsureNotNullOrEmpty(IReadOnlyList<AssetMovementLeg> legs)
 	{
 		if (legs is null || legs.Count == 0)
 		{
-			throw new ValidationException("Legs are required.");
+			throw new DomainValidationException("Legs are required.");
 		}
 	}
 
@@ -23,8 +27,16 @@ public static class LegGuards
 		{
 			if (fee.Direction != MovementDirection.Outflow)
 			{
-				throw new ValidationException("Fee legs must be Outflow.");
+				throw new DomainValidationException("Fee legs must be Outflow.");
 			}
+		}
+	}
+
+	public static void EnsureAllLegAmountsPositive(IReadOnlyList<AssetMovementLeg> legs)
+	{
+		if (legs.Any(l => l.Amount.Value <= 0m))
+		{
+			throw new DomainValidationException("All leg amounts must be > 0.");
 		}
 	}
 
@@ -33,13 +45,13 @@ public static class LegGuards
 		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count < 2)
 		{
-			throw new ValidationException("Trade/Exchange must contain at least 2 principal legs.");
+			throw new DomainValidationException("Trade/Exchange must contain at least 2 principal legs.");
 		}
 
 		if (principal.All(l => l.Direction != MovementDirection.Outflow) ||
 		    principal.All(l => l.Direction != MovementDirection.Inflow))
 		{
-			throw new ValidationException("Trade/Exchange must contain both Outflow and Inflow principal legs.");
+			throw new DomainValidationException("Trade/Exchange must contain both Outflow and Inflow principal legs.");
 		}
 			
 
@@ -48,7 +60,7 @@ public static class LegGuards
 		var inAssetIds = principal.Where(l => l.Direction == MovementDirection.Inflow).Select(l => l.AssetId).ToHashSet();
 		if (outAssetIds.Overlaps(inAssetIds))
 		{
-			throw new ValidationException("Trade/Exchange principal inflow and outflow assets must differ.");
+			throw new DomainValidationException("Trade/Exchange principal inflow and outflow assets must differ.");
 		}
 	}
 
@@ -69,7 +81,7 @@ public static class LegGuards
 		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count == 0 || principal.Any(l => l.Direction != MovementDirection.Inflow))
 		{
-			throw new ValidationException("This activity must have only Inflow principal legs.");
+			throw new DomainValidationException("This activity must have only Inflow principal legs.");
 		}
 	}
 
@@ -78,7 +90,7 @@ public static class LegGuards
 		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count == 0 || principal.Any(l => l.Direction != MovementDirection.Outflow))
 		{
-			throw new ValidationException("This activity must have only Outflow principal legs.");
+			throw new DomainValidationException("This activity must have only Outflow principal legs.");
 		}
 	}
 
@@ -89,8 +101,13 @@ public static class LegGuards
 			// minimal invariant: at least one principal leg is Futures allocation
 			if (!legs.Any(l => l is {Role: MovementRole.Principal, Allocation: AssetAllocationType.Futures}))
 			{
-				throw new ValidationException("Futures activities must include at least one Futures principal leg.");
+				throw new DomainValidationException("Futures activities must include at least one Futures principal leg.");
 			}
+		}
+		else
+		{
+			throw new NotSupportedException(
+				$"{marketKind} is not intended to be used for {nameof(EnsureFuturesAllocation)}");
 		}
 	}
 }

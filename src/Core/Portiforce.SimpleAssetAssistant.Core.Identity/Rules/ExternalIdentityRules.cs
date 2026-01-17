@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Identity.Rules;
@@ -10,7 +9,7 @@ public static class ExternalIdentityRules
 	{
 		if (identities.Count(i => i.IsPrimary) > 1)
 		{
-			throw new ValidationException("Only one external identity can be primary per account.");
+			throw new DomainValidationException("Only one external identity can be primary per account.");
 		}
 	}
 }

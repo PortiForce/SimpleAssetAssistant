@@ -17,10 +17,10 @@ public enum Role : byte
 	/// <summary>
 	/// Tenant scoped  role to configure tenant params and users
 	/// </summary>
-	TenantAdmin = 3,
+	TenantAdmin = 10,
 
 	/// <summary>
 	/// Tenant scoped role for user who is associated with a particular tenant in a multi-tenant system.
 	/// </summary>
-	TenantUser = 4
+	TenantUser = 15
 }

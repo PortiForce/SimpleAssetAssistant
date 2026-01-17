@@ -19,10 +19,8 @@ public sealed record IncomeActivity(ActivityId Id) : ReasonedActivity(Id)
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Income, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureOneSidedInflow(legs);
 
 		return new IncomeActivity(id ?? ActivityId.New())

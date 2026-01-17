@@ -22,10 +22,8 @@ public sealed record ServiceActivity(ActivityId Id) : ReasonedActivity(Id)
 		ActivityId? id = null)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Service, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureOneSidedOutflow(legs);
 
 		return new ServiceActivity(id ?? ActivityId.New())

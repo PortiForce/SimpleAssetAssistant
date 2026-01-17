@@ -22,10 +22,8 @@ public sealed record ExchangeActivity(ActivityId Id) : ExecutableActivity(Id)
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Exchange, reason);
-		ConsistencyRules.EnforceExternalMetadataRules(externalMetadata);
 
-		LegGuards.EnsureNotNullOrEmpty(legs);
-		LegGuards.EnsureFeeLegsAreValid(legs);
+		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureTradeOrExchangeShape(legs);
 
 		return new ExchangeActivity(id ?? ActivityId.New())
