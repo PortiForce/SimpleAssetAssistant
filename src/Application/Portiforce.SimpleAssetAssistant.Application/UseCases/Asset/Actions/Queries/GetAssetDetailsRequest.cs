@@ -4,6 +4,6 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Queries;
 
-public sealed record GetAssetDetailsRequest(AssetId Id) : IQuery<AssetDetailsDto>
+public sealed record GetAccountDetailsRequest(AssetId Id) : IQuery<AssetDetailsDto>
 {
 }

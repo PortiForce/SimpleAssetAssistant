@@ -5,8 +5,8 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Queries;
 
-public sealed record GetAssetsListRequest(
-	TenantId TenantId,        // Context is required to check Restricted Assets
+public sealed record GetAssetListRequest(
+	TenantId TenantId,
 	PageRequest PageRequest,
 	string? SearchTerm
 ) : IQuery<PagedResult<AssetListItemDto>>;

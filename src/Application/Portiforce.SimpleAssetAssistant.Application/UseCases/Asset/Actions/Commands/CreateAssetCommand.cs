@@ -1,6 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
-using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Commands;
@@ -8,6 +7,6 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Com
 public sealed record CreateAssetCommand(
 	string Name,
 	string Code,
-	AssetKind Kind,
+	string AssetKind,
 	byte NativeDecimals
 ) : ICommand<BaseCreateCommandResponse<AssetId>>;

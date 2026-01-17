@@ -5,10 +5,10 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Queries;
 
-public sealed record GetActivitiesRequest(
+public sealed record GetActivityListRequest(
 	AccountId AccountId,
 	PageRequest PageRequest,
 	DateTimeOffset? FromDate = null,
 	DateTimeOffset? ToDate = null,
-	string? AssetCode = null      // Filter by specific asset
+	string? AssetCode = null
 ) : IQuery<PagedResult<ActivityListItemDto>>;

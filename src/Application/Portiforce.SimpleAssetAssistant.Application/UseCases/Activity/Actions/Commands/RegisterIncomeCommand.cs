@@ -9,11 +9,9 @@ public sealed record RegisterIncomeCommand(
 	AccountId AccountId,
 	PlatformId PlatformId,
 	DateTimeOffset OccurredAt,
-
 	string AssetCode,
 	decimal Amount,
-	string IncomeReason,      // "Staking", "Dividend", "Airdrop"
-
+	string IncomeReason,
 	string Source,
 	string? ExternalId
 ) : ICommand<BaseCreateCommandResponse<ActivityId>>;

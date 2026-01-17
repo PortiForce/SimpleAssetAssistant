@@ -9,16 +9,11 @@ public sealed record RegisterTransferCommand(
 	AccountId AccountId,
 	PlatformId PlatformId,
 	DateTimeOffset OccurredAt,
-
 	string AssetCode,
 	decimal Amount,
-	string Direction,         // "Deposit" or "Withdrawal"
-
-	// Fee (Optional - usually withdrawal fee)
-	string? FeeAssetCode,
+	string Direction,
 	decimal? FeeAmount,
-
-	string? Reference,        // e.g. TX Hash
-	string? Counterparty,     // e.g. Wallet Address
+	string? Reference,
+	string? Counterparty,
 	string Source
 ) : ICommand<BaseCreateCommandResponse<ActivityId>>;

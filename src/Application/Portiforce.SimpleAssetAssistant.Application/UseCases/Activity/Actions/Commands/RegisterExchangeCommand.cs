@@ -1,6 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
@@ -14,25 +13,15 @@ public sealed record RegisterExchangeCommand(
 	AccountId AccountId,
 	PlatformId PlatformId,
 	DateTimeOffset OccurredAt,
-
-	// Trade Details
-	string Pair, // e.g. "BTC/USD"
-	MarketKind MarketKind,
-	TradeExecutionType ExecutionType,
-
-	// Inflow (What I got)
+	string Pair,
+	string MarketKind,
+	string ExecutionType,
 	string InAssetCode,
 	decimal InAmount,
-
-	// Outflow (What I gave)
 	string OutAssetCode,
 	decimal OutAmount,
-
-	// Fee (Optional)
 	string? FeeAssetCode,
 	decimal? FeeAmount,
-
-	// Metadata
 	string Source,
 	string? ExternalId
 ) : ICommand<BaseCreateCommandResponse<ActivityId>>;

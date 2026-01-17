@@ -5,6 +5,6 @@ using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Platform.Actions.Queries;
 
 // Returns system-wide supported platforms
-public sealed record GetPlatformsRequest(
+public sealed record GetPlatformListRequest(
 	PageRequest PageRequest
 ) : IQuery<PagedResult<PlatformListItemDto>>;

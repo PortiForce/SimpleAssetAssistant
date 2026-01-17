@@ -6,12 +6,12 @@ namespace Portiforce.SimpleAssetAssistant.Core.Models;
 /// Immutable persisted fact. Equality is identity-based (Id only),
 /// not record "value equality".
 /// </summary>
-public abstract record FactRecord<TId>(TId Id) : IEntity<TId>
+public abstract record Fact<TId>(TId Id) : IEntity<TId>
 	where TId : struct, IEquatable<TId>
 {
 	// IMPORTANT: this method REPLACES the record-generated one.
 	// Make sure you have it ONLY ONCE in the type.
-	public virtual bool Equals(FactRecord<TId>? other)
+	public virtual bool Equals(Fact<TId>? other)
 	{
 		if (ReferenceEquals(this, other))
 		{

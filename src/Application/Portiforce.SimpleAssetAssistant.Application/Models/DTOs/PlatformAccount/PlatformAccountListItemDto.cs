@@ -2,10 +2,10 @@
 
 namespace Portiforce.SimpleAssetAssistant.Application.Models.DTOs.PlatformAccount;
 
-public sealed record PlatformAccountDto(
+public sealed record PlatformAccountListItemDto(
 	PlatformAccountId Id,
 	TenantId TenantId,
-	AccountId AccountId, // Owner
+	AccountId AccountId,
 	PlatformId PlatformId,
-	string AccountName, // User's custom name: "My Main Binance"
+	string AccountName,
 	string? ExternalUserId);

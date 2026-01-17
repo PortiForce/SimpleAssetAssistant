@@ -9,9 +9,8 @@ public sealed record RegisterCorrectionCommand(
 	AccountId AccountId,
 	PlatformId PlatformId,
 	DateTimeOffset OccurredAt,
-
 	string AssetCode,
-	decimal DeltaAmount,      // Can be negative
-	string Reason,            // "UserCorrection"
+	decimal DeltaAmount,
+	string Reason,
 	string? Notes
 ) : ICommand<BaseCreateCommandResponse<ActivityId>>;
