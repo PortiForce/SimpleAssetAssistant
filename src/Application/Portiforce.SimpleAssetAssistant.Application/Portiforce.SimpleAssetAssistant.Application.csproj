@@ -20,8 +20,6 @@
     <Folder Include="UseCases\Activity\Handlers\Commands\" />
     <Folder Include="UseCases\Activity\Handlers\Queries\" />
     <Folder Include="UseCases\Asset\Actions\Responses\" />
-    <Folder Include="UseCases\Asset\Handlers\Commands\" />
-    <Folder Include="UseCases\Asset\Handlers\Queries\" />
     <Folder Include="UseCases\Client\Tenant\Actions\Responses\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />

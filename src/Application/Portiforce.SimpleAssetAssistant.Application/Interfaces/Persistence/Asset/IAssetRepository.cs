@@ -1,10 +1,13 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Asset;
 	
 public interface IAssetRepository : IRepository<Portiforce.SimpleAssetAssistant.Core.Assets.Models.Asset, AssetId>
 {
+	Task<bool> ExistsByCodeAsync(AssetCode code, CancellationToken ct);
+
 	public Task UpdateAsync(Core.Assets.Models.Asset asset, CancellationToken ct);
 
 	/// <summary>
