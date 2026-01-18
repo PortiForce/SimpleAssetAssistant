@@ -6,8 +6,8 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.PlatformAccount.A
 
 public sealed record AddPlatformAccountCommand(
 	TenantId TenantId,
-	AccountId AccountId,      // Owner
+	AccountId AccountId,
 	PlatformId PlatformId,
-	string AccountName,       // User's custom name: "My Main Binance"
-	string? ExternalUserId    // API Key ID or similar reference
+	string AccountName,
+	string? ExternalUserId
 ) : ICommand<BaseCreateCommandResponse<PlatformAccountId>>;

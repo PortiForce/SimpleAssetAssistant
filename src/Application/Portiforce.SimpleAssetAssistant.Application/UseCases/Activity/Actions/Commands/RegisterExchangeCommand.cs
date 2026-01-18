@@ -1,5 +1,8 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
@@ -10,18 +13,16 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.
 /// </summary>
 public sealed record RegisterExchangeCommand(
 	TenantId TenantId,
-	AccountId AccountId,
-	PlatformId PlatformId,
+	PlatformAccountId PlatformAccountId,
 	DateTimeOffset OccurredAt,
-	string Pair,
-	string MarketKind,
-	string ExecutionType,
-	string InAssetCode,
-	decimal InAmount,
-	string OutAssetCode,
-	decimal OutAmount,
-	string? FeeAssetCode,
-	decimal? FeeAmount,
-	string Source,
-	string? ExternalId
+	MarketKind MarketKind,
+	TradeExecutionType ExecutionType,
+	AssetId InAssetId,
+	Quantity InAmount,
+	AssetId OutAssetId,
+	Quantity OutAmount,
+	AssetId? FeeAssetId,
+	Quantity? FeeAmount,
+	ExternalMetadata Metadata,
+	string RawPair
 ) : ICommand<BaseCreateCommandResponse<ActivityId>>;

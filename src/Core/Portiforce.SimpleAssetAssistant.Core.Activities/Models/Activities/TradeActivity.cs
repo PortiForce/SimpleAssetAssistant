@@ -53,15 +53,15 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 
 		return new TradeActivity(id ?? ActivityId.New())
 		{
-				TenantId = tenantId,
-				PlatformAccountId = platformAccountId,
-				OccurredAt = occurredAt,
-				MarketKind = marketKind,
-				ExecutionType = executionType,
-				Reason = reason,
-				Legs = legs,
-				ExternalMetadata = externalMetadata,
-				Futures = futures
-			};
+			TenantId = tenantId,
+			PlatformAccountId = platformAccountId,
+			OccurredAt = occurredAt,
+			MarketKind = marketKind,
+			ExecutionType = executionType,
+			Reason = reason,
+			Legs = legs,
+			ExternalMetadata = externalMetadata,
+			Futures = futures
+		};
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -25,6 +26,7 @@ public sealed record AssetMovementLeg
 		MovementRole role,
 		MovementDirection direction,
 		AssetAllocationType allocation,
+		byte nativeDecimals,
 		string? instrumentKey = null)
 	{
 		if (amount == Quantity.Zero)
@@ -41,6 +43,8 @@ public sealed record AssetMovementLeg
 		{
 			throw new DomainValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
 		}
+
+		ConsistencyRules.EnsureScaleDoesNotExceed(amount.Value, nativeDecimals, nameof(amount));
 
 		var leg = new AssetMovementLeg
 		{

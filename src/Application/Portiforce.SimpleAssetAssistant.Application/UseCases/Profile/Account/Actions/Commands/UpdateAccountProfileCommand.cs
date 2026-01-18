@@ -1,5 +1,7 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Actions.Commands;
@@ -7,7 +9,9 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.A
 public sealed record UpdateAccountProfileCommand(
 	AccountId Id,
 	string Alias,
-	string? PhoneNumber,
+	PhoneNumber? PhoneNumber,
 	string Locale,
-	string DefaultCurrency
+	string DefaultCurrency,
+	AccountTier Tier,
+	Role Role
 ) : ICommand<BaseModifyCommandResponse<AccountId>>;
