@@ -17,6 +17,7 @@ public static class LimitationRules
 		{
 			public const int CodeMinLength = 2;
 			public const int CodeMaxLength = 16;
+			public const int NativeDecimalsMaxLength = 18;
 		}
 
 		public static class Tenant

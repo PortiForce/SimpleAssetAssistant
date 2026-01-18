@@ -4,6 +4,7 @@ using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Asset;
 using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Commands;
+using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Handlers.Commands;
@@ -33,6 +34,7 @@ public sealed class CreateAssetCommandHandler(
 		Core.Assets.Models.Asset asset = Core.Assets.Models.Asset.Create(
 			code: request.Code,
 			kind: request.AssetKind,
+			state: AssetLifecycleState.Draft,
 			name: request.Name,
 			nativeDecimals: request.NativeDecimals
 		);

@@ -16,6 +16,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		AssetId id,
 		AssetCode code,
 		AssetKind kind,
+		AssetLifecycleState state,
 		string? name,
 		byte nativeDecimals) : base(id)
 	{
@@ -27,9 +28,13 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		{
 			throw new DomainValidationException("AssetCode must be defined.");
 		}
-		if (nativeDecimals > 18)
+		if (nativeDecimals > LimitationRules.Lengths.Asset.NativeDecimalsMaxLength)
 		{
-			throw new DomainValidationException("NativeDecimals must be <= 18.");
+			throw new DomainValidationException($"NativeDecimals must be <= {LimitationRules.Lengths.Asset.NativeDecimalsMaxLength}.");
+		}
+		if (state == AssetLifecycleState.Deleted)
+		{
+			throw new DomainValidationException("State  cannot be Deleted for new Entity");
 		}
 
 		if (name is {Length: > LimitationRules.Lengths.NameMaxLength})
@@ -41,6 +46,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		Kind = kind;
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 		NativeDecimals = nativeDecimals;
+		EntityState = state;
 	}
 
 	public AssetCode Code { get; }
@@ -56,6 +62,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	public static Asset Create(
 		AssetCode code,
 		AssetKind kind,
+		AssetLifecycleState state,
 		string? name = null,
 		byte nativeDecimals = 4,
 		AssetId id = default)
@@ -63,6 +70,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 			id.IsEmpty ? AssetId.New() : id,
 			code,
 			kind,
+			state,
 			name,
 			nativeDecimals);
 
