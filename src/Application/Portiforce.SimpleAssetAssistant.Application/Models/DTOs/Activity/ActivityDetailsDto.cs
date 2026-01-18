@@ -3,7 +3,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Models.DTOs.Activity;
 
-public sealed record ActivityListItemDto(
+public sealed record ActivityDetailsDto(
 	ActivityId Id,
 	DateTimeOffset OccurredAt,
 	AssetActivityKind Kind,

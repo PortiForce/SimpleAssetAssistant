@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entitlements\Guards\" />
     <Folder Include="UseCases\Activity\Actions\Responses\" />
     <Folder Include="UseCases\Activity\Handlers\Commands\" />
     <Folder Include="UseCases\Activity\Handlers\Queries\" />

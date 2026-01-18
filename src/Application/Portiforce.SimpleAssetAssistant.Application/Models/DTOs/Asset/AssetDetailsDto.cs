@@ -1,13 +1,14 @@
-﻿using Portiforce.SimpleAssetAssistant.Core.Enums;
+﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Models.DTOs.Asset;
 
 public sealed record AssetDetailsDto(
 	AssetId Id,
-	string Code,
+	AssetCode Code,
 	string Name,
-	string Kind,
-	int Decimals,
-	EntityLifecycleState State
+	AssetKind Kind,
+	byte NativeDecimals,
+	AssetLifecycleState State
 );

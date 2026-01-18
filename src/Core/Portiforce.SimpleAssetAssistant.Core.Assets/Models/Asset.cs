@@ -1,5 +1,4 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
-using Portiforce.SimpleAssetAssistant.Core.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
@@ -50,7 +49,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	public string? Name { get; private set; }
 	public byte NativeDecimals { get; }
 
-	public EntityLifecycleState EntityState { get; private set; } = EntityLifecycleState.Active;
+	public AssetLifecycleState EntityState { get; private set; } = AssetLifecycleState.Draft;
 
 	public IReadOnlySet<AssetCode> Synonyms => _synonyms;
 
@@ -99,11 +98,11 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		EnsureEditable();
 
-		if (EntityState == EntityLifecycleState.Disabled)
+		if (EntityState == AssetLifecycleState.Disabled)
 		{
 			return false;
 		}
-		EntityState = EntityLifecycleState.Disabled;
+		EntityState = AssetLifecycleState.Disabled;
 		return true;
 	}
 
@@ -117,9 +116,9 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 
 	private bool IsReadonly()
 	{
-		return EntityState is 
-			EntityLifecycleState.Disabled 
-			or EntityLifecycleState.ReadOnly 
-			or EntityLifecycleState.Deleted;
+		return EntityState is
+			AssetLifecycleState.Disabled 
+			or AssetLifecycleState.ReadOnly 
+			or AssetLifecycleState.Deleted;
 	}
 }

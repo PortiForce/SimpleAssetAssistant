@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Models.DTOs.Client.Tenant;
 
-public record TenantDetailsDto
+public record TenantDetailsDto(ReadOnlySet<AssetId> RestrictedAssets)
 {
 	public required TenantId TenantId { get; init; }
 
@@ -14,6 +14,4 @@ public record TenantDetailsDto
 	public required TenantPlan Plan { get; init; }
 
 	public required TenantState State { get; init; }
-
-	public ReadOnlySet<AssetId> RestrictedAssets { get; init; }
 }
