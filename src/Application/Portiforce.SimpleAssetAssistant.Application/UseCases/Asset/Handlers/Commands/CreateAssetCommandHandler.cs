@@ -4,8 +4,6 @@ using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Asset;
 using Portiforce.SimpleAssetAssistant.Application.Responses;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Commands;
-using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
-using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Handlers.Commands;
