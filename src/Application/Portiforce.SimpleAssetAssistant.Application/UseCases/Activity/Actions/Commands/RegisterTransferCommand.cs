@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
@@ -13,8 +13,9 @@ public sealed record RegisterTransferCommand(
 	AssetId AssetId,
 	Quantity Amount,
 	MovementDirection Direction,
+	AssetId? FeeAssetId,
 	Quantity? FeeAmount,
 	string? Reference,
 	string? Counterparty,
 	string Source
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+) : ICommand<BaseCreateCommandResult<ActivityId>>;

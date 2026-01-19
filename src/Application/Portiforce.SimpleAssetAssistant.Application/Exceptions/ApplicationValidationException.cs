@@ -2,15 +2,17 @@
 
 namespace Portiforce.SimpleAssetAssistant.Application.Exceptions;
 
-public class ApplicationValidationException : Exception
+public sealed class ApplicationValidationException : Exception
 {
-	public List<string> Errors { get; set; } = [];
+	private List<string> _errors { get; set; } = new();
+
+	public IReadOnlyList<string> Errors => _errors.AsReadOnly();
 
 	public ApplicationValidationException(ValidationResult validationResult)
 	{
 		if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
 		{
-			Errors.Add(validationResult.ErrorMessage);
+			_errors.Add(validationResult.ErrorMessage);
 		}
 	}
 
@@ -20,7 +22,7 @@ public class ApplicationValidationException : Exception
 		{
 			if (!string.IsNullOrWhiteSpace(result.ErrorMessage))
 			{
-				Errors.Add(result.ErrorMessage);
+				_errors.Add(result.ErrorMessage);
 			}
 		}
 	}

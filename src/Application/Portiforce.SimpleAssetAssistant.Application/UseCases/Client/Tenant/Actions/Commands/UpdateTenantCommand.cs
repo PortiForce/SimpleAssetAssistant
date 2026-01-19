@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
@@ -11,4 +11,4 @@ public sealed record UpdateTenantCommand(
 	Email Email,
 	TenantPlan Plan, 
 	TenantState State
-) : ICommand<BaseModifyCommandResponse<TenantId>>;
+) : ICommand<BaseModifyCommandResult<TenantId>>;

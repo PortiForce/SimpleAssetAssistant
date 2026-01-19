@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
@@ -14,4 +14,4 @@ public sealed record RegisterCorrectionCommand(
 	QuantityDelta DeltaAmount, // Not Quantity, as this might accept negative values as a correction element
 	AssetActivityReason Reason,
 	string? Notes
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+) : ICommand<BaseCreateCommandResult<ActivityId>>;

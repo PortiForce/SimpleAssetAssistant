@@ -10,4 +10,17 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Contracts\Activity\Responses\" />
+    <Folder Include="Contracts\Asset\" />
+    <Folder Include="Contracts\Client\Tenant\" />
+    <Folder Include="Contracts\PlatformAccount\" />
+    <Folder Include="Contracts\Platform\" />
+    <Folder Include="Contracts\Profile\Account\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj" />
+  </ItemGroup>
+
 </Project>

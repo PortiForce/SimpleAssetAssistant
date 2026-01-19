@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
@@ -23,6 +23,5 @@ public sealed record RegisterTradeCommand(
 	Quantity OutAmount,
 	AssetId? FeeAssetId,
 	Quantity? FeeAmount,
-	ExternalMetadata Metadata,
-	string RawPair
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+	ExternalMetadata Metadata
+) : ICommand<BaseCreateCommandResult<ActivityId>>;

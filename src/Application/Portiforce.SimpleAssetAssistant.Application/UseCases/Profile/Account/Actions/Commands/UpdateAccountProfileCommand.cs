@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
@@ -14,4 +14,4 @@ public sealed record UpdateAccountProfileCommand(
 	string DefaultCurrency,
 	AccountTier Tier,
 	Role Role
-) : ICommand<BaseModifyCommandResponse<AccountId>>;
+) : ICommand<BaseModifyCommandResult<AccountId>>;

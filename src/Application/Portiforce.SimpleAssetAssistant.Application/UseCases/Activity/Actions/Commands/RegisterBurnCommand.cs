@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
@@ -16,4 +16,4 @@ public sealed record RegisterBurnCommand(
 	AssetActivityReason BurnReason,
 	string? Notes,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+) : ICommand<BaseCreateCommandResult<ActivityId>>;

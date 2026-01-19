@@ -1,7 +1,7 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Exceptions;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Asset;
-using Portiforce.SimpleAssetAssistant.Application.Responses;
+using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Actions.Commands;
 using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
@@ -10,16 +10,17 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Handlers.Commands;
 
 public sealed class CreateAssetCommandHandler(
-	IAssetRepository assetRepository,
+	IAssetReadRepository assetReadRepository,
+	IAssetWriteRepository assetWriteRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<CreateAssetCommand, BaseCreateCommandResponse<AssetId>>
+) : IRequestHandler<CreateAssetCommand, BaseCreateCommandResult<AssetId>>
 {
-	public async ValueTask<BaseCreateCommandResponse<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
+	public async ValueTask<BaseCreateCommandResult<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
 	{
 		// 1. Validate Business Rules (Uniqueness)
 		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
 		// so it belongs in the Application Layer (Handler).
-		bool exists = await assetRepository.ExistsByCodeAsync(request.Code, ct);
+		bool exists = await assetReadRepository.ExistsByCodeAsync(request.Code, ct);
 		if (exists)
 		{
 			throw new ConflictException($"Asset with code '{request.Code}' already exists.");
@@ -40,11 +41,15 @@ public sealed class CreateAssetCommandHandler(
 		);
 
 		// 5. Persistence
-		await assetRepository.AddAsync(asset, ct);
-		await unitOfWork.SaveChangesAsync(ct);
+		await assetWriteRepository.AddAsync(asset, ct);
+		var affectedRecords = await unitOfWork.SaveChangesAsync(ct);
+		if (affectedRecords == 0)
+		{
+			throw new ConflictException("No changes were persisted (possible concurrency issue or no-op update).");
+		}
 
 		// 6. Response
-		return new BaseCreateCommandResponse<AssetId>
+		return new BaseCreateCommandResult<AssetId>
 		{
 			Id = asset.Id,
 			Message = "Asset created successfully."
