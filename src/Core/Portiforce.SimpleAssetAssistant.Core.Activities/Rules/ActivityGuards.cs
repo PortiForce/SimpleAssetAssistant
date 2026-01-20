@@ -14,8 +14,8 @@ public static class ActivityGuards
 	public static bool IsReasonActivityPairAllowed(AssetActivityKind activityKind, AssetActivityReason reason) =>
 		activityKind switch
 		{
+			// todo feature: trade and exchange entities are quire tricky, maybe they should share same Buyy/Sell/Conversion flows
 			AssetActivityKind.Trade => reason is AssetActivityReason.Buy or AssetActivityReason.Sell,
-
 			AssetActivityKind.Exchange => reason is AssetActivityReason.Conversion,
 
 			AssetActivityKind.Income => reason is AssetActivityReason.Reward

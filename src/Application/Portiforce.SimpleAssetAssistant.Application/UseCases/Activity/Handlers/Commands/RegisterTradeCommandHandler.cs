@@ -6,14 +6,12 @@ using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
-using Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Futures;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
+using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
-
-namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Handlers.Commands;
 
 public sealed class RegisterTradeCommandHandler(
 	IActivityWriteRepository activityRepository,
@@ -23,58 +21,77 @@ public sealed class RegisterTradeCommandHandler(
 {
 	public async ValueTask<BaseCreateCommandResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
 	{
-		// 0. Fetch Required Asset Data and tech models
-		var assetIds = new List<AssetId>
-		{
-			request.InAssetId,
-			request.OutAssetId
-		};
-		if (request.FeeAssetId.HasValue && !assetIds.Contains(request.FeeAssetId.Value))
+		static bool IsFiatOrStableKind(AssetKind kind)
+			=> kind is AssetKind.Fiat or AssetKind.Stablecoin;
+
+		var assetIds = new HashSet<AssetId> { request.InAssetId, request.OutAssetId };
+		if (request.FeeAssetId.HasValue)
 		{
 			assetIds.Add(request.FeeAssetId.Value);
 		}
 
-		PageRequest pageRequest = new PageRequest(1, 20);		
+		var assetList = await assetRepository.GetListByAssetIdsAsync(
+			assetIds.ToList(),
+			new PageRequest(1, assetIds.Count),
+			ct);
 
-		PagedResult<AssetListItem> assetList = await assetRepository.GetListByAssetIdsAsync(
-			assetIds,
-			pageRequest,
-			ct
-		);
+		var fetchedAssetsMap = assetList.Items.ToDictionary(a => a.Id);
 
-		var outAssetDecimals = assetList.Items.FirstOrDefault(a => a.Id == request.OutAssetId)?.NativeDecimals ?? throw new NotFoundException(nameof(Asset), request.OutAssetId);
-		var inAssetDecimals = assetList.Items.FirstOrDefault(a => a.Id == request.InAssetId)?.NativeDecimals ?? throw new NotFoundException(nameof(Asset), request.InAssetId);
-
-		byte feeAssetDecimals = 0;
-		if (request.FeeAssetId.HasValue)
+		if (!fetchedAssetsMap.TryGetValue(request.OutAssetId, out var outAsset))
 		{
-			feeAssetDecimals = assetList.Items.FirstOrDefault(a => a.Id == request.FeeAssetId.Value)?.NativeDecimals ?? throw new NotFoundException(nameof(Asset), request.FeeAssetId.Value);
+			throw new NotFoundException("Asset", request.OutAssetId);
 		}
 
-		// 1. Build the Legs (The Mapping Logic)
+		if (!fetchedAssetsMap.TryGetValue(request.InAssetId, out var inAsset))
+		{
+			throw new NotFoundException("Asset", request.InAssetId);
+		}
+
+		byte? feeAssetDecimals = null;
+		if (request.FeeAssetId is null && request.FeeAmount is not null
+			|| request.FeeAssetId is not null && request.FeeAmount is null)
+		{
+			throw new BadRequestException("FeeAssetId and FeeAmount must be provided together.");
+		}
+
+		if (request is { FeeAssetId: not null, FeeAmount: not null })
+		{
+			if (!fetchedAssetsMap.TryGetValue(request.FeeAssetId.Value, out var feeAsset))
+			{
+				throw new NotFoundException("Asset", request.FeeAssetId.Value);
+			}
+
+			feeAssetDecimals = feeAsset.NativeDecimals;
+		}
+
+		var outMoney = IsFiatOrStableKind(outAsset.Kind);
+		var inMoney = IsFiatOrStableKind(inAsset.Kind);
+
+		var tradeReason =
+			outMoney && !inMoney ? AssetActivityReason.Buy :
+			!outMoney && inMoney ? AssetActivityReason.Sell :
+			AssetActivityReason.Conversion;
+
+		// 1) Build legs
 		var legs = new List<AssetMovementLeg>
 		{
-			// Leg 1: Outflow (Selling)
 			AssetMovementLeg.Create(
 				assetId: request.OutAssetId,
 				amount: request.OutAmount,
 				role: MovementRole.Principal,
 				direction: MovementDirection.Outflow,
 				allocation: AssetAllocationType.Spot,
-				nativeDecimals: outAssetDecimals
-			),
-			// Leg 2: Inflow (Buying)
+				nativeDecimals: outAsset.NativeDecimals),
+
 			AssetMovementLeg.Create(
 				assetId: request.InAssetId,
 				amount: request.InAmount,
 				role: MovementRole.Principal,
 				direction: MovementDirection.Inflow,
 				allocation: AssetAllocationType.Spot,
-				nativeDecimals: inAssetDecimals
-			)
+				nativeDecimals: inAsset.NativeDecimals),
 		};
 
-		// Leg 3: Fee
 		if (request is { FeeAssetId: not null, FeeAmount: not null })
 		{
 			legs.Add(AssetMovementLeg.Create(
@@ -83,43 +100,31 @@ public sealed class RegisterTradeCommandHandler(
 				role: MovementRole.Fee,
 				direction: MovementDirection.Outflow,
 				allocation: AssetAllocationType.Spot,
-				nativeDecimals: feeAssetDecimals
-			));
+				nativeDecimals: feeAssetDecimals!.Value));
 		}
 
-		// 2. Handle Futures Descriptor (if applicable)
-		FuturesDescriptor? futures = null;
-		if (request.MarketKind == MarketKind.Futures)
-		{
-			// tofo PForce: Simple mapping for MVP
-			futures = new FuturesDescriptor
-			{
-				// todo feature: map other properties if present in command
-				InstrumentKey = "PForce stub"
-			};
-		}
+		// 2) Futures descriptor (MVP)
+		FuturesDescriptor? futures = request.MarketKind == MarketKind.Futures
+			? new FuturesDescriptor { InstrumentKey = "PForce stub" }
+			: null;
 
-		// 3. Create Domain Entity
-		TradeActivity trade = TradeActivity.Create(
+		// 3) Domain entity
+		var trade = TradeActivity.Create(
 			tenantId: request.TenantId,
 			platformAccountId: request.PlatformAccountId,
 			occurredAt: request.OccurredAt,
-			// todo PForce: improve reason determination logic (if needed)
-			reason: request.InAmount.Value > request.OutAmount.Value
-					? AssetActivityReason.Buy
-					: AssetActivityReason.Sell,
+			reason: tradeReason,
 			marketKind: request.MarketKind,
 			executionType: request.ExecutionType,
 			legs: legs,
 			futures: futures,
 			externalMetadata: request.Metadata,
-			id: null
-		);
+			id: null);
 
-		// 4. Persist
-		await activityRepository.AddAsync(trade, ct); 
-		var affectedRecords = await unitOfWork.SaveChangesAsync(ct);
-		if (affectedRecords == 0)
+		// 4) Persist
+		await activityRepository.AddAsync(trade, ct);
+		var affected = await unitOfWork.SaveChangesAsync(ct);
+		if (affected == 0)
 		{
 			throw new ConflictException("No changes were persisted (possible concurrency issue or no-op update).");
 		}
