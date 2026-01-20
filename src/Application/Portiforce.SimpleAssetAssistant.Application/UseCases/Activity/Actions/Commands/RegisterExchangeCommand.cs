@@ -25,4 +25,4 @@ public sealed record RegisterExchangeCommand(
 	Quantity? FeeAmount,
 	ExchangeType Type,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

@@ -3,6 +3,6 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Profile;
 
-internal interface IAccountWriteRepository : IWriteRepository<Account, AccountId>
+public interface IAccountWriteRepository : IWriteRepository<Account, AccountId>
 {
 }

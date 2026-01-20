@@ -4,7 +4,7 @@ namespace Portiforce.SimpleAssetAssistant.Application.Exceptions;
 
 public sealed class ApplicationValidationException : Exception
 {
-	private List<string> _errors { get; set; } = new();
+	private readonly List<string> _errors = new();
 
 	public IReadOnlyList<string> Errors => _errors.AsReadOnly();
 

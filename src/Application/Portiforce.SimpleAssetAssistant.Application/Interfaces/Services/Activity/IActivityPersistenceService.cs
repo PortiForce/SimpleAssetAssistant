@@ -6,7 +6,7 @@ namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Activi
 
 public interface IActivityPersistenceService
 {
-	Task<BaseCreateCommandResult<ActivityId>> PersistNewAsync(
+	Task<CommandResult<ActivityId>> PersistNewAsync(
 		AssetActivityBase activity,
 		string extPrimaryId,
 		CancellationToken ct);

@@ -24,4 +24,4 @@ public sealed record RegisterTradeCommand(
 	AssetId? FeeAssetId,
 	Quantity? FeeAmount,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

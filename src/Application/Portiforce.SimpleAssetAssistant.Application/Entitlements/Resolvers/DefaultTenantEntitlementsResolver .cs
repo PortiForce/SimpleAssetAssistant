@@ -1,5 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Entitlements;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
+﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Entitlements.Resolvers;
@@ -16,9 +15,30 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 			AllowProjections: false,
 			AllowAdvancedAnalytics: false),
 
-		TenantPlan.Basic => new TenantEntitlements(50, 10, 200, 10_000, true, false),
-		TenantPlan.Advanced => new TenantEntitlements(200, 25, 1000, 25_000, true, true),
-		TenantPlan.Pro => new TenantEntitlements(1000, 50, 10_000, 150_000, true, true),
+		TenantPlan.Basic => new TenantEntitlements(
+			MaxUsers: 50,
+			MaxPlatforms: 10,
+			MaxDistinctAssets: 200,
+			MaxImportRows: 10_000,
+			AllowProjections: true,
+			AllowAdvancedAnalytics: false),
+
+
+		TenantPlan.Advanced => new TenantEntitlements(
+			MaxUsers: 100,
+			MaxPlatforms: 20,
+			MaxDistinctAssets: 500,
+			MaxImportRows: 12_000,
+			AllowProjections: true,
+			AllowAdvancedAnalytics: false),
+
+		TenantPlan.Pro => new TenantEntitlements(
+			MaxUsers: 200,
+			MaxPlatforms: 25,
+			MaxDistinctAssets: 1000,
+			MaxImportRows: 20_000,
+			AllowProjections: true,
+			AllowAdvancedAnalytics: true),
 
 		_ => throw new ArgumentOutOfRangeException(nameof(plan))
 	};

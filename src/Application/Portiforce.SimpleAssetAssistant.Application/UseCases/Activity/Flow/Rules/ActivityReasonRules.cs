@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Assets.Extensions;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Rules;
 
-public static class ActivityReasonRules
+internal static class ActivityReasonRules
 {
 	public static AssetActivityReason DetermineFromKinds(AssetKind outKind, AssetKind inKind)
 	{

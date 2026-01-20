@@ -11,4 +11,4 @@ public sealed record UpdateTenantCommand(
 	Email Email,
 	TenantPlan Plan, 
 	TenantState State
-) : ICommand<BaseModifyCommandResult<TenantId>>;
+) : ICommand<CommandResult<TenantId>>;

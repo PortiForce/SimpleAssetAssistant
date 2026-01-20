@@ -16,4 +16,4 @@ public sealed record RegisterServiceCommand(
 	Quantity Amount,
 	AssetActivityReason FeeReason,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

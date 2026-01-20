@@ -10,4 +10,4 @@ public sealed record CreateTenantCommand(
 	string Name,
 	Email AdminEmail,
 	TenantPlan Plan
-) : ICommand<BaseCreateCommandResult<TenantId>>;
+) : ICommand<CommandResult<TenantId>>;

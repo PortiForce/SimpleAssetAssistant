@@ -14,4 +14,4 @@ public sealed record UpdateAccountProfileCommand(
 	string DefaultCurrency,
 	AccountTier Tier,
 	Role Role
-) : ICommand<BaseModifyCommandResult<AccountId>>;
+) : ICommand<CommandResult<AccountId>>;

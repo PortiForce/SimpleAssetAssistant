@@ -2,7 +2,7 @@
 
 public sealed class BadRequestException : Exception
 {
-	public BadRequestException(string code) : base(code)
+	public BadRequestException(string message) : base(message)
 	{
 
 	}

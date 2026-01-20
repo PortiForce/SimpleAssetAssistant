@@ -5,9 +5,9 @@ using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
-namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Rules;
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Guards;
 
-internal sealed class ActivityIdempotencyGuard(IActivityReadRepository activityReadRepository) : IActivityIdempotencyGuard
+internal sealed class ActivityIdempotencyGuards(IActivityReadRepository activityReadRepository) : IActivityIdempotencyGuard
 {
 	public async Task EnsureNotExistsAsync(
 		ExternalMetadata metadata,
@@ -16,6 +16,11 @@ internal sealed class ActivityIdempotencyGuard(IActivityReadRepository activityR
 		PlatformAccountId platformAccountId,
 		CancellationToken ct)
 	{
+		if (metadata == null)
+		{
+			throw new ArgumentNullException(nameof(metadata));
+		}
+
 		string primaryId = metadata.GetPrimaryId();
 
 		// check that record is not added already
@@ -23,7 +28,7 @@ internal sealed class ActivityIdempotencyGuard(IActivityReadRepository activityR
 		{
 			bool isRecordAlreadyAdded = await activityReadRepository.ExistsByExternalIdAsync(
 				metadata.ExternalId,
-				AssetActivityKind.Exchange,
+				kind,
 				tenantId,
 				platformAccountId,
 				ct);
@@ -37,7 +42,7 @@ internal sealed class ActivityIdempotencyGuard(IActivityReadRepository activityR
 		{
 			bool isRecordAlreadyAdded = await activityReadRepository.ExistsByFingerprintAsync(
 				metadata.Fingerprint,
-				AssetActivityKind.Exchange,
+				kind,
 				tenantId,
 				platformAccountId,
 				ct);

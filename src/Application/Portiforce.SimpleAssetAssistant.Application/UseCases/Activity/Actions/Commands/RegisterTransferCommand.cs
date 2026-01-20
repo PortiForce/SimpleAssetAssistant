@@ -18,4 +18,4 @@ public sealed record RegisterTransferCommand(
 	string? Reference,
 	string? Counterparty,
 	string Source
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

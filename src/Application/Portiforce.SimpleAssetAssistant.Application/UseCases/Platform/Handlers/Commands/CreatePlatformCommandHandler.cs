@@ -13,9 +13,9 @@ public sealed class CreatePlatformCommandHandler(
 	IPlatformReadRepository platformReadRepository,
 	IPlatformWriteRepository platformWriteRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<CreatePlatformCommand, BaseCreateCommandResult<PlatformId>>
+) : IRequestHandler<CreatePlatformCommand, CommandResult<PlatformId>>
 {
-	public async ValueTask<BaseCreateCommandResult<PlatformId>> Handle(CreatePlatformCommand request, CancellationToken ct)
+	public async ValueTask<CommandResult<PlatformId>> Handle(CreatePlatformCommand request, CancellationToken ct)
 	{
 		// 1. Validate Business Rules (Uniqueness)
 		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
@@ -48,7 +48,7 @@ public sealed class CreatePlatformCommandHandler(
 		}
 
 		// 6. Response
-		return new BaseCreateCommandResult<PlatformId>
+		return new CommandResult<PlatformId>
 		{
 			Id = platform.Id,
 			Message = "Platform created successfully."

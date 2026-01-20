@@ -9,4 +9,4 @@ public sealed record CreatePlatformCommand(
 	string Name,
 	string Code,
 	PlatformKind Kind 
-) : ICommand<BaseCreateCommandResult<PlatformId>>;
+) : ICommand<CommandResult<PlatformId>>;

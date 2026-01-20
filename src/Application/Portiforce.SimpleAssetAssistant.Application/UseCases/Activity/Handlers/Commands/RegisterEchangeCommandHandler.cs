@@ -10,23 +10,25 @@ using Portiforce.SimpleAssetAssistant.Application.UseCases.Asset.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Handlers.Commands;
 
 public sealed class RegisterExchangeCommandHandler(
 	IActivityIdempotencyGuard activityIdempotencyGuard,
 	IAssetLookupService assetLookupService,
 	IActivityPersistenceService activityPersistenceService
-) : IRequestHandler<RegisterExchangeCommand, BaseCreateCommandResult<ActivityId>>
+) : IRequestHandler<RegisterExchangeCommand, CommandResult<ActivityId>>
 {
-	public async ValueTask<BaseCreateCommandResult<ActivityId>> Handle(RegisterExchangeCommand request, CancellationToken ct)
+	public async ValueTask<CommandResult<ActivityId>> Handle(RegisterExchangeCommand request, CancellationToken ct)
 	{
 		// 0) Validation and preparation
-		ActivityGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);
+		ActivityCommandGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);
+		ActivityCommandGuards.EnsureMovementNotEmpty(request.OutAmount, request.InAmount);
 
 		await activityIdempotencyGuard.EnsureNotExistsAsync(
 			request.Metadata,
-			AssetActivityKind.Trade,
+			AssetActivityKind.Exchange,
 			request.TenantId,
 			request.PlatformAccountId, ct);
 
@@ -37,7 +39,7 @@ public sealed class RegisterExchangeCommandHandler(
 		}
 
 		IReadOnlyDictionary<AssetId, AssetListItem> fetchedAssetsMap = await assetLookupService.GetRequiredAsync(
-			assetIds.ToList(),
+			assetIds,
 			ct);
 
 		AssetListItem outAsset = fetchedAssetsMap[request.OutAssetId];
@@ -52,8 +54,8 @@ public sealed class RegisterExchangeCommandHandler(
 
 		AssetActivityReason actualReason = ActivityReasonRules.DetermineFromKinds(outAsset.Kind, inAsset.Kind);
 
-		string extPrimaryId = request.Metadata.GetPrimaryId();
-		ActivityReasonRules.EnsureIsExchangeReason(actualReason, extPrimaryId);
+		string primaryId = request.Metadata.GetPrimaryId();
+		ActivityReasonRules.EnsureIsExchangeReason(actualReason, primaryId);
 
 		// 1) Build legs
 		List<AssetMovementLeg> legs = MovementLegFactory.CreateSpotTwoLegsWithOptionalFee(
@@ -78,6 +80,6 @@ public sealed class RegisterExchangeCommandHandler(
 			externalMetadata: request.Metadata,
 			id: null);
 
-		return await activityPersistenceService.PersistNewAsync(exchangeActivity, extPrimaryId, ct);
+		return await activityPersistenceService.PersistNewAsync(exchangeActivity, primaryId, ct);
 	}
 }

@@ -13,7 +13,7 @@ internal sealed class ActivityPersistenceService(
 	IActivityWriteRepository activityWriteRepository,
 	IUnitOfWork unitOfWork) : IActivityPersistenceService
 {
-	public async Task<BaseCreateCommandResult<ActivityId>> PersistNewAsync(
+	public async Task<CommandResult<ActivityId>> PersistNewAsync(
 		AssetActivityBase activity,
 		string extPrimaryId,
 		CancellationToken ct)
@@ -42,7 +42,7 @@ internal sealed class ActivityPersistenceService(
 			throw new ConflictException($"No changes were persisted (possible concurrency issue). {activityKind} activity Id: {extPrimaryId}");
 		}
 
-		return new BaseCreateCommandResult<ActivityId>
+		return new CommandResult<ActivityId>
 		{
 			Id = activity.Id,
 			Message = $"{activityKind} registered successfully"

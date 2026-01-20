@@ -5,7 +5,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Factories;
 
-public static class MovementLegFactory
+internal static class MovementLegFactory
 {
 	public static List<AssetMovementLeg> CreateSpotTwoLegsWithOptionalFee(
 		AssetId outId,

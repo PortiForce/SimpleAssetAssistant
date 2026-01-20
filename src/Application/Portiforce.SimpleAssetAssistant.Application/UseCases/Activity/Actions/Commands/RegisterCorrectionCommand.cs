@@ -14,4 +14,4 @@ public sealed record RegisterCorrectionCommand(
 	QuantityDelta DeltaAmount, // Not Quantity, as this might accept negative values as a correction element
 	AssetActivityReason Reason,
 	string? Notes
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

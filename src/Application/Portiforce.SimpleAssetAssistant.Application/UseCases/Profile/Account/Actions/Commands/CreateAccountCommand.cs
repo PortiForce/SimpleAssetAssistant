@@ -12,4 +12,4 @@ public sealed record CreateAccountCommand(
 	string Alias,
 	Role Role,
 	AccountTier Tier
-) : ICommand<BaseCreateCommandResult<AccountId>>;
+) : ICommand<CommandResult<AccountId>>;

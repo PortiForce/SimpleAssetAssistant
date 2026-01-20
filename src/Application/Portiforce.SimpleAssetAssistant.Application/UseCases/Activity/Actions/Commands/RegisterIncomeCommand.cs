@@ -15,4 +15,4 @@ public sealed record RegisterIncomeCommand(
 	Quantity Amount,
 	AssetActivityReason IncomeReason,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

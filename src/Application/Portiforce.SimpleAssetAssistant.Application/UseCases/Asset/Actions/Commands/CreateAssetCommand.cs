@@ -11,4 +11,4 @@ public sealed record CreateAssetCommand(
 	AssetCode Code,
 	AssetKind AssetKind,
 	byte NativeDecimals
-) : ICommand<BaseCreateCommandResult<AssetId>>;
+) : ICommand<CommandResult<AssetId>>;

@@ -13,9 +13,9 @@ public sealed class CreateAssetCommandHandler(
 	IAssetReadRepository assetReadRepository,
 	IAssetWriteRepository assetWriteRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<CreateAssetCommand, BaseCreateCommandResult<AssetId>>
+) : IRequestHandler<CreateAssetCommand, CommandResult<AssetId>>
 {
-	public async ValueTask<BaseCreateCommandResult<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
+	public async ValueTask<CommandResult<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
 	{
 		// 1. Validate Business Rules (Uniqueness)
 		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
@@ -49,7 +49,7 @@ public sealed class CreateAssetCommandHandler(
 		}
 
 		// 6. Response
-		return new BaseCreateCommandResult<AssetId>
+		return new CommandResult<AssetId>
 		{
 			Id = asset.Id,
 			Message = "Asset created successfully."

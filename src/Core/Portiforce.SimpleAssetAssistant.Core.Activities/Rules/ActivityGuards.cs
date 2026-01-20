@@ -49,25 +49,4 @@ public static class ActivityGuards
 			throw new ArgumentException($"Reason '{reason}' is not allowed for '{activityKind}' activity.");
 		}
 	}
-
-	public static void EnsureMovementNotEmpty(Quantity fromAmount, Quantity toAmount)
-	{
-		if (fromAmount.Value == 0m && toAmount.Value == 0m)
-		{
-			throw new DomainValidationException("At least one of FromAmount or ToAmount must be > 0.");
-		}
-	}
-
-	public static void EnsureFeeConsistency(Quantity? feeAmount, AssetId? feeAssetId)
-	{
-		if (feeAmount is { IsPositive: true } && feeAssetId is null)
-		{
-			throw new DomainValidationException("FeeAssetId is required when FeeAmount > 0.");
-		}
-
-		if (feeAmount == null && feeAssetId is not null)
-		{
-			throw new DomainValidationException("FeeAssetId must be null when FeeAmount is zero.");
-		}
-	}
 }

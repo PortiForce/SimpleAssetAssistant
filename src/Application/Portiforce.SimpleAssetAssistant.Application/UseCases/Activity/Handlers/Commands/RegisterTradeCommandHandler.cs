@@ -11,19 +11,21 @@ using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Futures;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Handlers.Commands;
 
 public sealed class RegisterTradeCommandHandler(
 	IActivityIdempotencyGuard activityIdempotencyGuard,
 	IAssetLookupService assetLookupService,
 	IActivityPersistenceService activityPersistenceService
-) : IRequestHandler<RegisterTradeCommand, BaseCreateCommandResult<ActivityId>>
+) : IRequestHandler<RegisterTradeCommand, CommandResult<ActivityId>>
 {
-	public async ValueTask<BaseCreateCommandResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
+	public async ValueTask<CommandResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
 	{
 		// 0) Validation and preparation
-		ActivityGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);
+		ActivityCommandGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);
+		ActivityCommandGuards.EnsureMovementNotEmpty(request.OutAmount, request.InAmount);
 
 		await activityIdempotencyGuard.EnsureNotExistsAsync(
 			request.Metadata,
@@ -38,7 +40,7 @@ public sealed class RegisterTradeCommandHandler(
 		}
 
 		IReadOnlyDictionary<AssetId, AssetListItem> fetchedAssetsMap = await assetLookupService.GetRequiredAsync(
-			assetIds.ToList(),
+			assetIds,
 			ct);
 
 		AssetListItem outAsset = fetchedAssetsMap[request.OutAssetId];
@@ -53,8 +55,8 @@ public sealed class RegisterTradeCommandHandler(
 
 		AssetActivityReason actualReason = ActivityReasonRules.DetermineFromKinds(outAsset.Kind, inAsset.Kind);
 
-		string extPrimaryId = request.Metadata.GetPrimaryId();
-		ActivityReasonRules.EnsureIsTradeReason(actualReason, extPrimaryId);
+		string primaryId = request.Metadata.GetPrimaryId();
+		ActivityReasonRules.EnsureIsTradeReason(actualReason, primaryId);
 
 		// 1) Build legs
 		List<AssetMovementLeg> legs = MovementLegFactory.CreateSpotTwoLegsWithOptionalFee(
@@ -87,6 +89,6 @@ public sealed class RegisterTradeCommandHandler(
 			id: null);
 
 		// 4) Persist data
-		return await activityPersistenceService.PersistNewAsync(tradeActivity, extPrimaryId, ct);
+		return await activityPersistenceService.PersistNewAsync(tradeActivity, primaryId, ct);
 	}
 }

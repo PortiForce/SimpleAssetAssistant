@@ -10,4 +10,4 @@ public sealed record AddPlatformAccountCommand(
 	PlatformId PlatformId,
 	string AccountName,
 	string? ExternalUserId
-) : ICommand<BaseCreateCommandResult<PlatformAccountId>>;
+) : ICommand<CommandResult<PlatformAccountId>>;

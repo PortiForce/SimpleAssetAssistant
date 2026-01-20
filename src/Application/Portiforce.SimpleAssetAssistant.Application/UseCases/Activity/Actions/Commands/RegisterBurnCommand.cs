@@ -16,4 +16,4 @@ public sealed record RegisterBurnCommand(
 	AssetActivityReason BurnReason,
 	string? Notes,
 	ExternalMetadata Metadata
-) : ICommand<BaseCreateCommandResult<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;
