@@ -3,6 +3,6 @@
 /// <summary>
 /// Marker interface to mark Projection Detail models.
 /// </summary>
-public interface IDetailsProjection
+public interface IDetailsProjection : IProjection
 {
 }

@@ -3,6 +3,6 @@
 /// <summary>
 /// Marker interface to mark Projection ListItem models.
 /// </summary>
-public interface IListItemProjection
+public interface IListItemProjection : IProjection
 {
 }

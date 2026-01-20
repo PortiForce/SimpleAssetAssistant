@@ -22,15 +22,13 @@ public interface IAssetReadRepository : IReadRepository<AssetDetails, AssetId>
 		CancellationToken ct);
 
 	/// <summary>
-	/// Return list of asset defined by Asset Ids
+	/// Return Not pages list of asset defined by Asset Ids
 	/// </summary>
-	/// <param name="assetIds">list of asset Ids to fetch</param>
-	/// <param name="pageRequest"></param>
+	/// <param name="assetIds">list of asset Ids to fetch (not large)</param>
 	/// <param name="ct"></param>
-	/// <returns></returns>
+	/// <returns>Not pages list of asset models</returns>
 	Task<PagedResult<AssetListItem>> GetListByAssetIdsAsync(
 		IReadOnlyCollection<AssetId> assetIds,
-		PageRequest pageRequest,
 		CancellationToken ct);
 
 	Task<PagedResult<AssetListItem>> GetListByAccountIdAsync(

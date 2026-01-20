@@ -7,18 +7,17 @@ using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
-using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Futures;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
 using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
-public sealed class RegisterTradeCommandHandler(
+public sealed class RegisterExchangeCommandHandler(
 	IActivityWriteRepository activityRepository,
 	IAssetReadRepository assetRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<RegisterTradeCommand, BaseCreateCommandResult<ActivityId>>
+) : IRequestHandler<RegisterExchangeCommand, BaseCreateCommandResult<ActivityId>>
 {
-	public async ValueTask<BaseCreateCommandResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
+	public async ValueTask<BaseCreateCommandResult<ActivityId>> Handle(RegisterExchangeCommand request, CancellationToken ct)
 	{
 		static bool IsFiatOrStableKind(AssetKind kind)
 			=> kind is AssetKind.Fiat or AssetKind.Stablecoin;
@@ -65,7 +64,7 @@ public sealed class RegisterTradeCommandHandler(
 		var outMoney = IsFiatOrStableKind(outAsset.Kind);
 		var inMoney = IsFiatOrStableKind(inAsset.Kind);
 
-		var tradeReason =
+		var reason =
 			outMoney && !inMoney ? AssetActivityReason.Buy :
 			!outMoney && inMoney ? AssetActivityReason.Sell :
 			AssetActivityReason.Conversion;
@@ -101,26 +100,19 @@ public sealed class RegisterTradeCommandHandler(
 				nativeDecimals: feeAssetDecimals!.Value));
 		}
 
-		// 2) Futures descriptor (MVP)
-		FuturesDescriptor? futures = request.MarketKind == MarketKind.Futures
-			? new FuturesDescriptor { InstrumentKey = "PForce stub" }
-			: null;
-
 		// 3) Domain entity
-		var trade = TradeActivity.Create(
+		var exchange = ExchangeActivity.Create(
 			tenantId: request.TenantId,
 			platformAccountId: request.PlatformAccountId,
 			occurredAt: request.OccurredAt,
-			reason: tradeReason,
-			marketKind: request.MarketKind,
-			executionType: request.ExecutionType,
+			reason: reason,
+			exchangeType: request.Type,
 			legs: legs,
-			futures: futures,
 			externalMetadata: request.Metadata,
 			id: null);
 
 		// 4) Persist
-		await activityRepository.AddAsync(trade, ct);
+		await activityRepository.AddAsync(exchange, ct);
 		var affected = await unitOfWork.SaveChangesAsync(ct);
 		if (affected == 0)
 		{
@@ -129,7 +121,7 @@ public sealed class RegisterTradeCommandHandler(
 
 		return new BaseCreateCommandResult<ActivityId>
 		{
-			Id = trade.Id,
+			Id = exchange.Id,
 			Message = "Trade registered successfully"
 		};
 	}
