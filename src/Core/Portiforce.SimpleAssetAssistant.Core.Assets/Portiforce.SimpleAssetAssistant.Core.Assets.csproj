@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Primitives\" />
-  </ItemGroup>
-
 </Project>

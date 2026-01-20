@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
-
 </Project>
