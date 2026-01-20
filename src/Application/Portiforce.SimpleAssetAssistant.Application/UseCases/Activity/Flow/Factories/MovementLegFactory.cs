@@ -1,0 +1,52 @@
+﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+
+namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Factories;
+
+public static class MovementLegFactory
+{
+	public static List<AssetMovementLeg> CreateSpotTwoLegsWithOptionalFee(
+		AssetId outId,
+		Quantity outAmount,
+		byte outDecimals,
+		AssetId inId,
+		Quantity inAmount,
+		byte inDecimals,
+		AssetId? feeId,
+		Quantity? feeAmount,
+		byte? feeDecimals)
+	{
+		List<AssetMovementLeg> legs = new List<AssetMovementLeg>(capacity: feeId is null ? 2 : 3)
+		{
+			AssetMovementLeg.Create(
+				outId, outAmount,
+				MovementRole.Principal,
+				MovementDirection.Outflow,
+				AssetAllocationType.Spot,
+				outDecimals),
+
+			AssetMovementLeg.Create(
+				inId,
+				inAmount,
+				MovementRole.Principal,
+				MovementDirection.Inflow,
+				AssetAllocationType.Spot,
+				inDecimals),
+		};
+
+		if (feeId is not null)
+		{
+			legs.Add(AssetMovementLeg.Create(
+				feeId.Value,
+				feeAmount!.Value,
+				MovementRole.Fee,
+				MovementDirection.Outflow,
+				AssetAllocationType.Spot,
+				feeDecimals!.Value));
+		}
+
+		return legs;
+	}
+}

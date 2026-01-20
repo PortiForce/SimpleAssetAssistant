@@ -1,4 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Assets.Extensions;
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
@@ -128,5 +129,14 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 			AssetLifecycleState.Disabled 
 			or AssetLifecycleState.ReadOnly 
 			or AssetLifecycleState.Deleted;
+	}
+
+	/// <summary>
+	/// Verifies that Asset is Fiat or StableCoin related
+	/// </summary>
+	/// <returns>true if asset belongs to Fiat or StableCoin kinds</returns>
+	public bool IsFiatOrStableKind()
+	{
+		return AssetExtensions.IsFiatOrStableKind(Kind);
 	}
 }

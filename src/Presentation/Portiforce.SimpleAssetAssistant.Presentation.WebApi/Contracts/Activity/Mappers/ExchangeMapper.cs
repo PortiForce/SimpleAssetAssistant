@@ -6,9 +6,9 @@ using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Req
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Mappers;
 
-public static class TradeMappings
+public static class ExchangeMapper
 {
-	public static RegisterTradeCommand ToCommand(this RegisterTradeRequest r) => new(
+	public static RegisterExchangeCommand ToCommand(this RegisterExchangeRequest r) => new(
 		TenantId: TenantId.From(r.TenantId),
 		PlatformAccountId: PlatformAccountId.From(r.PlatformAccountId),
 		OccurredAt: r.OccurredAt,
@@ -20,6 +20,7 @@ public static class TradeMappings
 		OutAmount: new Quantity(r.OutAmount),
 		FeeAssetId: r.FeeAssetId is null ? null : AssetId.From(r.FeeAssetId.Value),
 		FeeAmount: r.FeeAmount is null ? null : new Quantity(r.FeeAmount.Value),
+		Type: r.ExchangeType,
 		Metadata: new ExternalMetadata(source: r.Source, externalId: r.ExternalId)
 	);
 }

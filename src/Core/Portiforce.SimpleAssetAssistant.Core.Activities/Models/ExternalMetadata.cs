@@ -30,4 +30,14 @@ public sealed record ExternalMetadata
 	public string? ExternalId { get; }
 	public string? Fingerprint { get; }
 	public string? Notes { get; }
+
+	public bool IsExternalIdDriven()
+	{
+		return !string.IsNullOrWhiteSpace(ExternalId);
+	}
+
+	public string GetPrimaryId()
+	{
+		return IsExternalIdDriven() ? ExternalId : Fingerprint;
+	}
 }

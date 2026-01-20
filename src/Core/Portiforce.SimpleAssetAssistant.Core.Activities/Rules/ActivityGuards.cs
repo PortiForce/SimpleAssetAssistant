@@ -58,14 +58,14 @@ public static class ActivityGuards
 		}
 	}
 
-	public static void EnsureFeeConsistency(Quantity feeAmount, AssetId? feeAssetId)
+	public static void EnsureFeeConsistency(Quantity? feeAmount, AssetId? feeAssetId)
 	{
-		if (feeAmount.Value > 0 && feeAssetId is null)
+		if (feeAmount is { IsPositive: true } && feeAssetId is null)
 		{
 			throw new DomainValidationException("FeeAssetId is required when FeeAmount > 0.");
 		}
 
-		if (feeAmount.Value == 0 && feeAssetId is not null)
+		if (feeAmount == null && feeAssetId is not null)
 		{
 			throw new DomainValidationException("FeeAssetId must be null when FeeAmount is zero.");
 		}
