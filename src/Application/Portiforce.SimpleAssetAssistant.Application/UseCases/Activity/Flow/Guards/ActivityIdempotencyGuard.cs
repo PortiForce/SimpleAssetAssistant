@@ -7,7 +7,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Guards;
 
-internal sealed class ActivityIdempotencyGuards(IActivityReadRepository activityReadRepository) : IActivityIdempotencyGuard
+internal sealed class ActivityIdempotencyGuard(IActivityReadRepository activityReadRepository) : IActivityIdempotencyGuard
 {
 	public async Task EnsureNotExistsAsync(
 		ExternalMetadata metadata,

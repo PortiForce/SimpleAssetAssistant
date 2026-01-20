@@ -24,7 +24,7 @@ public sealed class RegisterExchangeCommandHandler(
 	{
 		// 0) Validation and preparation
 		ActivityCommandGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);
-		ActivityCommandGuards.EnsureMovementNotEmpty(request.OutAmount, request.InAmount);
+		ActivityCommandGuards.EnsureTradeOrExchangeShape(request.OutAmount, request.InAmount);
 
 		await activityIdempotencyGuard.EnsureNotExistsAsync(
 			request.Metadata,

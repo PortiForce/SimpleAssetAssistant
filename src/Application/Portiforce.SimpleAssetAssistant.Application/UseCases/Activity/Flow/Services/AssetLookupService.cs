@@ -12,9 +12,7 @@ internal sealed class AssetLookupService(IAssetReadRepository assetReadRepositor
 		IReadOnlyCollection<AssetId> ids,
 		CancellationToken ct)
 	{
-		var assetList = await assetReadRepository.GetListByAssetIdsAsync(
-			ids.ToList(),
-			ct);
+		var assetList = await assetReadRepository.GetListByAssetIdsAsync(ids, ct);
 
 		Dictionary<AssetId, AssetListItem> fetchedAssetsMap = assetList.ToDictionary(a => a.Id);
 

@@ -8,22 +8,25 @@ internal class ActivityCommandGuards
 {
 	public static void EnsureMovementNotEmpty(Quantity fromAmount, Quantity toAmount)
 	{
-		if (fromAmount.Value == 0m && toAmount.Value == 0m)
+		if (fromAmount.IsZero && toAmount.IsZero)
 		{
 			throw new BadRequestException("At least one of FromAmount or ToAmount must be > 0.");
 		}
 	}
 
+	public static void EnsureTradeOrExchangeShape(Quantity fromAmount, Quantity toAmount)
+	{
+		if (fromAmount.IsZero || toAmount.IsZero)
+		{
+			throw new BadRequestException("Both FromAmount and ToAmount must be > 0.");
+		}
+	}
+
 	public static void EnsureFeeConsistency(Quantity? feeAmount, AssetId? feeAssetId)
 	{
-		if (feeAmount is { IsPositive: true } && feeAssetId is null)
+		if ((feeAssetId is null) != (feeAmount is null))
 		{
-			throw new BadRequestException("FeeAssetId is required when FeeAmount > 0.");
-		}
-
-		if (feeAmount == null && feeAssetId is not null)
-		{
-			throw new BadRequestException("FeeAssetId must be null when FeeAmount is zero.");
+			throw new BadRequestException("FeeAssetId and FeeAmount must be provided together.");
 		}
 	}
 }
