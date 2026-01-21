@@ -64,9 +64,9 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 			throw new DomainValidationException("Platform Name is required.");
 		}
 
-		if (name.Trim().Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Trim().Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
+			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
 		}
 		Name = name.Trim();
 	}

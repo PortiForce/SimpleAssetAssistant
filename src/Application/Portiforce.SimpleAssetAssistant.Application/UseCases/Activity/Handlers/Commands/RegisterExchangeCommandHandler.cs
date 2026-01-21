@@ -57,8 +57,11 @@ public sealed class RegisterExchangeCommandHandler(
 		string primaryId = request.Metadata.GetPrimaryId();
 		ActivityReasonRules.EnsureIsExchangeReason(actualReason, primaryId);
 
+		var activityId = ActivityId.New();
+
 		// 1) Build legs
 		List<AssetMovementLeg> legs = MovementLegFactory.CreateSpotTwoLegsWithOptionalFee(
+			activityId,
 			outAsset.Id,
 			request.OutAmount,
 			outAsset.NativeDecimals,
@@ -78,7 +81,7 @@ public sealed class RegisterExchangeCommandHandler(
 			exchangeType: request.Type,
 			legs: legs,
 			externalMetadata: request.Metadata,
-			id: null);
+			id: activityId);
 
 		return await activityPersistenceService.PersistNewAsync(exchangeActivity, primaryId, ct);
 	}

@@ -10,17 +10,17 @@ public sealed record TenantImportSettings
 		int maxRowsPerImport,
 		int maxFileSizeMb)
 	{
-		if (maxRowsPerImport > LimitationRules.Lengths.Tenant.MaxRowsPerFile)
+		if (maxRowsPerImport > EntityConstraints.Domain.Tenant.MaxRowsPerFile)
 		{
 			throw new ArgumentOutOfRangeException(
 				nameof(maxRowsPerImport),
-				$"Max rows per import cannot exceed {LimitationRules.Lengths.Tenant.MaxRowsPerFile}.");
+				$"Max rows per import cannot exceed {EntityConstraints.Domain.Tenant.MaxRowsPerFile}.");
 		}
 
-		if (maxFileSizeMb > LimitationRules.Lengths.Tenant.MaxFileSizeMb)
+		if (maxFileSizeMb > EntityConstraints.Domain.Tenant.MaxFileSizeMb)
 		{
 			throw new DomainValidationException(
-				$"Max file size for upload is limited to {LimitationRules.Lengths.Tenant.MaxFileSizeMb} mb");
+				$"Max file size for upload is limited to {EntityConstraints.Domain.Tenant.MaxFileSizeMb} mb");
 		}
 
 		RequireReviewBeforeProcessing = requireReviewBeforeProcessing;

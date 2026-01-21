@@ -12,6 +12,9 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 	private Tenant(
 		TenantId id,
 		string name,
+		string code,
+		string? brandName,
+		string domainPrefix,
 		TenantState state,
 		TenantPlan tenantPlan,
 		TenantSettings settings) :base(id)
@@ -21,28 +24,44 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("TenantId must be defined.");
 		}
 
+		if (string.IsNullOrWhiteSpace(code))
+		{
+			throw new DomainValidationException("Code should be defined");
+		}
+
 		name = NormalizeAndValidateTenantName(name);
 
 		Name = name;
+		Code = code;
+		BrandName = brandName;
+		DomainPrefix = domainPrefix;
 		State = state;
 		Plan = tenantPlan;
 		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
 	}
 
 	public string Name { get; private set; }
+	public string Code { get; private set; }
+	public string? BrandName { get; private set; }
+	public string DomainPrefix { get; private set; }
 	public TenantState State { get; private set; }
 	public TenantSettings Settings { get; private set; }
 	public TenantPlan Plan { get; private set; } = TenantPlan.Demo;
 
 	private readonly HashSet<AssetId> _restrictedAssets = new();
 
+	private readonly List<TenantRestrictedAsset> _restrictedTenantAssets = new();
+
 	/// <summary>
 	/// Company/tenant related country specific list of restricted assets
 	/// </summary>
-	public IReadOnlySet<AssetId> RestrictedAssets => _restrictedAssets;
+	public IReadOnlyCollection<TenantRestrictedAsset> RestrictedAssets => _restrictedTenantAssets;
 
 	public static Tenant Create(
 		string name,
+		string code,
+		string brandName,
+		string domainPrefix,
 		TenantSettings? settings = null,
 		TenantState state = TenantState.Provisioning,
 		TenantPlan plan = TenantPlan.Demo,
@@ -50,6 +69,9 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		=> new(
 			id.IsEmpty ? TenantId.New() : id,
 			name,
+			code,
+			brandName,
+			domainPrefix,
 			state,
 			plan,
 			settings ?? TenantSettings.Default());
@@ -87,18 +109,43 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		Plan = plan;
 	}
 
-	public void UpdateRestrictedAssetList(AssetId assetId, bool isRestricted)
+	private void SyncRestrictedAssetsFromEf()
+	{
+		_restrictedAssets.Clear();
+		foreach (var r in _restrictedTenantAssets)
+		{
+			_restrictedAssets.Add(r.AssetId);
+		}
+	}
+
+	public void UpdateRestrictedAssetList(IReadOnlyCollection<AssetId> assetIds, bool isRestricted)
 	{
 		EnsureEditable();
 
-		// todo : consider RestrictionAction enum instead of bool (if necessary)
+		if (assetIds.Count == 0)
+		{
+			return;
+		}
+
 		if (isRestricted)
 		{
-			_restrictedAssets.Add(assetId);
+			foreach (var assetId in assetIds)
+			{
+				if (_restrictedAssets.Add(assetId))
+				{
+					_restrictedTenantAssets.Add(new TenantRestrictedAsset(Id, assetId));
+				}
+			}
 		}
 		else
 		{
-			_restrictedAssets.Remove(assetId);
+			foreach (var assetId in assetIds)
+			{
+				if (_restrictedAssets.Remove(assetId))
+				{
+					_restrictedTenantAssets.RemoveAll(x => x.AssetId == assetId);
+				}
+			}
 		}
 	}
 
@@ -117,8 +164,8 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("Tenant name is required.");
 		}
 
-		int min = LimitationRules.Lengths.Tenant.MinNameLength;
-		int max = LimitationRules.Lengths.Tenant.MaxNameLength;
+		int min = EntityConstraints.Domain.Tenant.MinNameLength;
+		int max = EntityConstraints.Domain.Tenant.MaxNameLength;
 
 		name = name.Trim();
 		if (name.Length < min || name.Length > max)

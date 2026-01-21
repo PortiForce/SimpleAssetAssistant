@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.EF\Portiforce.SimpleAssetAssistant.Infrastructure.EF.csproj" />
   </ItemGroup>
 
 </Project>

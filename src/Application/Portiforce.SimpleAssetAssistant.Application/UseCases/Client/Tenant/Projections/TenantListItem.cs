@@ -7,5 +7,8 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Pro
 public sealed record TenantListItem(
 	TenantId Id,
 	string Name,
+	string Code,
+	string? BrandName,
+	string? DomainPrefix,
 	TenantPlan Plan,
 	TenantState State) : IListItemProjection;

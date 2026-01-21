@@ -58,8 +58,11 @@ public sealed class RegisterTradeCommandHandler(
 		string primaryId = request.Metadata.GetPrimaryId();
 		ActivityReasonRules.EnsureIsTradeReason(actualReason, primaryId);
 
+		var activityId = ActivityId.New();
+
 		// 1) Build legs
 		List<AssetMovementLeg> legs = MovementLegFactory.CreateSpotTwoLegsWithOptionalFee(
+			activityId,
 			outAsset.Id,
 			request.OutAmount,
 			outAsset.NativeDecimals,

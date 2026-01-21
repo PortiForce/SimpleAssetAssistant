@@ -63,9 +63,9 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		}
 
 		// Google 'sub' is short, passkey subjects can vary
-		if (providerSubject.Length > LimitationRules.Lengths.ProviderSubjectMaxLength)
+		if (providerSubject.Length > EntityConstraints.CommonSettings.ProviderSubjectMaxLength)
 		{
-			throw new DomainValidationException($"ProviderSubject is too long (max {LimitationRules.Lengths.ProviderSubjectMaxLength}).");
+			throw new DomainValidationException($"ProviderSubject is too long (max {EntityConstraints.CommonSettings.ProviderSubjectMaxLength}).");
 		}
 
 		return providerSubject.Trim();

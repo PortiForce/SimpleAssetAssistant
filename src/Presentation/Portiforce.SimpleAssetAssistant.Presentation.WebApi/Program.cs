@@ -1,4 +1,6 @@
 using Portiforce.SimpleAssetAssistant.Application;
+using Portiforce.SimpleAssetAssistant.Core.Identity;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi;
@@ -43,6 +45,8 @@ public class Program
 
 		// registration of related flows
 		builder.Services.AddApplication();
+		builder.Services.AddIdentity();
+		builder.Services.AddEfInfrastructure(builder.Configuration);
 
 		var app = builder.Build();
 

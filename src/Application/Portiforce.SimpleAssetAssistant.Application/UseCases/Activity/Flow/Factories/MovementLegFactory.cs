@@ -8,6 +8,7 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Fac
 internal static class MovementLegFactory
 {
 	public static List<AssetMovementLeg> CreateSpotTwoLegsWithOptionalFee(
+		ActivityId activityId,
 		AssetId outId,
 		Quantity outAmount,
 		byte outDecimals,
@@ -21,13 +22,16 @@ internal static class MovementLegFactory
 		List<AssetMovementLeg> legs = new List<AssetMovementLeg>(capacity: feeId is null ? 2 : 3)
 		{
 			AssetMovementLeg.Create(
-				outId, outAmount,
+				activityId,
+				outId,
+				outAmount,
 				MovementRole.Principal,
 				MovementDirection.Outflow,
 				AssetAllocationType.Spot,
 				outDecimals),
 
 			AssetMovementLeg.Create(
+				activityId,
 				inId,
 				inAmount,
 				MovementRole.Principal,
@@ -39,6 +43,7 @@ internal static class MovementLegFactory
 		if (feeId is not null)
 		{
 			legs.Add(AssetMovementLeg.Create(
+				activityId,
 				feeId.Value,
 				feeAmount!.Value,
 				MovementRole.Fee,

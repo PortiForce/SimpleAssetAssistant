@@ -128,8 +128,8 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 
 		alias = alias.Trim().ToLowerInvariant();
 
-		int min = LimitationRules.Lengths.Account.MinAliasLength;
-		int max = LimitationRules.Lengths.Account.MaxAliasLength;
+		int min = EntityConstraints.Domain.Account.MinAliasLength;
+		int max = EntityConstraints.Domain.Account.MaxAliasLength;
 
 		if (alias.Length < min || alias.Length > max)
 		{

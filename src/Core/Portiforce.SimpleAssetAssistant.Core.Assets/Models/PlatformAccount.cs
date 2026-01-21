@@ -45,10 +45,10 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		}
 		name = name.Trim();
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
 			throw new ArgumentException(
-				$"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}",
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
 				nameof(name));
 		}
 
@@ -102,10 +102,10 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 
 		name = name.Trim();
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
 			throw new ArgumentException(
-				$"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}",
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
 				nameof(name));
 		}
 

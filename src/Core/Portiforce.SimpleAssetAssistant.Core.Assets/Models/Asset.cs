@@ -29,18 +29,18 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		{
 			throw new DomainValidationException("AssetCode must be defined.");
 		}
-		if (nativeDecimals > LimitationRules.Lengths.Asset.NativeDecimalsMaxLength)
+		if (nativeDecimals > EntityConstraints.Domain.Asset.NativeDecimalsMaxLength)
 		{
-			throw new DomainValidationException($"NativeDecimals must be <= {LimitationRules.Lengths.Asset.NativeDecimalsMaxLength}.");
+			throw new DomainValidationException($"NativeDecimals must be <= {EntityConstraints.Domain.Asset.NativeDecimalsMaxLength}.");
 		}
 		if (state == AssetLifecycleState.Deleted)
 		{
 			throw new DomainValidationException("State  cannot be Deleted for new Entity");
 		}
 
-		if (name is {Length: > LimitationRules.Lengths.NameMaxLength})
+		if (name is {Length: > EntityConstraints.CommonSettings.NameMaxLength})
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
+			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
 		}
 
 		Code = code;
@@ -84,9 +84,9 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 			throw new ArgumentException("Name should be not empty", nameof(name));
 		}
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
+			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
 		}
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 	}

@@ -38,7 +38,7 @@ public readonly record struct AssetCode
 		// Pragmatic rules:
 		// - 2–16 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
 		// - Allow letters, digits, dot, dash
-		if (code.Length < LimitationRules.Lengths.Asset.CodeMinLength || code.Length > LimitationRules.Lengths.Asset.CodeMaxLength)
+		if (code.Length < EntityConstraints.Domain.Asset.CodeMinLength || code.Length > EntityConstraints.Domain.Asset.CodeMaxLength)
 		{
 			return false;
 		}

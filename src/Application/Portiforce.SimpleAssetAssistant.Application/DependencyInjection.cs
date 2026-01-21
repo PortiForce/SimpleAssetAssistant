@@ -1,6 +1,17 @@
 ﻿using System.Reflection;
+
 using Microsoft.Extensions.DependencyInjection;
+
+using Portiforce.SimpleAssetAssistant.Application.Entitlements.Resolvers;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Time;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Guards;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Activity;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Asset;
+using Portiforce.SimpleAssetAssistant.Application.Tech.Common.Time;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Guards;
+using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Services;
 
 namespace Portiforce.SimpleAssetAssistant.Application;
 
@@ -22,10 +33,15 @@ public static class DependencyInjection
 		services.AddScoped<IMediator>(sp => sp.GetRequiredService<Mediator>());
 		services.AddScoped<IPublisher>(sp => sp.GetRequiredService<Mediator>());
 
-		// 3. Behaviors (Pipelines)
-		// Note: Order matters here. Behaviors execute in the order registered.
-		// services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-		// services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+		// 3. Remaining services registration
+		// Core tech
+		services.AddSingleton<IClock, SystemClock>();
+		services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
+
+		// UseCases: guards/services
+		services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuard>();
+		services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
+		services.AddScoped<IAssetLookupService, AssetLookupService>();
 
 		return services;
 	}
@@ -33,24 +49,23 @@ public static class DependencyInjection
 	private static void RegisterHandlers(IServiceCollection services, Assembly asm)
 	{
 		// Filter for non-abstract, non-interface classes
-		var types = asm.DefinedTypes
+		IEnumerable<TypeInfo> types = asm.DefinedTypes
 			.Where(t => t is { IsAbstract: false, IsInterface: false });
 
-		foreach (var type in types)
+		foreach (TypeInfo type in types)
 		{
-			foreach (var itf in type.ImplementedInterfaces)
+			foreach (Type itf in type.ImplementedInterfaces)
 			{
 				if (!itf.IsGenericType)
 				{
 					continue;
 				}
 
-				var def = itf.GetGenericTypeDefinition();
+				Type def = itf.GetGenericTypeDefinition();
 
 				// Register Command/Query Handlers and Notification Handlers
 				if (def == typeof(IRequestHandler<,>) || def == typeof(INotificationHandler<>))
 				{
-					// CHANGE: Use AddScoped instead of AddTransient
 					services.AddScoped(itf, type);
 				}
 			}

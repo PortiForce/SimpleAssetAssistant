@@ -27,11 +27,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssis
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.Persistence", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.Persistence\Portiforce.SimpleAssetAssistant.Infrastructure.Persistence.csproj", "{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.Identity", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.Identity\Portiforce.SimpleAssetAssistant.Infrastructure.Identity.csproj", "{31C583C8-67A1-42BD-B4CE-A03422AF9B47}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Application", "Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj", "{89855405-B39D-C740-EEA1-837E5ABF3FAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.EF", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.EF\Portiforce.SimpleAssetAssistant.Infrastructure.EF.csproj", "{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +67,6 @@ Global
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,6 +75,10 @@ Global
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,9 +91,9 @@ Global
 		{DE17966E-D143-4E97-820A-33131934AD52} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
 		{7A42093C-AE03-41D7-AAD3-5FE655146768} = {6E31B63C-4567-4993-B7CE-536BA29E276C}
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
-		{FEDFC550-AA18-4923-AEE9-01A3BB2C331E} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
 		{31C583C8-67A1-42BD-B4CE-A03422AF9B47} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD} = {A11A108D-FB20-4BDA-BA01-A466DA27CE09}
+		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}
