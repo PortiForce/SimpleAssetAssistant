@@ -12,10 +12,15 @@ public readonly record struct Quantity
 	public bool IsZero => Value == 0m;
 	public bool IsPositive => Value > 0m;
 
-	public Quantity(decimal value)
+	private Quantity(decimal value)
+	{
+		Value = value;
+	}
+
+	public static Quantity Create(decimal value)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(value, nameof(value));
-		Value = value;
+		return new Quantity(value);
 	}
 
 	public QuantityDelta ToDelta() => new(Value);

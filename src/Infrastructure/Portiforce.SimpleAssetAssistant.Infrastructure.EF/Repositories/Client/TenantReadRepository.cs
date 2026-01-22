@@ -24,7 +24,8 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 				x.DomainPrefix,
 				x.Plan,
 				x.State,
-				Restricted = x.RestrictedAssets.Select(r => r.AssetId).ToList()
+				RestrictedAssets = x.RestrictedAssets.Select(r => r.AssetId).ToList(),
+				RestrictedPlatforms = x.RestrictedPlatforms.Select(r => r.PlatformId).ToList()
 			})
 			.SingleOrDefaultAsync(ct);
 
@@ -41,7 +42,8 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 			DomainPrefix: tenant.DomainPrefix,
 			Plan: tenant.Plan,
 			State: tenant.State,
-			RestrictedAssets: new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenant.Restricted))
+			RestrictedAssets: new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenant.RestrictedAssets)),
+			RestrictedPlatforms: new ReadOnlySet<PlatformId>(new HashSet<PlatformId>(tenant.RestrictedPlatforms))
 		);
 	}
 }

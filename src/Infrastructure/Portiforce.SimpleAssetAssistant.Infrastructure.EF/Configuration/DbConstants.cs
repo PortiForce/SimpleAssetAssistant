@@ -1,4 +1,6 @@
-﻿namespace Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
+﻿using Microsoft.Extensions.Primitives;
+
+namespace Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 internal static class DbConstants
 {
@@ -15,6 +17,8 @@ internal static class DbConstants
 		public static class EntityNames
 		{
 			public const string TenantEntityName = "Tenant";
+			public const string TenantRestrictedAssetEntityName = "TenantRestrictedAsset";
+			public const string TenantRestrictedPlatformEntityName = "TenantRestrictedPlatform";
 
 			public const string PlatformEntityName = "Platform";
 			public const string PlatformAccountEntityName = "PlatformAccount";

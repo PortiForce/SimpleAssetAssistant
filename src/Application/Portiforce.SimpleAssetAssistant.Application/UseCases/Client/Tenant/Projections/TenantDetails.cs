@@ -13,4 +13,5 @@ public sealed record TenantDetails(
 	string? DomainPrefix,
 	TenantPlan Plan,
 	TenantState State,
-	ReadOnlySet<AssetId> RestrictedAssets) : IDetailsProjection;
+	ReadOnlySet<AssetId> RestrictedAssets,
+	ReadOnlySet<PlatformId> RestrictedPlatforms) : IDetailsProjection;

@@ -18,6 +18,6 @@ public readonly record struct QuantityDelta
 	public QuantityDelta Abs() => new(decimal.Abs(Value));
 
 	public Quantity ToQuantityNonNegative()
-		=> Value >= 0m ? new Quantity(Value)
+		=> Value >= 0m ? Quantity.Create(Value)
 			: throw new ArgumentOutOfRangeException(nameof(Value), "Delta is negative.");
 }

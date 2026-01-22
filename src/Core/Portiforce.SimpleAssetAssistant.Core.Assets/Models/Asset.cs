@@ -47,7 +47,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		Kind = kind;
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 		NativeDecimals = nativeDecimals;
-		EntityState = state;
+		State = state;
 	}
 
 	public AssetCode Code { get; }
@@ -56,7 +56,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	public string? Name { get; private set; }
 	public byte NativeDecimals { get; }
 
-	public AssetLifecycleState EntityState { get; private set; } = AssetLifecycleState.Draft;
+	public AssetLifecycleState State { get; private set; } = AssetLifecycleState.Draft;
 
 	public IReadOnlySet<AssetCode> Synonyms => _synonyms;
 
@@ -107,11 +107,11 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		EnsureEditable();
 
-		if (EntityState == AssetLifecycleState.Disabled)
+		if (State == AssetLifecycleState.Disabled)
 		{
 			return false;
 		}
-		EntityState = AssetLifecycleState.Disabled;
+		State = AssetLifecycleState.Disabled;
 		return true;
 	}
 
@@ -119,13 +119,13 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		if (IsReadonly())
 		{
-			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {EntityState}, id: {Id}");
+			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
 		}
 	}
 
 	private bool IsReadonly()
 	{
-		return EntityState is
+		return State is
 			AssetLifecycleState.Disabled 
 			or AssetLifecycleState.ReadOnly 
 			or AssetLifecycleState.Deleted;

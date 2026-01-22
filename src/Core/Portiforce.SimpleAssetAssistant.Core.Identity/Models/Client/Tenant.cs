@@ -50,12 +50,21 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 	private readonly HashSet<AssetId> _restrictedAssets = new();
 
+	private readonly HashSet<PlatformId> _restrictedPlatforms = new();
+
 	private readonly List<TenantRestrictedAsset> _restrictedTenantAssets = new();
+
+	private readonly List<TenantRestrictedPlatform> _restrictedTenantPlatforms = new();
 
 	/// <summary>
 	/// Company/tenant related country specific list of restricted assets
 	/// </summary>
 	public IReadOnlyCollection<TenantRestrictedAsset> RestrictedAssets => _restrictedTenantAssets;
+
+	/// <summary>
+	/// Company/tenant related country specific list of restricted platforms
+	/// </summary>
+	public IReadOnlyCollection<TenantRestrictedPlatform> RestrictedPlatforms => _restrictedTenantPlatforms;
 
 	public static Tenant Create(
 		string name,
@@ -118,6 +127,15 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		}
 	}
 
+	private void SyncRestrictedPlatformsFromEf()
+	{
+		_restrictedPlatforms.Clear();
+		foreach (var r in _restrictedTenantPlatforms)
+		{
+			_restrictedPlatforms.Add(r.PlatformId);
+		}
+	}
+
 	public void UpdateRestrictedAssetList(IReadOnlyCollection<AssetId> assetIds, bool isRestricted)
 	{
 		EnsureEditable();
@@ -149,6 +167,37 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		}
 	}
 
+	public void UpdateRestrictedPlatformList(IReadOnlyCollection<PlatformId> platformIds, bool isRestricted)
+	{
+		EnsureEditable();
+
+		if (platformIds.Count == 0)
+		{
+			return;
+		}
+
+		if (isRestricted)
+		{
+			foreach (var platformId in platformIds)
+			{
+				if (_restrictedPlatforms.Add(platformId))
+				{
+					_restrictedTenantPlatforms.Add(new TenantRestrictedPlatform(Id, platformId));
+				}
+			}
+		}
+		else
+		{
+			foreach (var platformId in platformIds)
+			{
+				if (_restrictedPlatforms.Remove(platformId))
+				{
+					_restrictedTenantPlatforms.RemoveAll(x => x.PlatformId == platformId);
+				}
+			}
+		}
+	}
+
 	private void EnsureEditable()
 	{
 		if (State is TenantState.Deleted)
@@ -164,8 +213,8 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("Tenant name is required.");
 		}
 
-		int min = EntityConstraints.Domain.Tenant.MinNameLength;
-		int max = EntityConstraints.Domain.Tenant.MaxNameLength;
+		int min = EntityConstraints.Domain.Tenant.NameMinLength;
+		int max = EntityConstraints.Domain.Tenant.NameMaxLength;
 
 		name = name.Trim();
 		if (name.Length < min || name.Length > max)

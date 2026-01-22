@@ -15,11 +15,11 @@ public static class TradeMapper
 		MarketKind: r.MarketKind,
 		ExecutionType: r.ExecutionType,
 		InAssetId: AssetId.From(r.InAssetId),
-		InAmount: new Quantity(r.InAmount),
+		InAmount: Quantity.Create(r.InAmount),
 		OutAssetId: AssetId.From(r.OutAssetId),
-		OutAmount: new Quantity(r.OutAmount),
+		OutAmount: Quantity.Create(r.OutAmount),
 		FeeAssetId: r.FeeAssetId is null ? null : AssetId.From(r.FeeAssetId.Value),
-		FeeAmount: r.FeeAmount is null ? null : new Quantity(r.FeeAmount.Value),
+		FeeAmount: r.FeeAmount is null ? null : Quantity.Create(r.FeeAmount.Value),
 		Metadata: new ExternalMetadata(source: r.Source, externalId: r.ExternalId)
 	);
 }
