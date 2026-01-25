@@ -18,10 +18,10 @@ public static class EFDatabaseExtensions
 			{
 				var context = services.GetRequiredService<AssetAssistantDbContext>();
 
-				// 1. Assets Seeding
+				// 1. Assets seeding
 				if (!context.Assets.Any())
 				{
-					Console.WriteLine("Seeding Assets...");
+					Console.WriteLine("Seeding Assets.");
 					List<Asset> assets = AssetDataSeeder.GetAssets();
 					context.Assets.AddRange(assets);
 					context.SaveChanges();
@@ -32,20 +32,20 @@ public static class EFDatabaseExtensions
 					Console.WriteLine("Assets already exist. Skipping seed.");
 				}
 
-				// 2. Platforms Seeding
+				// 2. Platforms seeding
 				if (!context.Platforms.Any())
 				{
-					Console.WriteLine("Seeding Platforms...");
+					Console.WriteLine("Seeding Platforms.");
 					List<Platform> platforms = PlatformDataSeeder.GetPlatforms();
 					context.Platforms.AddRange(platforms);
 					context.SaveChanges();
 					Console.WriteLine($"Seeded {platforms.Count} Platforms.");
 				}
 
-				// 3. Tenants:Seeding
+				// 3. Tenants:seeding
 				if (!context.Tenants.Any())
 				{
-					Console.WriteLine("Seeding Tenants...");
+					Console.WriteLine("Seeding Tenants.");
 					List<Tenant> tenants = TenantDataSeeder.GetTenants();
 					context.Tenants.AddRange(tenants);
 					context.SaveChanges();
@@ -54,8 +54,7 @@ public static class EFDatabaseExtensions
 			}
 			catch (Exception ex)
 			{
-				//var logger = services.GetRequiredService<ILogger<Program>>();
-				//logger.LogError(ex, "An error occurred while seeding the database.");
+				// todo tech: log exception - decide what to do later
 				throw;
 			}
 		}
