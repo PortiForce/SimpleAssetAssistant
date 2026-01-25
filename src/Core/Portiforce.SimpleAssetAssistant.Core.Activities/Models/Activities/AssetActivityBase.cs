@@ -6,17 +6,41 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public abstract record AssetActivityBase(ActivityId Id) : FactRecord<ActivityId>(Id), IAggregateRoot
+public abstract record AssetActivityBase : Fact<ActivityId>, IAggregateRoot
 {
-	public abstract AssetActivityKind Kind { get; }
+	protected AssetActivityBase(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs
+		) : base(id)
+	{
+		TenantId = tenantId;
+		PlatformAccountId = platformAccountId;
+		Kind = kind;
+		OccurredAt = occuredAt;
+		ExternalMetadata = externalMetadata;
+		Legs = legs;
+	}
 
-	public required TenantId TenantId { get; init; }
+	// Private Empty Constructor for EF Core
+	protected AssetActivityBase()
+	{
+		Legs = new List<AssetMovementLeg>();
+	}
 
-	public required PlatformAccountId PlatformAccountId { get; init; }
+	public TenantId TenantId { get; private set; }
 
-	public required DateTimeOffset OccurredAt { get; init; }
+	public PlatformAccountId PlatformAccountId { get; private set; }
 
-	public required ExternalMetadata ExternalMetadata { get; init; }
+	public AssetActivityKind Kind { get; private set; }
 
-	public required IReadOnlyList<AssetMovementLeg> Legs { get; init; }
+	public DateTimeOffset OccurredAt { get; private set; }
+
+	public ExternalMetadata ExternalMetadata { get; private set; }
+
+	public IReadOnlyList<AssetMovementLeg> Legs { get; private set; }
 }

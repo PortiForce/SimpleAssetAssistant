@@ -33,9 +33,15 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		IsPrimary = isPrimary;
 	}
 
-	public AccountId AccountId { get; }
-	public AuthProvider Provider { get; }
-	public string ProviderSubject { get; }
+	// Private Empty Constructor for EF Core
+	private ExternalIdentity()
+	{
+
+	}
+
+	public AccountId AccountId { get; init; }
+	public AuthProvider Provider { get; init; }
+	public string ProviderSubject { get; init; }
 
 	public bool IsPrimary { get; private set; }
 
@@ -63,9 +69,9 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		}
 
 		// Google 'sub' is short, passkey subjects can vary
-		if (providerSubject.Length > LimitationRules.Lengths.ProviderSubjectMaxLength)
+		if (providerSubject.Length > EntityConstraints.CommonSettings.ProviderSubjectMaxLength)
 		{
-			throw new DomainValidationException($"ProviderSubject is too long (max {LimitationRules.Lengths.ProviderSubjectMaxLength}).");
+			throw new DomainValidationException($"ProviderSubject is too long (max {EntityConstraints.CommonSettings.ProviderSubjectMaxLength}).");
 		}
 
 		return providerSubject.Trim();

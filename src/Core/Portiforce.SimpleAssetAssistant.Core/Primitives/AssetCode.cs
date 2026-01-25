@@ -2,9 +2,15 @@
 
 namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
-public readonly record struct AssetCode
+public sealed record AssetCode
 {
-	public string Value { get; }
+	// Private Empty Constructor for EF Core
+	private AssetCode()
+	{
+
+	}
+
+	public string Value { get; init; } = null!;
 
 	private AssetCode(string value)
 	{
@@ -38,7 +44,7 @@ public readonly record struct AssetCode
 		// Pragmatic rules:
 		// - 2–16 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
 		// - Allow letters, digits, dot, dash
-		if (code.Length < LimitationRules.Lengths.Asset.CodeMinLength || code.Length > LimitationRules.Lengths.Asset.CodeMaxLength)
+		if (code.Length is < EntityConstraints.Domain.Asset.CodeMinLength or > EntityConstraints.Domain.Asset.CodeMaxLength)
 		{
 			return false;
 		}

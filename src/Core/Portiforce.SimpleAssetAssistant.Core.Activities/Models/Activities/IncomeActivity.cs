@@ -5,9 +5,32 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record IncomeActivity(ActivityId Id) : ReasonedActivity(Id)
+public sealed record IncomeActivity : ReasonedActivity
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Income;
+	// not public, init only via factory
+	private IncomeActivity(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs,
+		AssetActivityReason reason)
+		: base(
+			id,
+			tenantId,
+			platformAccountId,
+			kind,
+			occuredAt,
+			externalMetadata,
+			legs,
+			reason)
+	{
+	}
+
+	// Private Empty Constructor for EF Core
+	private IncomeActivity() : base() { }
 
 	public static IncomeActivity Create(
 		TenantId tenantId,
@@ -23,14 +46,14 @@ public sealed record IncomeActivity(ActivityId Id) : ReasonedActivity(Id)
 		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureOneSidedInflow(legs);
 
-		return new IncomeActivity(id ?? ActivityId.New())
-		{
-			TenantId = tenantId,
-			PlatformAccountId = platformAccountId,
-			OccurredAt = occurredAt,
-			Reason = reason,
-			Legs = legs,
-			ExternalMetadata = externalMetadata
-		};
+		return new IncomeActivity(
+			id ?? ActivityId.New(),
+			tenantId,
+			platformAccountId,
+			AssetActivityKind.Income,
+			occurredAt,
+			externalMetadata,
+			legs,
+			reason);
 	}
 }

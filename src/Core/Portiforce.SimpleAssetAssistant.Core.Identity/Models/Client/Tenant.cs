@@ -12,8 +12,11 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 	private Tenant(
 		TenantId id,
 		string name,
+		string code,
+		string? brandName,
+		string domainPrefix,
 		TenantState state,
-		TenantPlan tenantPlan,
+		TenantPlan plan,
 		TenantSettings settings) :base(id)
 	{
 		if (id.IsEmpty)
@@ -21,35 +24,69 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("TenantId must be defined.");
 		}
 
+		if (string.IsNullOrWhiteSpace(code))
+		{
+			throw new DomainValidationException("Code should be defined");
+		}
+
 		name = NormalizeAndValidateTenantName(name);
 
 		Name = name;
+		Code = code;
+		BrandName = brandName;
+		DomainPrefix = domainPrefix;
 		State = state;
-		Plan = tenantPlan;
+		Plan = plan;
 		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
 	}
 
+	// Private Empty Constructor for EF Core
+	private Tenant()
+	{
+		
+	}
+
 	public string Name { get; private set; }
+	public string Code { get; init; }
+	public string? BrandName { get; private set; }
+	public string DomainPrefix { get; init; }
 	public TenantState State { get; private set; }
 	public TenantSettings Settings { get; private set; }
-	public TenantPlan Plan { get; private set; } = TenantPlan.Demo;
+	public TenantPlan Plan { get; private set; }
 
 	private readonly HashSet<AssetId> _restrictedAssets = new();
+
+	private readonly HashSet<PlatformId> _restrictedPlatforms = new();
+
+	private readonly List<TenantRestrictedAsset> _restrictedTenantAssets = new();
+
+	private readonly List<TenantRestrictedPlatform> _restrictedTenantPlatforms = new();
 
 	/// <summary>
 	/// Company/tenant related country specific list of restricted assets
 	/// </summary>
-	public IReadOnlySet<AssetId> RestrictedAssets => _restrictedAssets;
+	public IReadOnlyCollection<TenantRestrictedAsset> RestrictedAssets => _restrictedTenantAssets;
+
+	/// <summary>
+	/// Company/tenant related country specific list of restricted platforms
+	/// </summary>
+	public IReadOnlyCollection<TenantRestrictedPlatform> RestrictedPlatforms => _restrictedTenantPlatforms;
 
 	public static Tenant Create(
 		string name,
-		TenantSettings? settings = null,
+		string code,
+		string brandName,
+		string domainPrefix,
 		TenantState state = TenantState.Provisioning,
 		TenantPlan plan = TenantPlan.Demo,
+		TenantSettings? settings = null,
 		TenantId id = default)
 		=> new(
 			id.IsEmpty ? TenantId.New() : id,
 			name,
+			code,
+			brandName,
+			domainPrefix,
 			state,
 			plan,
 			settings ?? TenantSettings.Default());
@@ -87,18 +124,90 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		Plan = plan;
 	}
 
-	public void UpdateRestrictedAssetList(AssetId assetId, bool isRestricted)
+	public void UpdateSettings(TenantSettings newSettings)
 	{
 		EnsureEditable();
 
-		// todo : consider RestrictionAction enum instead of bool (if necessary)
+		Settings = newSettings ?? throw new DomainValidationException("Settings cannot be null.");
+	}
+
+	private void SyncRestrictedAssetsFromEf()
+	{
+		_restrictedAssets.Clear();
+		foreach (var r in _restrictedTenantAssets)
+		{
+			_restrictedAssets.Add(r.AssetId);
+		}
+	}
+
+	private void SyncRestrictedPlatformsFromEf()
+	{
+		_restrictedPlatforms.Clear();
+		foreach (var r in _restrictedTenantPlatforms)
+		{
+			_restrictedPlatforms.Add(r.PlatformId);
+		}
+	}
+
+	public void UpdateRestrictedAssetList(IReadOnlyCollection<AssetId> assetIds, bool isRestricted)
+	{
+		EnsureEditable();
+
+		if (assetIds.Count == 0)
+		{
+			return;
+		}
+
 		if (isRestricted)
 		{
-			_restrictedAssets.Add(assetId);
+			foreach (var assetId in assetIds)
+			{
+				if (_restrictedAssets.Add(assetId))
+				{
+					_restrictedTenantAssets.Add(new TenantRestrictedAsset(Id, assetId));
+				}
+			}
 		}
 		else
 		{
-			_restrictedAssets.Remove(assetId);
+			foreach (var assetId in assetIds)
+			{
+				if (_restrictedAssets.Remove(assetId))
+				{
+					_restrictedTenantAssets.RemoveAll(x => x.AssetId == assetId);
+				}
+			}
+		}
+	}
+
+	public void UpdateRestrictedPlatformList(IReadOnlyCollection<PlatformId> platformIds, bool isRestricted)
+	{
+		EnsureEditable();
+
+		if (platformIds.Count == 0)
+		{
+			return;
+		}
+
+		if (isRestricted)
+		{
+			foreach (var platformId in platformIds)
+			{
+				if (_restrictedPlatforms.Add(platformId))
+				{
+					_restrictedTenantPlatforms.Add(new TenantRestrictedPlatform(Id, platformId));
+				}
+			}
+		}
+		else
+		{
+			foreach (var platformId in platformIds)
+			{
+				if (_restrictedPlatforms.Remove(platformId))
+				{
+					_restrictedTenantPlatforms.RemoveAll(x => x.PlatformId == platformId);
+				}
+			}
 		}
 	}
 
@@ -117,8 +226,8 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("Tenant name is required.");
 		}
 
-		int min = LimitationRules.Lengths.Tenant.MinNameLength;
-		int max = LimitationRules.Lengths.Tenant.MaxNameLength;
+		int min = EntityConstraints.Domain.Tenant.NameMinLength;
+		int max = EntityConstraints.Domain.Tenant.NameMaxLength;
 
 		name = name.Trim();
 		if (name.Length < min || name.Length > max)

@@ -1,4 +1,7 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 
@@ -8,11 +11,11 @@ public static class ActivityGuards
 	/// Validates that a given Reason is compatible with a given ActivityKind.
 	/// IMPORTANT: Transfer is not "reasoned" in this model; do not call this for Transfer.
 	/// </summary>
-	public static bool IsAllowed(AssetActivityKind activityKind, AssetActivityReason reason) =>
+	public static bool IsReasonActivityPairAllowed(AssetActivityKind activityKind, AssetActivityReason reason) =>
 		activityKind switch
 		{
+			// todo feature: trade and exchange entities are quire tricky, maybe they should share same Buyy/Sell/Conversion flows
 			AssetActivityKind.Trade => reason is AssetActivityReason.Buy or AssetActivityReason.Sell,
-
 			AssetActivityKind.Exchange => reason is AssetActivityReason.Conversion,
 
 			AssetActivityKind.Income => reason is AssetActivityReason.Reward
@@ -38,10 +41,10 @@ public static class ActivityGuards
 		{
 			throw new ArgumentException(
 				$"'{nameof(AssetActivityKind.Transfer)}' is not a reasoned activity. " +
-				$"Do not validate it via {nameof(IsAllowed)}; validate transfer via Direction/LegGuards instead.");
+				$"Do not validate it via {nameof(IsReasonActivityPairAllowed)}; validate transfer via Direction/LegGuards instead.");
 		}
 
-		if (!IsAllowed(activityKind, reason))
+		if (!IsReasonActivityPairAllowed(activityKind, reason))
 		{
 			throw new ArgumentException($"Reason '{reason}' is not allowed for '{activityKind}' activity.");
 		}

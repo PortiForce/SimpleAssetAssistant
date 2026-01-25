@@ -1,17 +1,21 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
 
-public sealed record AssetMovementLeg
+public sealed record AssetMovementLeg : Fact<LegId>
 {
-	public required AssetId AssetId { get; init; }
+	public AssetId AssetId { get; init; }
 
-	public required Quantity Amount { get; init; }
+	public ActivityId ActivityId { get; init; }
 
-	public required MovementDirection Direction { get; init; }
+	public Quantity Amount { get; init; }
+
+	public MovementDirection Direction { get; init; }
 
 	public MovementRole Role { get; init; } = MovementRole.Principal;
 
@@ -19,13 +23,15 @@ public sealed record AssetMovementLeg
 
 	public string? InstrumentKey { get; init; }
 
-	public static AssetMovementLeg Create(
+	private AssetMovementLeg(
+		LegId id,
+		ActivityId activityId,
 		AssetId assetId,
 		Quantity amount,
 		MovementRole role,
 		MovementDirection direction,
 		AssetAllocationType allocation,
-		string? instrumentKey = null)
+		string? instrumentKey): base(id)
 	{
 		if (amount == Quantity.Zero)
 		{
@@ -37,21 +43,49 @@ public sealed record AssetMovementLeg
 			throw new DomainValidationException("AssetId should be defined value for a leg");
 		}
 
+		if (activityId.IsEmpty)
+		{
+			throw new DomainValidationException("ActivityId should be defined value for a leg");
+		}
+
 		if (role == MovementRole.Fee && direction != MovementDirection.Outflow)
 		{
 			throw new DomainValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
 		}
-
-		var leg = new AssetMovementLeg
-		{
-			AssetId = assetId,
-			Amount = amount,
-			Direction = direction,
-			Role = role,
-			Allocation = allocation,
-			InstrumentKey = instrumentKey
-		};
 		
-		return leg;
+		ActivityId = activityId;
+		AssetId = assetId;
+		Amount = amount;
+		Role = role;
+		Allocation = allocation;
+		Direction = direction;
+		InstrumentKey = instrumentKey;
+	}
+
+	// Private Empty Constructor for EF Core
+	private AssetMovementLeg() : base() { }
+
+	public static AssetMovementLeg Create(
+		ActivityId activityId,
+		AssetId assetId,
+		Quantity amount,
+		MovementRole role,
+		MovementDirection direction,
+		AssetAllocationType allocation,
+		byte nativeDecimals,
+		LegId id = default,
+		string? instrumentKey = null)
+	{
+		ConsistencyRules.EnsureScaleDoesNotExceed(amount.Value, nativeDecimals, nameof(amount));
+
+		return new (
+			id.IsEmpty ? LegId.New() : id,
+			activityId,
+			assetId,
+			amount,
+			role,
+			direction,
+			allocation,
+			instrumentKey);
 	}
 }

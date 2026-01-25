@@ -5,9 +5,37 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record TransferActivity(ActivityId Id) : AssetActivityBase(Id)
+public sealed record TransferActivity : AssetActivityBase
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Transfer;
+	// not public, init only via factory
+	private TransferActivity(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs,
+		TransferKind transferKind,
+		TransferDirection direction,
+		string? reference,
+		string? counterparty)
+		: base(
+			id,
+			tenantId,
+			platformAccountId,
+			kind, occuredAt,
+			externalMetadata,
+			legs)
+	{
+		TransferKind = transferKind;
+		Direction = direction;
+		Reference = reference;
+		Counterparty = counterparty;
+	}
+
+	// Private Empty Constructor for EF Core
+	private TransferActivity() : base() { }
 
 	public TransferKind TransferKind { get; init; }
 	public TransferDirection Direction { get; init; }
@@ -30,17 +58,17 @@ public sealed record TransferActivity(ActivityId Id) : AssetActivityBase(Id)
 		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureTransferShape(direction, legs);
 
-		return new TransferActivity(id ?? ActivityId.New())
-		{
-			TenantId = tenantId,
-			PlatformAccountId = platformAccountId,
-			OccurredAt = occurredAt,
-			TransferKind = transferKind,
-			Direction = direction,
-			Reference = reference,
-			Counterparty = counterparty,
-			Legs = legs,
-			ExternalMetadata = externalMetadata
-		};
+		return new TransferActivity(
+			id ?? ActivityId.New(),
+			tenantId,
+			platformAccountId,
+			AssetActivityKind.Transfer,
+			occurredAt,
+			externalMetadata,
+			legs,
+			transferKind,
+			direction,
+			reference,
+			counterparty);
 	}
 }

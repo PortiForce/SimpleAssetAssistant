@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
@@ -8,4 +8,4 @@ public sealed record ManageTenantAssetRestrictionCommand(
 	TenantId TenantId,
 	AssetId AssetId,
 	bool  IsRestricted
-) : ICommand<BaseCommandResponse>;
+) : ICommand<BaseCommandResult>;

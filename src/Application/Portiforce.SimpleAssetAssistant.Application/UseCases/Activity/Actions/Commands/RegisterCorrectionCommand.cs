@@ -1,17 +1,17 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
 
 public sealed record RegisterCorrectionCommand(
 	TenantId TenantId,
-	AccountId AccountId,
-	PlatformId PlatformId,
+	PlatformAccountId PlatformAccountId,
 	DateTimeOffset OccurredAt,
-
-	string AssetCode,
-	decimal DeltaAmount,      // Can be negative
-	string Reason,            // "UserCorrection"
+	AssetId AssetId,
+	QuantityDelta DeltaAmount, // Not Quantity, as this might accept negative values as a correction element
+	AssetActivityReason Reason,
 	string? Notes
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

@@ -14,7 +14,7 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		TenantId tenantId,
 		AccountId accountId,
 		PlatformId platformId,
-		string name,
+		string accountName,
 		PlatformAccountState state,
 		string? externalAccountId,
 		string? externalUserId): base(id)
@@ -39,34 +39,36 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 			throw new DomainValidationException("PlatformId must be defined.");
 		}
 
-		if (string.IsNullOrWhiteSpace(name))
+		if (string.IsNullOrWhiteSpace(accountName))
 		{
 			throw new DomainValidationException("PlatformAccount Name is required.");
 		}
-		name = name.Trim();
+		accountName = accountName.Trim();
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (accountName.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
 			throw new ArgumentException(
-				$"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}",
-				nameof(name));
+				$"AccountName value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
+				nameof(accountName));
 		}
 
 		TenantId = tenantId;
 		AccountId = accountId;
 		PlatformId = platformId;
-		Name = name;
+		AccountName = accountName;
 		State = state;
 
 		ExternalAccountId = string.IsNullOrWhiteSpace(externalAccountId) ? null : externalAccountId.Trim();
 		ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
 	}
 
-	public TenantId TenantId { get; }
-	public AccountId AccountId { get; }
-	public PlatformId PlatformId { get; }
+	// Private Empty Constructor for EF Core
+	private PlatformAccount() { }
 
-	public string Name { get; private set; }
+	public TenantId TenantId { get; init; }
+	public AccountId AccountId { get; init; }
+	public PlatformId PlatformId { get; init; }
+	public string AccountName { get; private set; }
 	public PlatformAccountState State { get; private set; }
 
 	public string? ExternalAccountId { get; private set; }
@@ -102,14 +104,14 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 
 		name = name.Trim();
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
 			throw new ArgumentException(
-				$"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}",
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
 				nameof(name));
 		}
 
-		Name = name;
+		AccountName = name;
 	}
 
 	public void ChangeState(PlatformAccountState state)

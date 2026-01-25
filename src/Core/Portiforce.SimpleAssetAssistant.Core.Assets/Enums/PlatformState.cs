@@ -3,6 +3,11 @@
 public enum PlatformState : byte
 {
 	/// <summary>
+	/// Draft (pre-operation) state
+	/// </summary>
+	Draft = 0,
+
+	/// <summary>
 	/// Fully operational
 	/// </summary>
 	Active = 1,

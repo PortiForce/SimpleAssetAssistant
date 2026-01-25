@@ -1,5 +1,8 @@
-
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Portiforce.SimpleAssetAssistant.Application;
+using Portiforce.SimpleAssetAssistant.Core.Identity;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi;
 
@@ -15,28 +18,61 @@ public class Program
 			builder.Configuration.AddUserSecrets<Program>(optional: true);
 		}
 
-		// Add services to the container.
-
 		builder.Services.AddControllers();
-		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+		// RFC 7807 ProblemDetails support
+		builder.Services.AddProblemDetails(options =>
+		{
+			// attach trace id for correlation
+			options.CustomizeProblemDetails = ctx =>
+			{
+				ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+
+				// If you decide to use stable error codes, your ApiExceptionHandler should set:
+				// ctx.ProblemDetails.Extensions["code"] = "PF-409-DUPLICATE_EXTERNAL_ID";
+				//
+				// Keep CustomizeProblemDetails as "global defaults" only,
+				// and put exception-specific mapping into ApiExceptionHandler.
+			};
+		});
+
+		// Central exception handling via IExceptionHandler
+		builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
 		builder.Services.AddOpenApi();
 
-		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+		//  current user / correlation / multi-tenancy access outside controllers
+		builder.Services.AddHttpContextAccessor();
+
+		// registration of related flows
+		builder.Services.AddApplication();
+		builder.Services.AddIdentity();
+		builder.Services.AddEfInfrastructure(builder.Configuration);
 
 		var app = builder.Build();
 
-		// Configure the HTTP request pipeline.
-		if (app.Environment.IsDevelopment())
+		if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
 		{
 			app.MapOpenApi();
 		}
+
+		app.UseExceptionHandler();
 
 		app.UseHttpsRedirection();
 
 		app.UseAuthorization();
 
 		app.MapControllers();
+
+		// ==========================================
+		// ? EXECUTE SEEDING HERE
+		// ==========================================
+		if (app.Environment.IsDevelopment())
+		{
+			// It is safe to run this on every startup in Dev
+			// It checks .Any() internally so it won't duplicate data
+			app.PopulateGlobalDictionaries();
+		}
 
 		app.Run();
 	}

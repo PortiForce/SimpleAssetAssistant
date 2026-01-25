@@ -1,8 +1,14 @@
 ﻿namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
-public readonly record struct Email
+public sealed record Email
 {
-	public string Value { get; }
+	// Private Empty Constructor for EF Core
+	private Email()
+	{
+
+	}
+
+	public string Value { get; init; } = null!;
 
 	private Email(string value) => Value = value;
 

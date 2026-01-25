@@ -1,24 +1,21 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
 
 public sealed record RegisterTransferCommand(
 	TenantId TenantId,
-	AccountId AccountId,
-	PlatformId PlatformId,
+	PlatformAccountId PlatformAccountId,
 	DateTimeOffset OccurredAt,
-
-	string AssetCode,
-	decimal Amount,
-	string Direction,         // "Deposit" or "Withdrawal"
-
-	// Fee (Optional - usually withdrawal fee)
-	string? FeeAssetCode,
-	decimal? FeeAmount,
-
-	string? Reference,        // e.g. TX Hash
-	string? Counterparty,     // e.g. Wallet Address
+	AssetId AssetId,
+	Quantity Amount,
+	MovementDirection Direction,
+	AssetId? FeeAssetId,
+	Quantity? FeeAmount,
+	string? Reference,
+	string? Counterparty,
 	string Source
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+) : ICommand<CommandResult<ActivityId>>;

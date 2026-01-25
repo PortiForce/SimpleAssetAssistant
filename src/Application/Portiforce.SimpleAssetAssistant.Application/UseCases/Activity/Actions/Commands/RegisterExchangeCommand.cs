@@ -1,6 +1,8 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Responses;
+﻿using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Commands;
@@ -11,28 +13,17 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.
 /// </summary>
 public sealed record RegisterExchangeCommand(
 	TenantId TenantId,
-	AccountId AccountId,
-	PlatformId PlatformId,
+	PlatformAccountId PlatformAccountId,
 	DateTimeOffset OccurredAt,
-
-	// Trade Details
-	string Pair, // e.g. "BTC/USD"
 	MarketKind MarketKind,
 	TradeExecutionType ExecutionType,
-
-	// Inflow (What I got)
-	string InAssetCode,
-	decimal InAmount,
-
-	// Outflow (What I gave)
-	string OutAssetCode,
-	decimal OutAmount,
-
-	// Fee (Optional)
-	string? FeeAssetCode,
-	decimal? FeeAmount,
-
-	// Metadata
-	string Source,
-	string? ExternalId
-) : ICommand<BaseCreateCommandResponse<ActivityId>>;
+	AssetId InAssetId,
+	Quantity InAmount,
+	AssetId OutAssetId,
+	Quantity OutAmount,
+	AssetId? FeeAssetId,
+	Quantity? FeeAmount,
+	ExchangeType Type,
+	CompletionType CompletionType,
+	ExternalMetadata Metadata
+) : ICommand<CommandResult<ActivityId>>;

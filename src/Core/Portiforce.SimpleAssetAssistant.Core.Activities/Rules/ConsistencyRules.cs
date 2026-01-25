@@ -1,30 +1,31 @@
-﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
-using Portiforce.SimpleAssetAssistant.Core.Exceptions;
-using Portiforce.SimpleAssetAssistant.Core.Primitives;
-using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Rules;
 
 public static class ConsistencyRules
 {
-	public static void EnsureMovementNotEmpty(Quantity fromAmount, Quantity toAmount)
+	/// <summary>
+	/// Ensures that the decimal precision of a value does not exceed
+	/// the maximum allowed scale for the related asset.
+	/// </summary>
+	/// <param name="value">Actual value to validate</param>
+	/// <param name="maxDecimals">Maximum allowed decimal places</param>
+	/// <param name="paramName">Name of the field being validated</param>
+	/// <exception cref="DomainValidationException">
+	/// Thrown when the value exceeds allowed precision.
+	/// </exception>
+	public static void EnsureScaleDoesNotExceed(
+		decimal value,
+		byte maxDecimals,
+		string paramName)
 	{
-		if (fromAmount.Value == 0m && toAmount.Value == 0m)
-		{
-			throw new DomainValidationException("At least one of FromAmount or ToAmount must be > 0.");
-		}
-	}
+		var bits = decimal.GetBits(value);
+		var scale = (bits[3] >> 16) & 0x7F;
 
-	public static void EnsureFeeConsistency(Quantity feeAmount, AssetId? feeAssetId)
-	{
-		if (feeAmount.Value > 0 && feeAssetId is null)
+		if (scale > maxDecimals)
 		{
-			throw new DomainValidationException("FeeAssetId is required when FeeAmount > 0.");
-		}
-
-		if (feeAmount.Value == 0 && feeAssetId is not null)
-		{
-			throw new DomainValidationException("FeeAssetId must be null when FeeAmount is zero.");
+			throw new DomainValidationException(
+				$"{paramName} has {scale} decimal places, but max allowed is {maxDecimals}.");
 		}
 	}
 }

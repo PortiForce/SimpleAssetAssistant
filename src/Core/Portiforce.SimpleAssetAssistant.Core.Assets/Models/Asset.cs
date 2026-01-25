@@ -1,5 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Assets.Enums;
-using Portiforce.SimpleAssetAssistant.Core.Enums;
+using Portiforce.SimpleAssetAssistant.Core.Assets.Extensions;
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
@@ -17,6 +17,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		AssetId id,
 		AssetCode code,
 		AssetKind kind,
+		AssetLifecycleState state,
 		string? name,
 		byte nativeDecimals) : base(id)
 	{
@@ -28,35 +29,43 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		{
 			throw new DomainValidationException("AssetCode must be defined.");
 		}
-		if (nativeDecimals > 18)
+		if (nativeDecimals > EntityConstraints.Domain.Asset.NativeDecimalsMaxLength)
 		{
-			throw new DomainValidationException("NativeDecimals must be <= 18.");
+			throw new DomainValidationException($"NativeDecimals must be <= {EntityConstraints.Domain.Asset.NativeDecimalsMaxLength}.");
+		}
+		if (state == AssetLifecycleState.Deleted)
+		{
+			throw new DomainValidationException("State  cannot be Deleted for new Entity");
 		}
 
-		if (name is {Length: > LimitationRules.Lengths.NameMaxLength})
+		if (name is {Length: > EntityConstraints.CommonSettings.NameMaxLength})
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
+			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
 		}
 
 		Code = code;
 		Kind = kind;
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 		NativeDecimals = nativeDecimals;
+		State = state;
 	}
 
-	public AssetCode Code { get; }
-	public AssetKind Kind { get; }
+	// Private Empty Constructor for EF Core
+	private Asset()
+	{
+		_synonyms = new HashSet<AssetCode>();
+	}
 
+	public AssetCode Code { get; init; }
+	public AssetKind Kind { get; init; }
 	public string? Name { get; private set; }
-	public byte NativeDecimals { get; }
-
-	public EntityLifecycleState EntityState { get; private set; } = EntityLifecycleState.Active;
-
-	public IReadOnlySet<AssetCode> Synonyms => _synonyms;
+	public byte NativeDecimals { get; private set; }
+	public AssetLifecycleState State { get; private set; } = AssetLifecycleState.Draft;
 
 	public static Asset Create(
 		AssetCode code,
 		AssetKind kind,
+		AssetLifecycleState state,
 		string? name = null,
 		byte nativeDecimals = 4,
 		AssetId id = default)
@@ -64,6 +73,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 			id.IsEmpty ? AssetId.New() : id,
 			code,
 			kind,
+			state,
 			name,
 			nativeDecimals);
 
@@ -76,9 +86,9 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 			throw new ArgumentException("Name should be not empty", nameof(name));
 		}
 
-		if (name.Length > LimitationRules.Lengths.NameMaxLength)
+		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {LimitationRules.Lengths.NameMaxLength}", nameof(name));
+			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
 		}
 		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 	}
@@ -95,15 +105,20 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		return _synonyms.Add(code);
 	}
 
+	public IReadOnlySet<AssetCode> GetSynonyms()
+	{
+		return _synonyms;
+	}
+
 	public bool Deactivate()
 	{
 		EnsureEditable();
 
-		if (EntityState == EntityLifecycleState.Disabled)
+		if (State == AssetLifecycleState.Disabled)
 		{
 			return false;
 		}
-		EntityState = EntityLifecycleState.Disabled;
+		State = AssetLifecycleState.Disabled;
 		return true;
 	}
 
@@ -111,15 +126,24 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 	{
 		if (IsReadonly())
 		{
-			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {EntityState}, id: {Id}");
+			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
 		}
 	}
 
 	private bool IsReadonly()
 	{
-		return EntityState is 
-			EntityLifecycleState.Disabled 
-			or EntityLifecycleState.ReadOnly 
-			or EntityLifecycleState.Deleted;
+		return State is
+			AssetLifecycleState.Disabled 
+			or AssetLifecycleState.ReadOnly 
+			or AssetLifecycleState.Deleted;
+	}
+
+	/// <summary>
+	/// Verifies that Asset is Fiat or StableCoin related
+	/// </summary>
+	/// <returns>true if asset belongs to Fiat or StableCoin kinds</returns>
+	public bool IsFiatOrStableKind()
+	{
+		return AssetExtensions.IsFiatOrStableKind(Kind);
 	}
 }

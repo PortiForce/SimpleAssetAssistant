@@ -5,5 +5,5 @@ public interface IUnitOfWork
 	/// <summary>
 	/// Commits all changes tracked by Repositories to the database.
 	/// </summary>
-	Task SaveChangesAsync(CancellationToken ct);
+	Task<int> SaveChangesAsync(CancellationToken ct);
 }

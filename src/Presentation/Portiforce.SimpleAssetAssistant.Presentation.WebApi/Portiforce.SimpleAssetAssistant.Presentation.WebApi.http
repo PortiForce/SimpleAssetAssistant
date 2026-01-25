@@ -1,6 +1,6 @@
 @Portiforce.SimpleAssetAssistant.Presentation.WebApi_HostAddress = http://localhost:5157
 
-GET {{Portiforce.SimpleAssetAssistant.Presentation.WebApi_HostAddress}}/weatherforecast/
+GET {{Portiforce.SimpleAssetAssistant.Presentation.WebApi_HostAddress}}/activities/v1/
 Accept: application/json
 
 ###

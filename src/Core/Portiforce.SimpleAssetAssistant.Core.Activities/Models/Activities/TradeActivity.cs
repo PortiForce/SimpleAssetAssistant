@@ -7,13 +7,44 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
+public sealed record TradeActivity : ExecutableActivity
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Trade;
+	// not public, init only via factory
+	private TradeActivity(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs,
+		AssetActivityReason reason,
+		CompletionType completionType,
+		TradeExecutionType executionType,
+		MarketKind marketKind,
+		FuturesDescriptor? futures)
+		: base(
+			id,
+			tenantId,
+			platformAccountId,
+			kind,
+			occuredAt,
+			externalMetadata,
+			legs,
+			reason,
+			completionType)
+	{
+		ExecutionType = executionType;
+		MarketKind = marketKind;
+		Futures = futures;
+	}
 
-	public TradeExecutionType ExecutionType { get; init; } = TradeExecutionType.NotDefined;
+	// Private Empty Constructor for EF Core
+	private TradeActivity() : base() { }
 
-	public MarketKind MarketKind { get; init; } = MarketKind.Spot;
+	public TradeExecutionType ExecutionType { get; init; }
+
+	public MarketKind MarketKind { get; init; }
 
 	/// <summary>
 	/// Futures-aware minimal fields.
@@ -30,6 +61,7 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 		IReadOnlyList<AssetMovementLeg> legs,
 		FuturesDescriptor? futures,
 		ExternalMetadata externalMetadata,
+		CompletionType  completionType,
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Trade, reason);
@@ -51,17 +83,18 @@ public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 
 		}
 
-		return new TradeActivity(id ?? ActivityId.New())
-		{
-				TenantId = tenantId,
-				PlatformAccountId = platformAccountId,
-				OccurredAt = occurredAt,
-				MarketKind = marketKind,
-				ExecutionType = executionType,
-				Reason = reason,
-				Legs = legs,
-				ExternalMetadata = externalMetadata,
-				Futures = futures
-			};
+		return new TradeActivity(
+			id ?? ActivityId.New(),
+			tenantId,
+			platformAccountId,
+			AssetActivityKind.Trade,
+			occurredAt,
+			externalMetadata,
+			legs,
+			reason,
+			completionType,
+			executionType,
+			marketKind,
+			futures);
 	}
 }

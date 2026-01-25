@@ -16,7 +16,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Role role,
 		AccountState state,
 		AccountTier tier,
-		ContactInfo? contact,
+		ContactInfo contact,
 		AccountSettings settings): base(id)
 	{
 		if (id.IsEmpty)
@@ -42,23 +42,29 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
-	public TenantId TenantId { get; }
-	public string Alias { get; }
+	// Private Empty Constructor for EF Core
+	private Account()
+	{
+
+	}
+
+	public TenantId TenantId { get; init; }
+	public string Alias { get; init; }
 
 	public Role Role { get; private set; }
 	public AccountState State { get; private set; }
 	public AccountTier Tier { get; private set; }
 
-	public ContactInfo? Contact { get; private set; }
+	public ContactInfo Contact { get; private set; }
 	public AccountSettings Settings { get; private set; }
 
 	public static Account Create(
 		TenantId tenantId,
 		string alias,
+		ContactInfo contact,
 		Role role = Role.TenantUser,
 		AccountState state = AccountState.NotVerified,
 		AccountTier tier = AccountTier.Demo,
-		ContactInfo? contact = null,
 		AccountSettings? settings = null,
 		AccountId id = default)
 	{
@@ -99,7 +105,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		State = AccountState.Disabled;
 	}
 
-	public void UpdateContact(ContactInfo? contact)
+	public void UpdateContact(ContactInfo contact)
 	{
 		EnsureEditable();
 		Contact = contact;
@@ -128,8 +134,8 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 
 		alias = alias.Trim().ToLowerInvariant();
 
-		int min = LimitationRules.Lengths.Account.MinAliasLength;
-		int max = LimitationRules.Lengths.Account.MaxAliasLength;
+		int min = EntityConstraints.Domain.Account.AliasMinLength;
+		int max = EntityConstraints.Domain.Account.AliasMaxLength;
 
 		if (alias.Length < min || alias.Length > max)
 		{
