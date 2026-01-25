@@ -14,6 +14,7 @@ public sealed record RegisterTradeRequest(
 	decimal? FeeAmount,
 	MarketKind MarketKind,
 	TradeExecutionType ExecutionType,
+	CompletionType CompletionType,
 	string Source,
 	string? ExternalId
 );

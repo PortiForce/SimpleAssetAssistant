@@ -1,8 +1,14 @@
 ﻿namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
-public readonly record struct FiatCurrency
+public sealed record FiatCurrency
 {
-	public string Code { get; }
+	// Private Empty Constructor for EF Core
+	private FiatCurrency()
+	{
+
+	}
+
+	public string Code { get; init; } = null!;
 
 	private FiatCurrency(string code) => Code = code;
 

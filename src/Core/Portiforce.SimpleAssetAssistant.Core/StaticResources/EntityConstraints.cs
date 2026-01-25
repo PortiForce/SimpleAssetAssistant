@@ -69,7 +69,7 @@ public static class EntityConstraints
 
 		public static class Activity
 		{
-
+			public const int FuturesInstrumentKeyLength = 100;
 		}
 
 		public static class ActivityLeg

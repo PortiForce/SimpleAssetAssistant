@@ -5,9 +5,32 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record UserCorrectionActivity(ActivityId Id) : ReasonedActivity(Id)
+public sealed record UserCorrectionActivity : ReasonedActivity
 {
-	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.UserCorrection;
+	// not public, init only via factory
+	private UserCorrectionActivity(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs,
+		AssetActivityReason reason)
+		: base(
+			id,
+			tenantId,
+			platformAccountId,
+			kind,
+			occuredAt,
+			externalMetadata,
+			legs,
+			reason)
+	{
+	}
+
+	// Private Empty Constructor for EF Core
+	private UserCorrectionActivity() : base() { }
 
 	public static UserCorrectionActivity Create(
 		TenantId tenantId,
@@ -22,14 +45,14 @@ public sealed record UserCorrectionActivity(ActivityId Id) : ReasonedActivity(Id
 
 		LegGuards.EnforceCommonRules(legs);
 
-		return new UserCorrectionActivity(id ?? ActivityId.New())
-		{
-			TenantId = tenantId,
-			PlatformAccountId = platformAccountId,
-			OccurredAt = occurredAt,
-			Reason = reason,
-			Legs = legs,
-			ExternalMetadata = externalMetadata
-		};
+		return new UserCorrectionActivity(
+			id ?? ActivityId.New(),
+			tenantId,
+			platformAccountId,
+			AssetActivityKind.UserCorrection,
+			occurredAt,
+			externalMetadata,
+			legs,
+			reason);
 	}
 }

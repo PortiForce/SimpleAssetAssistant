@@ -33,9 +33,15 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		IsPrimary = isPrimary;
 	}
 
-	public AccountId AccountId { get; }
-	public AuthProvider Provider { get; }
-	public string ProviderSubject { get; }
+	// Private Empty Constructor for EF Core
+	private ExternalIdentity()
+	{
+
+	}
+
+	public AccountId AccountId { get; init; }
+	public AuthProvider Provider { get; init; }
+	public string ProviderSubject { get; init; }
 
 	public bool IsPrimary { get; private set; }
 

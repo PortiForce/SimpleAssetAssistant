@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Connections;
-using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
-using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
@@ -44,28 +42,14 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
-	private Account(
-		AccountId id,
-		TenantId tenantId,
-		string alias,
-		Role role,
-		AccountState state,
-		AccountTier tier)
-		: this(
-			id,
-			tenantId,
-			alias,
-			role,
-			state,
-			tier,
-			new ContactInfo(Email.Create("test@portiforce.com"), null, null),
-			AccountSettings.Default()) 
+	// Private Empty Constructor for EF Core
+	private Account()
 	{
-		
+
 	}
 
-	public TenantId TenantId { get; private set; }
-	public string Alias { get; private set; }
+	public TenantId TenantId { get; init; }
+	public string Alias { get; init; }
 
 	public Role Role { get; private set; }
 	public AccountState State { get; private set; }

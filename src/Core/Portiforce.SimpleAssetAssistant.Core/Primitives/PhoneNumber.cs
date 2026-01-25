@@ -1,8 +1,14 @@
 ﻿namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
-public readonly record struct PhoneNumber
+public sealed record PhoneNumber
 {
-	public string Value { get; }
+	// Private Empty Constructor for EF Core
+	private PhoneNumber()
+	{
+
+	}
+
+	public string Value { get; init; } = null!;
 
 	private PhoneNumber(string value)
 	{

@@ -21,6 +21,7 @@ public static class ExchangeMapper
 		FeeAssetId: r.FeeAssetId is null ? null : AssetId.From(r.FeeAssetId.Value),
 		FeeAmount: r.FeeAmount is null ? null : Quantity.Create(r.FeeAmount.Value),
 		Type: r.ExchangeType,
-		Metadata: new ExternalMetadata(source: r.Source, externalId: r.ExternalId)
+		Metadata: new ExternalMetadata(source: r.Source, externalId: r.ExternalId),
+		CompletionType:r.CompletionType
 	);
 }

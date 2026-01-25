@@ -14,6 +14,12 @@ public sealed record ContactInfo
 		BackupEmail = backupEmail;
 	}
 
+	// Private Empty Constructor for EF Core
+	private ContactInfo()
+	{
+
+	}
+
 	public Email Email { get; init; }
 
 	public PhoneNumber? Phone { get; init; }

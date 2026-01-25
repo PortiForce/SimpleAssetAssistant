@@ -21,6 +21,12 @@ public sealed class TenantRestrictedAsset
 		AssetId = assetId;
 	}
 
+	// Private Empty Constructor for EF Core
+	private TenantRestrictedAsset()
+	{
+
+	}
+
 	public TenantId TenantId { get; init; }
 	public AssetId AssetId { get; init; }
 }

@@ -26,10 +26,13 @@ public sealed record ExternalMetadata
 		Notes = notes;
 	}
 
-	public string Source { get; }
-	public string? ExternalId { get; }
-	public string? Fingerprint { get; }
-	public string? Notes { get; }
+	// Private Empty Constructor for EF Core
+	private ExternalMetadata() { }
+
+	public string Source { get; init; } = null!;
+	public string? ExternalId { get; init; }
+	public string? Fingerprint { get; init; }
+	public string? Notes { get; init; }
 
 	public bool IsExternalIdDriven()
 	{

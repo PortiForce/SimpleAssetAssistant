@@ -40,34 +40,19 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
 	}
 
-	private Tenant(
-		TenantId id,
-		string name,
-		string code,
-		string? brandName,
-		string domainPrefix,
-		TenantState state,
-		TenantPlan plan)
-		: this(
-			id,
-			name,
-			code,
-			brandName,
-			domainPrefix,
-			state,
-			plan,
-			TenantSettings.Default())
+	// Private Empty Constructor for EF Core
+	private Tenant()
 	{
 		
 	}
 
 	public string Name { get; private set; }
-	public string Code { get; private set; }
+	public string Code { get; init; }
 	public string? BrandName { get; private set; }
-	public string DomainPrefix { get; private set; }
+	public string DomainPrefix { get; init; }
 	public TenantState State { get; private set; }
 	public TenantSettings Settings { get; private set; }
-	public TenantPlan Plan { get; private set; } = TenantPlan.Demo;
+	public TenantPlan Plan { get; private set; }
 
 	private readonly HashSet<AssetId> _restrictedAssets = new();
 

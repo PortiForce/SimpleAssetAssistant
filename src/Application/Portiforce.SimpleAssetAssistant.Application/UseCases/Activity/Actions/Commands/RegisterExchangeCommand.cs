@@ -24,5 +24,6 @@ public sealed record RegisterExchangeCommand(
 	AssetId? FeeAssetId,
 	Quantity? FeeAmount,
 	ExchangeType Type,
+	CompletionType CompletionType,
 	ExternalMetadata Metadata
 ) : ICommand<CommandResult<ActivityId>>;

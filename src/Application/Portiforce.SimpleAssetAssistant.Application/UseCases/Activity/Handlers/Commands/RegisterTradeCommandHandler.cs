@@ -94,6 +94,7 @@ public sealed class RegisterTradeCommandHandler(
 			legs: legs,
 			futures: futures,
 			externalMetadata: request.Metadata,
+			completionType: request.CompletionType,
 			id: null);
 
 		// 4) Persist data

@@ -212,7 +212,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			cb.Property(x => x.BackupEmail)
 				.HasColumnName("ContactBackupEmail")
 				.HasConversion(
-					v => v.HasValue ? v.Value.Value : null,
+					v => v != null ? v.Value : null,
 					v => string.IsNullOrEmpty(v) ? null : Email.Create(v))
 				.HasMaxLength(EntityConstraints.CommonSettings.EmailAddressDefaultLength);
 
@@ -220,7 +220,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			cb.Property(x => x.Phone)
 				.HasColumnName("ContactPhone")
 				.HasConversion(
-					v => v.HasValue ? v.Value.Value : null,
+					v => v != null ? v.Value : null,
 					v => string.IsNullOrEmpty(v) ? null : PhoneNumber.Create(v))
 				.HasMaxLength(EntityConstraints.Domain.Account.PhoneNumberMaxLength);
 		});
@@ -234,6 +234,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 			sb.Property(x => x.Locale)
 				.HasColumnName("Settings_Locale")
+				.HasMaxLength(6)
 				.IsRequired();
 
 			sb.Property(x => x.DefaultCurrency)
@@ -338,6 +339,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		e.Property(x => x.ExternalUserId)
 			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
 
+		e.Property(x => x.ExternalAccountId)
+			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
+
 		e.Property(x => x.State)
 			.IsRequired()
 			.HasConversion<int>();
@@ -437,11 +441,11 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		// Discriminator: Kind
 		e.HasDiscriminator(x => x.Kind)
 			.HasValue<TradeActivity>(AssetActivityKind.Trade)
-			.HasValue<TradeActivity>(AssetActivityKind.Burn)
-			.HasValue<TradeActivity>(AssetActivityKind.Income)
-			.HasValue<TradeActivity>(AssetActivityKind.Service)
-			.HasValue<TradeActivity>(AssetActivityKind.Transfer)
-			.HasValue<TradeActivity>(AssetActivityKind.UserCorrection)
+			.HasValue<BurnActivity>(AssetActivityKind.Burn)
+			.HasValue<IncomeActivity>(AssetActivityKind.Income)
+			.HasValue<ServiceActivity>(AssetActivityKind.Service)
+			.HasValue<TransferActivity>(AssetActivityKind.Transfer)
+			.HasValue<UserCorrectionActivity>(AssetActivityKind.UserCorrection)
 			.HasValue<ExchangeActivity>(AssetActivityKind.Exchange);
 
 		// ExternalMetadata moved from OwnsOne to a Complex Property
@@ -464,32 +468,43 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 				.HasMaxLength(EntityConstraints.CommonSettings.ExternalNotesMaxLength);
 		});
 
-		// Configure the derived TradeActivity specific properties
+		// Configure the derived Activities specific properties
+		// trade
 		modelBuilder.Entity<TradeActivity>(trade =>
 		{
 			trade.OwnsOne(x => x.Futures, fb =>
 			{
 				fb.Property(f => f.InstrumentKey)
-					.HasColumnName("Futures_InstrumentKey");
+					.HasColumnName("Futures_InstrumentKey")
+					.HasMaxLength(EntityConstraints.Domain.Activity.FuturesInstrumentKeyLength);
 
 				fb.Property(f => f.ContractKind)
 					.HasColumnName("Futures_ContractKind")
 					.HasConversion<int>();
 
 				fb.Property(f => f.BaseAssetCode)
-					.HasColumnName("Futures_BaseAssetCode");
+					.HasColumnName("Futures_BaseAssetCode")
+					.HasMaxLength(EntityConstraints.Domain.Asset.CodeMaxLength);
 
 				fb.Property(f => f.QuoteAssetCode)
-					.HasColumnName("Futures_QuoteAssetCode");
+					.HasColumnName("Futures_QuoteAssetCode")
+					.HasMaxLength(EntityConstraints.Domain.Asset.CodeMaxLength);
 
 				fb.Property(f => f.PositionEffect)
 					.HasColumnName("Futures_PositionEffect")
 					.HasConversion<int>();
 			});
 
-			// map TradeActivity specific properties
-			trade.Property(x => x.ExecutionType).IsRequired();
-			trade.Property(x => x.MarketKind).IsRequired();
+			// transfer
+			modelBuilder.Entity<TransferActivity>(transfer =>
+			{
+				transfer.Property(x => x.Reference)
+					.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
+
+				transfer.Property(x => x.Counterparty)
+					.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
+			});
+
 		});
 
 		// Idempotency uniqueness (filtered)

@@ -36,10 +36,13 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 		Kind = kind;
 		State = state;
 	}
-	
+
+	// Private Empty Constructor for EF Core
+	private Platform() { }
+
 	public string Name { get; private set; }
 	public string Code { get; private set; }
-	public PlatformKind Kind { get; }
+	public PlatformKind Kind { get; init; }
 	public PlatformState State { get; private set; }
 
 	public static Platform Create(

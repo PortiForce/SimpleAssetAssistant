@@ -81,6 +81,7 @@ public sealed class RegisterExchangeCommandHandler(
 			exchangeType: request.Type,
 			legs: legs,
 			externalMetadata: request.Metadata,
+			completionType: request.CompletionType,
 			id: activityId);
 
 		return await activityPersistenceService.PersistNewAsync(exchangeActivity, primaryId, ct);

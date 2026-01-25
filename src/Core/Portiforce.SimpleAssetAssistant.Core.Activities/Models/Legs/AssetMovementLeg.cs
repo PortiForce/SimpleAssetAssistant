@@ -62,6 +62,9 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		InstrumentKey = instrumentKey;
 	}
 
+	// Private Empty Constructor for EF Core
+	private AssetMovementLeg() : base() { }
+
 	public static AssetMovementLeg Create(
 		ActivityId activityId,
 		AssetId assetId,

@@ -3,11 +3,17 @@
 /// <summary>
 /// Domain delta amount representation, accepts negative values as well 
 /// </summary>
-public readonly record struct QuantityDelta
+public sealed record QuantityDelta
 {
+	// Private Empty Constructor for EF Core
+	private QuantityDelta()
+	{
+
+	}
+
 	public static QuantityDelta Zero => new(0m);
 
-	public decimal Value { get; }
+	public decimal Value { get; init; }
 
 	public bool IsZero => Value == 0m;
 	public bool IsPositive => Value > 0m;

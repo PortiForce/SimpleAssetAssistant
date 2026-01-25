@@ -5,11 +5,36 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
-public sealed record ServiceActivity(ActivityId Id) : ReasonedActivity(Id)
+public sealed record ServiceActivity : ReasonedActivity
 {
-	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Service;
+	// not public, init only via factory
+	private ServiceActivity(
+		ActivityId id,
+		TenantId tenantId,
+		PlatformAccountId platformAccountId,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
+		IReadOnlyList<AssetMovementLeg> legs,
+		AssetActivityReason reason,
+		ServiceType serviceType)
+		: base(
+			id,
+			tenantId,
+			platformAccountId,
+			kind,
+			occuredAt,
+			externalMetadata,
+			legs,
+			reason)
+	{
+		ServiceType = serviceType;
+	}
 
-	public required ServiceType ServiceType { get; init; }
+	// Private Empty Constructor for EF Core
+	private ServiceActivity() : base() { }
+
+	public ServiceType ServiceType { get; init; }
 
 	public static ServiceActivity Create(
 		TenantId tenantId,
@@ -26,15 +51,15 @@ public sealed record ServiceActivity(ActivityId Id) : ReasonedActivity(Id)
 		LegGuards.EnforceCommonRules(legs);
 		LegGuards.EnsureOneSidedOutflow(legs);
 
-		return new ServiceActivity(id ?? ActivityId.New())
-		{
-			TenantId = tenantId,
-			PlatformAccountId = platformAccountId,
-			OccurredAt = occurredAt,
-			ServiceType = serviceType,
-			Reason = reason,
-			Legs = legs,
-			ExternalMetadata = externalMetadata,
-		};
+		return new ServiceActivity(
+			id ?? ActivityId.New(),
+			tenantId,
+			platformAccountId,
+			AssetActivityKind.Service,
+			occurredAt,
+			externalMetadata,
+			legs,
+			reason,
+			serviceType);
 	}
 }

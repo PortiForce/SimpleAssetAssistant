@@ -15,6 +15,7 @@ public sealed record RegisterExchangeRequest(
 	MarketKind MarketKind,
 	TradeExecutionType ExecutionType,
 	ExchangeType ExchangeType,
+	CompletionType CompletionType,
 	string Source,
 	string? ExternalId
 );

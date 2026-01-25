@@ -62,9 +62,12 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
 	}
 
-	public TenantId TenantId { get; }
-	public AccountId AccountId { get; }
-	public PlatformId PlatformId { get; }
+	// Private Empty Constructor for EF Core
+	private PlatformAccount() { }
+
+	public TenantId TenantId { get; init; }
+	public AccountId AccountId { get; init; }
+	public PlatformId PlatformId { get; init; }
 	public string AccountName { get; private set; }
 	public PlatformAccountState State { get; private set; }
 

@@ -40,16 +40,17 @@ internal static class MovementLegFactory
 				inDecimals),
 		};
 
-		if (feeId is not null)
+		if (feeId is not null && feeAmount is { IsPositive: true })
 		{
-			legs.Add(AssetMovementLeg.Create(
-				activityId,
-				feeId.Value,
-				feeAmount!.Value,
-				MovementRole.Fee,
-				MovementDirection.Outflow,
-				AssetAllocationType.Spot,
-				feeDecimals!.Value));
+			legs.Add(
+				AssetMovementLeg.Create(
+					activityId,
+					feeId.Value,
+					feeAmount,
+					MovementRole.Fee,
+					MovementDirection.Outflow,
+					AssetAllocationType.Spot,
+					feeDecimals!.Value));
 		}
 
 		return legs;

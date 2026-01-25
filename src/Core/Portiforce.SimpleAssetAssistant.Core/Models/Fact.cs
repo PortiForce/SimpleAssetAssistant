@@ -6,9 +6,23 @@ namespace Portiforce.SimpleAssetAssistant.Core.Models;
 /// Immutable persisted fact. Equality is identity-based (Id only),
 /// not record "value equality".
 /// </summary>
-public abstract record Fact<TId>(TId Id) : IEntity<TId>
+public abstract record Fact<TId> : IEntity<TId>
 	where TId : struct, IEquatable<TId>
 {
+	public TId Id { get; private set; }
+
+	// Protected Constructor for Domain Logic
+	protected Fact(TId id)
+	{
+		Id = id;
+	}
+
+	// Protected Empty Constructor for EF Core Chain
+	// Using default! suppresses null warnings, EF fixes this at runtime.
+#pragma warning disable CS8618
+	protected Fact() { }
+#pragma warning restore CS8618
+
 	// IMPORTANT: this method REPLACES the record-generated one.
 	// Make sure you have it ONLY ONCE in the type.
 	public virtual bool Equals(Fact<TId>? other)

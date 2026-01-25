@@ -50,10 +50,16 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		State = state;
 	}
 
-	public AssetCode Code { get; }
-	public AssetKind Kind { get; }
+	// Private Empty Constructor for EF Core
+	private Asset()
+	{
+		_synonyms = new HashSet<AssetCode>();
+	}
+
+	public AssetCode Code { get; init; }
+	public AssetKind Kind { get; init; }
 	public string? Name { get; private set; }
-	public byte NativeDecimals { get; }
+	public byte NativeDecimals { get; private set; }
 	public AssetLifecycleState State { get; private set; } = AssetLifecycleState.Draft;
 
 	public static Asset Create(

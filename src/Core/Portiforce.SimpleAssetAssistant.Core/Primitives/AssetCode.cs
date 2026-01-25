@@ -2,9 +2,15 @@
 
 namespace Portiforce.SimpleAssetAssistant.Core.Primitives;
 
-public readonly record struct AssetCode
+public sealed record AssetCode
 {
-	public string Value { get; }
+	// Private Empty Constructor for EF Core
+	private AssetCode()
+	{
+
+	}
+
+	public string Value { get; init; } = null!;
 
 	private AssetCode(string value)
 	{

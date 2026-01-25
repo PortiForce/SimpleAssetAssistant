@@ -27,10 +27,16 @@ public sealed record TenantImportSettings
 		MaxRowsPerImport = maxRowsPerImport;
 		MaxFileSizeMb = maxFileSizeMb;
 	}
-	
-	public bool RequireReviewBeforeProcessing { get; } = true;
-	public int MaxRowsPerImport { get; }
-	public int MaxFileSizeMb { get; }
+
+	// Private Empty Constructor for EF Core
+	private TenantImportSettings()
+	{
+
+	}
+
+	public bool RequireReviewBeforeProcessing { get; init; } = true;
+	public int MaxRowsPerImport { get; init; }
+	public int MaxFileSizeMb { get; init; }
 
 	public static TenantImportSettings Create(
 		bool requireReviewBeforeProcessing,

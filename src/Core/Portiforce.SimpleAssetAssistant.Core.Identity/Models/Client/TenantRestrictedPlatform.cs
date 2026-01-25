@@ -21,6 +21,13 @@ public sealed class TenantRestrictedPlatform
 		PlatformId = platformId;
 	}
 
+
+	// Private Empty Constructor for EF Core
+	private TenantRestrictedPlatform()
+	{
+
+	}
+
 	public TenantId TenantId { get; init; }
 	public PlatformId PlatformId { get; init; }
 }

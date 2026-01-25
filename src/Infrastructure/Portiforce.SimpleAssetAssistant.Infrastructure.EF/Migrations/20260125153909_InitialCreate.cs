@@ -94,7 +94,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					ContactEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
 					ContactPhone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
 					Settings_DefaultFiatCurrency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
-					Settings_Locale = table.Column<string>(type: "nvarchar(max)", nullable: false),
+					Settings_Locale = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
 					Settings_TimeZone = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
 					TwoFactorPreferred = table.Column<bool>(type: "bit", nullable: false)
 				},
@@ -161,7 +161,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					PlatformId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
 					AccountName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
 					State = table.Column<int>(type: "int", nullable: false),
-					ExternalAccountId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+					ExternalAccountId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					ExternalUserId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
 				},
@@ -197,24 +197,29 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Kind = table.Column<int>(type: "int", nullable: false),
 					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
 					PlatformAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					Kind = table.Column<int>(type: "int", nullable: false),
 					OccurredAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
 					ExternalId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					Fingerprint = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					ExternalNotes = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
 					ExternalSource = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-					ExchangeType = table.Column<byte>(type: "tinyint", nullable: true),
 					Reason = table.Column<byte>(type: "tinyint", nullable: true),
+					ExchangeType = table.Column<byte>(type: "tinyint", nullable: true),
 					CompletionType = table.Column<byte>(type: "tinyint", nullable: true),
+					ServiceType = table.Column<byte>(type: "tinyint", nullable: true),
 					ExecutionType = table.Column<byte>(type: "tinyint", nullable: true),
 					MarketKind = table.Column<byte>(type: "tinyint", nullable: true),
-					Futures_InstrumentKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+					Futures_InstrumentKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					Futures_ContractKind = table.Column<int>(type: "int", nullable: true),
-					Futures_BaseAssetCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					Futures_QuoteAssetCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					Futures_PositionEffect = table.Column<int>(type: "int", nullable: true)
+					Futures_BaseAssetCode = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),
+					Futures_QuoteAssetCode = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),
+					Futures_PositionEffect = table.Column<int>(type: "int", nullable: true),
+					TransferKind = table.Column<byte>(type: "tinyint", nullable: true),
+					Direction = table.Column<byte>(type: "tinyint", nullable: true),
+					Reference = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+					Counterparty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
 				},
 				constraints: table =>
 				{
@@ -392,7 +397,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 			migrationBuilder.CreateIndex(
 				name: "UX_Account_Tenant_ContactEmail",
 				schema: DbConstants.Domain.DefaultSchemaName,
-				table: "Accounts",
+				table: "Account",
 				columns: new[] { "TenantId", "ContactEmail" },
 				unique: true);
 
@@ -417,23 +422,6 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 		/// <inheritdoc />
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
-			// custom migrations start (not handled by automatic model creations)
-			migrationBuilder.DropIndex(
-				name: "UX_Account_Tenant_ContactEmail",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: "Accounts");
-
-			migrationBuilder.DropIndex(
-				name: "UX_Activity_ExternalId",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: DbConstants.Domain.EntityNames.ActivityEntityName);
-
-			migrationBuilder.DropIndex(
-				name: "UX_Activity_Fingerprint",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: DbConstants.Domain.EntityNames.ActivityEntityName);
-			// custom migrations end 
-
 			migrationBuilder.DropTable(
 				name: "ActivityLeg",
 				schema: DbConstants.Domain.DefaultSchemaName);
