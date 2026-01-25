@@ -75,7 +75,12 @@ public sealed class RegisterTradeCommandHandler(
 
 		// 2) Futures descriptor (MVP)
 		FuturesDescriptor? futures = request.MarketKind == MarketKind.Futures
-			? new FuturesDescriptor { InstrumentKey = "PForce stub" }
+			? FuturesDescriptor .Create(
+				"PForce-Stub",
+				FuturesContractKind.Dated,
+				"BTC",
+				"BTC",
+				FuturesPositionEffect.Open)
 			: null;
 
 		// 3) Build domain entity

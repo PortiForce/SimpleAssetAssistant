@@ -31,7 +31,6 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		MovementRole role,
 		MovementDirection direction,
 		AssetAllocationType allocation,
-		byte nativeDecimals,
 		string? instrumentKey): base(id)
 	{
 		if (amount == Quantity.Zero)
@@ -53,8 +52,6 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		{
 			throw new DomainValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
 		}
-
-		ConsistencyRules.EnsureScaleDoesNotExceed(amount.Value, nativeDecimals, nameof(amount));
 		
 		ActivityId = activityId;
 		AssetId = assetId;
@@ -75,7 +72,10 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		byte nativeDecimals,
 		LegId id = default,
 		string? instrumentKey = null)
-	=> new (
+	{
+		ConsistencyRules.EnsureScaleDoesNotExceed(amount.Value, nativeDecimals, nameof(amount));
+
+		return new (
 			id.IsEmpty ? LegId.New() : id,
 			activityId,
 			assetId,
@@ -83,6 +83,6 @@ public sealed record AssetMovementLeg : Fact<LegId>
 			role,
 			direction,
 			allocation,
-			nativeDecimals,
 			instrumentKey);
+	}
 }

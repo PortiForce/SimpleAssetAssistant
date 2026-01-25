@@ -16,7 +16,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		string? brandName,
 		string domainPrefix,
 		TenantState state,
-		TenantPlan tenantPlan,
+		TenantPlan plan,
 		TenantSettings settings) :base(id)
 	{
 		if (id.IsEmpty)
@@ -36,8 +36,29 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		BrandName = brandName;
 		DomainPrefix = domainPrefix;
 		State = state;
-		Plan = tenantPlan;
+		Plan = plan;
 		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
+	}
+
+	private Tenant(
+		TenantId id,
+		string name,
+		string code,
+		string? brandName,
+		string domainPrefix,
+		TenantState state,
+		TenantPlan plan)
+		: this(
+			id,
+			name,
+			code,
+			brandName,
+			domainPrefix,
+			state,
+			plan,
+			TenantSettings.Default())
+	{
+		
 	}
 
 	public string Name { get; private set; }
@@ -71,9 +92,9 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		string code,
 		string brandName,
 		string domainPrefix,
-		TenantSettings? settings = null,
 		TenantState state = TenantState.Provisioning,
 		TenantPlan plan = TenantPlan.Demo,
+		TenantSettings? settings = null,
 		TenantId id = default)
 		=> new(
 			id.IsEmpty ? TenantId.New() : id,

@@ -52,13 +52,9 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 
 	public AssetCode Code { get; }
 	public AssetKind Kind { get; }
-
 	public string? Name { get; private set; }
 	public byte NativeDecimals { get; }
-
 	public AssetLifecycleState State { get; private set; } = AssetLifecycleState.Draft;
-
-	public IReadOnlySet<AssetCode> Synonyms => _synonyms;
 
 	public static Asset Create(
 		AssetCode code,
@@ -101,6 +97,11 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		}
 
 		return _synonyms.Add(code);
+	}
+
+	public IReadOnlySet<AssetCode> GetSynonyms()
+	{
+		return _synonyms;
 	}
 
 	public bool Deactivate()

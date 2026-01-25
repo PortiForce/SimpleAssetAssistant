@@ -8,7 +8,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public abstract record AssetActivityBase(ActivityId Id) : Fact<ActivityId>(Id), IAggregateRoot
 {
-	public abstract AssetActivityKind Kind { get; }
+	public abstract AssetActivityKind Kind { get; init; }
 
 	public required TenantId TenantId { get; init; }
 

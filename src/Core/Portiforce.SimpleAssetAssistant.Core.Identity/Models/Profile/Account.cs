@@ -1,7 +1,9 @@
-﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+﻿using Microsoft.AspNetCore.Connections;
+using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Interfaces;
 using Portiforce.SimpleAssetAssistant.Core.Models;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 
@@ -16,7 +18,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Role role,
 		AccountState state,
 		AccountTier tier,
-		ContactInfo? contact,
+		ContactInfo contact,
 		AccountSettings settings): base(id)
 	{
 		if (id.IsEmpty)
@@ -42,23 +44,43 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
-	public TenantId TenantId { get; }
-	public string Alias { get; }
+	private Account(
+		AccountId id,
+		TenantId tenantId,
+		string alias,
+		Role role,
+		AccountState state,
+		AccountTier tier)
+		: this(
+			id,
+			tenantId,
+			alias,
+			role,
+			state,
+			tier,
+			new ContactInfo(Email.Create("test@portiforce.com"), null, null),
+			AccountSettings.Default()) 
+	{
+		
+	}
+
+	public TenantId TenantId { get; private set; }
+	public string Alias { get; private set; }
 
 	public Role Role { get; private set; }
 	public AccountState State { get; private set; }
 	public AccountTier Tier { get; private set; }
 
-	public ContactInfo? Contact { get; private set; }
+	public ContactInfo Contact { get; private set; }
 	public AccountSettings Settings { get; private set; }
 
 	public static Account Create(
 		TenantId tenantId,
 		string alias,
+		ContactInfo contact,
 		Role role = Role.TenantUser,
 		AccountState state = AccountState.NotVerified,
 		AccountTier tier = AccountTier.Demo,
-		ContactInfo? contact = null,
 		AccountSettings? settings = null,
 		AccountId id = default)
 	{
@@ -99,7 +121,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		State = AccountState.Disabled;
 	}
 
-	public void UpdateContact(ContactInfo? contact)
+	public void UpdateContact(ContactInfo contact)
 	{
 		EnsureEditable();
 		Contact = contact;

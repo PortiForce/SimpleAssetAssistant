@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record TransferActivity(ActivityId Id) : AssetActivityBase(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Transfer;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Transfer;
 
 	public TransferKind TransferKind { get; init; }
 	public TransferDirection Direction { get; init; }

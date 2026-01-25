@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record IncomeActivity(ActivityId Id) : ReasonedActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Income;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Income;
 
 	public static IncomeActivity Create(
 		TenantId tenantId,

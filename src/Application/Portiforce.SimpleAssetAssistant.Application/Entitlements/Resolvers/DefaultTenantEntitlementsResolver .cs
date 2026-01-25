@@ -34,7 +34,15 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 
 		TenantPlan.Pro => new TenantEntitlements(
 			MaxUsers: 200,
-			MaxPlatforms: 25,
+			MaxPlatforms: 50,
+			MaxDistinctAssets: 1000,
+			MaxImportRows: 20_000,
+			AllowProjections: true,
+			AllowAdvancedAnalytics: true),
+
+		TenantPlan.Custom => new TenantEntitlements(
+			MaxUsers: 5,
+			MaxPlatforms: 50,
 			MaxDistinctAssets: 1000,
 			MaxImportRows: 20_000,
 			AllowProjections: true,

@@ -16,7 +16,7 @@ public sealed record AccountSettings
 	/// <summary>
 	/// User preference; enforcement is a tenant policy.
 	/// </summary>
-	public bool TwoFactorPreferred { get; init; }
+	public bool TwoFactorPreferred { get; init; } = true;
 
 	public static AccountSettings Default() => new();
 }

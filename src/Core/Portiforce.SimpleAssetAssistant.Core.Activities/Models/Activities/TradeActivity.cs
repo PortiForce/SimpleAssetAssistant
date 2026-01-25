@@ -9,7 +9,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record TradeActivity(ActivityId Id) : ExecutableActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Trade;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Trade;
 
 	public TradeExecutionType ExecutionType { get; init; } = TradeExecutionType.NotDefined;
 

@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record ExchangeActivity(ActivityId Id) : ExecutableActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Exchange;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Exchange;
 
 	public ExchangeType ExchangeType { get; init; } = ExchangeType.Direct;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
@@ -10,7 +9,6 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Extensions;
 
 using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
@@ -24,7 +22,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 	public DbSet<Platform> Platforms => Set<Platform>();
 	public DbSet<PlatformAccount> PlatformAccounts => Set<PlatformAccount>();
 
-	public DbSet<Core.Assets.Models.Asset> Assets => Set<Core.Assets.Models.Asset>();
+	public DbSet<Asset> Assets => Set<Asset>();
 
 	public DbSet<AssetActivityBase> Activities => Set<AssetActivityBase>();
 	public DbSet<AssetMovementLeg> ActivityLegs => Set<AssetMovementLeg>();
@@ -91,6 +89,75 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		e.Property(x => x.DomainPrefix)
 			.HasMaxLength(EntityConstraints.Domain.Tenant.PublicDomainMaxLength);
 
+		e.Property(x => x.Plan)
+			.IsRequired()
+			.HasConversion<int>();
+
+		e.Property(x => x.State)
+			.IsRequired()
+			.HasConversion<int>();
+
+		// ============================
+		// TenantSettings (owned root)
+		// ============================
+		e.ComplexProperty(x => x.Settings, sb =>
+		{
+			// ---------- Defaults ----------
+			sb.ComplexProperty(x => x.Defaults, db =>
+			{
+				db.Property(x => x.DefaultCurrency)
+					.HasColumnName("Defaults_DefaultCurrency")
+					.HasConversion(
+						currency => currency.Code,
+						value => FiatCurrency.Create(value)
+					)
+					.HasMaxLength(3)
+					.IsRequired();
+
+				db.Property(x => x.DefaultTimeZoneId)
+					.HasColumnName("Defaults_DefaultTimeZone")
+					.HasMaxLength(64)
+					.IsRequired();
+
+				db.Property(x => x.DefaultLocale)
+					.HasColumnName("Defaults_DefaultLocale")
+					.HasMaxLength(6)
+					.IsRequired();
+			});
+
+			// ---------- Security ----------
+			sb.ComplexProperty(x => x.Security, sec =>
+			{
+				sec.Property(x => x.EnforceTwoFactor)
+					.HasColumnName("Security_EnforceTwoFactor")
+					.IsRequired();
+			});
+
+			// ---------- Import ----------
+			sb.ComplexProperty(x => x.Import, imp =>
+			{
+				imp.Property(x => x.RequireReviewBeforeProcessing)
+					.HasColumnName("Import_RequireReview")
+					.IsRequired();
+
+				imp.Property(x => x.MaxRowsPerImport)
+					.HasColumnName("Import_MaxRows")
+					.IsRequired();
+
+				imp.Property(x => x.MaxFileSizeMb)
+					.HasColumnName("Import_MaxFileSizeMb")
+					.IsRequired();
+			});
+
+			// ---------- Retention ----------
+			sb.ComplexProperty(x => x.Retention, ret =>
+			{
+				ret.Property(x => x.DeletedDataRetentionDays)
+					.HasColumnName("Retention_DeletedDays")
+					.IsRequired();
+			});
+		});
+
 		// RowVersion on mutable aggregate root
 		e.Property<byte[]>("RowVersion")
 			.IsRowVersion()
@@ -109,6 +176,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasDatabaseName("UX_Tenant_DomainPrefix")
 			.HasFilter("[DomainPrefix] IS NOT NULL");
 
+		// todo tech: might be an issue
 		e.Navigation(x => x.RestrictedAssets).AutoInclude(false);
 		e.Navigation(x => x.RestrictedPlatforms).AutoInclude(false);
 	}
@@ -128,11 +196,58 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasConversion(new StrongIdConverter<TenantId>(x => x.Value, TenantId.From))
 			.IsRequired();
 
-		// adjust length to your Email VO constraints
-		e.Property(x => x.Contact.Email)
-			.HasMaxLength(EntityConstraints.Domain.Account.EmailMaxLength)
-			.IsRequired();
+		// Owned ContactInfo
+		e.ComplexProperty(x => x.Contact, cb =>
+		{
+			// IMPORTANT: use explicit column names to keep indexes simple & stable
+			cb.Property(x => x.Email)
+				.HasColumnName("ContactEmail")
+				.IsRequired()
+				.HasConversion(
+					v => v.Value,
+					v => Email.Create(v))
+				.HasMaxLength(EntityConstraints.CommonSettings.EmailAddressDefaultLength);
 
+			// nullable
+			cb.Property(x => x.BackupEmail)
+				.HasColumnName("ContactBackupEmail")
+				.HasConversion(
+					v => v.HasValue ? v.Value.Value : null,
+					v => string.IsNullOrEmpty(v) ? null : Email.Create(v))
+				.HasMaxLength(EntityConstraints.CommonSettings.EmailAddressDefaultLength);
+
+			// nullable
+			cb.Property(x => x.Phone)
+				.HasColumnName("ContactPhone")
+				.HasConversion(
+					v => v.HasValue ? v.Value.Value : null,
+					v => string.IsNullOrEmpty(v) ? null : PhoneNumber.Create(v))
+				.HasMaxLength(EntityConstraints.Domain.Account.PhoneNumberMaxLength);
+		});
+		
+		// an alternative to OwnsOne, also NavigationProperty is not needed here
+		e.ComplexProperty(x => x.Settings, sb =>
+		{
+			sb.Property(x => x.TimeZoneId)
+				.HasColumnName("Settings_TimeZone")
+				.HasMaxLength(64);
+
+			sb.Property(x => x.Locale)
+				.HasColumnName("Settings_Locale")
+				.IsRequired();
+
+			sb.Property(x => x.DefaultCurrency)
+				.HasColumnName("Settings_DefaultFiatCurrency")
+				.HasConversion(
+					currency => currency.Code,
+					value => FiatCurrency.Create(value)
+				)
+				.HasMaxLength(3);
+
+			sb.Property(x => x.TwoFactorPreferred)
+				.HasColumnName("TwoFactorPreferred");
+		});
+		
 		e.Property(x => x.Alias)
 			.HasMaxLength(EntityConstraints.Domain.Account.AliasMaxLength)
 			.IsRequired();
@@ -142,16 +257,14 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.IsRowVersion()
 			.IsConcurrencyToken();
 
-		// Email unique within tenant
-		e.HasIndex(x => new { x.TenantId, x.Contact.Email })
-			.IsUnique()
-			.HasDatabaseName("UX_Account_Tenant_Email");
-
 		e.HasIndex(x => x.TenantId)
 			.HasDatabaseName("IX_Account_TenantId");
 
 		e.HasIndex(x => x.State)
 			.HasDatabaseName("IX_Account_State");
+
+		// Email unique within tenant
+		// should be handled with migration file directly to preserve purity of entity, inside generated Up method
 	}
 
 	private static void DefinePlatformConfiguration(ModelBuilder modelBuilder)
@@ -172,6 +285,14 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		e.Property(x => x.Name)
 			.HasMaxLength(EntityConstraints.Domain.Platform.NameMaxLength)
 			.IsRequired();
+
+		e.Property(x => x.Kind)
+			.IsRequired()
+			.HasConversion<int>();
+
+		e.Property(x => x.State)
+			.IsRequired()
+			.HasConversion<int>();
 
 		e.Property<byte[]>("RowVersion")
 			.IsRowVersion()
@@ -217,6 +338,10 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		e.Property(x => x.ExternalUserId)
 			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
 
+		e.Property(x => x.State)
+			.IsRequired()
+			.HasConversion<int>();
+
 		// RowVersion: user might edit mapping/settings
 		e.Property<byte[]>("RowVersion")
 			.IsRowVersion()
@@ -236,7 +361,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 	private static void DefineAssetConfiguration(ModelBuilder modelBuilder)
 	{
-		var e = modelBuilder.Entity<Core.Assets.Models.Asset>();
+		var e = modelBuilder.Entity<Asset>();
 		e.ToTable(DbConstants.Domain.EntityNames.AssetEntityName);
 
 		e.HasKey(x => x.Id);
@@ -260,6 +385,14 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 		e.Property(x => x.NativeDecimals)
 			.IsRequired();
+
+		e.Property(x => x.Kind)
+			.IsRequired()
+			.HasConversion<int>();
+
+		e.Property(x => x.State)
+			.IsRequired()
+			.HasConversion<int>();
 
 		// RowVersion: optional but safe for catalog edits
 		e.Property<byte[]>("RowVersion")
@@ -293,6 +426,10 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasConversion(new StrongIdConverter<PlatformAccountId>(x => x.Value, PlatformAccountId.From))
 			.IsRequired();
 
+		e.Property(x => x.Kind)
+			.HasConversion<int>()
+			.IsRequired();
+
 		// Facts ordering: OccurredAt then Id, scoped by PlatformAccount
 		e.HasIndex(x => new { x.PlatformAccountId, x.OccurredAt, x.Id })
 			.HasDatabaseName("IX_Activity_PlatformAccount_OccurredAt_Id");
@@ -300,10 +437,15 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		// Discriminator: Kind
 		e.HasDiscriminator(x => x.Kind)
 			.HasValue<TradeActivity>(AssetActivityKind.Trade)
+			.HasValue<TradeActivity>(AssetActivityKind.Burn)
+			.HasValue<TradeActivity>(AssetActivityKind.Income)
+			.HasValue<TradeActivity>(AssetActivityKind.Service)
+			.HasValue<TradeActivity>(AssetActivityKind.Transfer)
+			.HasValue<TradeActivity>(AssetActivityKind.UserCorrection)
 			.HasValue<ExchangeActivity>(AssetActivityKind.Exchange);
 
-		// ExternalMetadata as owned type with explicit column names (for stable filters/indexes)
-		e.OwnsOne(x => x.ExternalMetadata, meta =>
+		// ExternalMetadata moved from OwnsOne to a Complex Property
+		e.ComplexProperty(x => x.ExternalMetadata, meta =>
 		{
 			meta.Property(m => m.ExternalId)
 				.HasColumnName("ExternalId")
@@ -316,18 +458,42 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			meta.Property(m => m.Source)
 				.HasColumnName("ExternalSource")
 				.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
+
+			meta.Property(m => m.Notes)
+				.HasColumnName("ExternalNotes") 
+				.HasMaxLength(EntityConstraints.CommonSettings.ExternalNotesMaxLength);
+		});
+
+		// Configure the derived TradeActivity specific properties
+		modelBuilder.Entity<TradeActivity>(trade =>
+		{
+			trade.OwnsOne(x => x.Futures, fb =>
+			{
+				fb.Property(f => f.InstrumentKey)
+					.HasColumnName("Futures_InstrumentKey");
+
+				fb.Property(f => f.ContractKind)
+					.HasColumnName("Futures_ContractKind")
+					.HasConversion<int>();
+
+				fb.Property(f => f.BaseAssetCode)
+					.HasColumnName("Futures_BaseAssetCode");
+
+				fb.Property(f => f.QuoteAssetCode)
+					.HasColumnName("Futures_QuoteAssetCode");
+
+				fb.Property(f => f.PositionEffect)
+					.HasColumnName("Futures_PositionEffect")
+					.HasConversion<int>();
+			});
+
+			// map TradeActivity specific properties
+			trade.Property(x => x.ExecutionType).IsRequired();
+			trade.Property(x => x.MarketKind).IsRequired();
 		});
 
 		// Idempotency uniqueness (filtered)
-		e.HasIndex(x => new { x.TenantId, x.PlatformAccountId, x.Kind, x.ExternalMetadata.ExternalId })
-			.IsUnique()
-			.HasDatabaseName("UX_Activity_ExternalId")
-			.HasFilter("[ExternalId] IS NOT NULL");
-
-		e.HasIndex(x => new { x.TenantId, x.PlatformAccountId, x.Kind, x.ExternalMetadata.Fingerprint })
-			.IsUnique()
-			.HasDatabaseName("UX_Activity_Fingerprint")
-			.HasFilter("[Fingerprint] IS NOT NULL");
+		// should be handled with migration file directly to preserve purity of entity, inside generated Up method
 
 		// No RowVersion: Activity should be immutable (facts)
 	}
@@ -351,6 +517,18 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasConversion(new StrongIdConverter<AssetId>(x => x.Value, AssetId.From))
 			.IsRequired();
 
+		e.Property(x => x.Direction)
+			.IsRequired()
+			.HasConversion<int>();
+
+		e.Property(x => x.Role)
+			.IsRequired()
+			.HasConversion<int>();
+
+		e.Property(x => x.Allocation)
+			.IsRequired()
+			.HasConversion<int>();
+
 		// Quantity is VO: map to decimal
 		e.Property(x => x.Amount)
 			.HasConversion(
@@ -359,10 +537,6 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			)
 			.HasColumnType("decimal(38, 18)") 
 			.IsRequired();
-
-		e.Property(x => x.Direction).IsRequired();
-		e.Property(x => x.Role).IsRequired();
-		e.Property(x => x.Allocation).IsRequired();
 
 		e.Property(x => x.InstrumentKey)
 			.HasMaxLength(EntityConstraints.Domain.ActivityLeg.InstrumentKeyMaxLength);

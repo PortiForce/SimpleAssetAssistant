@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record UserCorrectionActivity(ActivityId Id) : ReasonedActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.UserCorrection;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.UserCorrection;
 
 	public static UserCorrectionActivity Create(
 		TenantId tenantId,

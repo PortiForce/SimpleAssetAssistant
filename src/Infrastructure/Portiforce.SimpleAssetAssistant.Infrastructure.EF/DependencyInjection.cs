@@ -27,16 +27,21 @@ public static class DependencyInjection
 	{
 		services.AddDbContext<AssetAssistantDbContext>(opt =>
 		{
-			var cs = configuration.GetConnectionString("AssetAssistantDb");
-			opt.UseSqlServer(cs);
+			opt.UseSqlServer(
+				configuration.GetConnectionString("AssetAssistantSQLDb"),
+				sql => sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName));
 			opt.EnableDetailedErrors();
-			// opt.EnableSensitiveDataLogging(); // only for local debugging
+
+#if DEBUG
+			// only for local debugging
+			opt.EnableSensitiveDataLogging();
+#endif
 		});
 
 		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 		// Guards/services that are implemented in infrastructure (if any)
-		// if alternative to app-layer guard is requied, use this:
+		// if alternative to app-layer guard is required, use this:
 		// services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuardEf>(); 
 
 		// Repositories

@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record BurnActivity(ActivityId Id) : ReasonedActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Burn;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Burn;
 
 	public static BurnActivity Create(
 		TenantId tenantId,

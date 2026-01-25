@@ -5,5 +5,6 @@ public enum TenantPlan : byte
 	Demo = 1,
 	Basic = 2,
 	Advanced = 3,
-	Pro = 4
+	Pro = 4,
+	Custom = 99
 }

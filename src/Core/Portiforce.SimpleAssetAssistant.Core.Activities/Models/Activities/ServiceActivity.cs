@@ -7,7 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities;
 
 public sealed record ServiceActivity(ActivityId Id) : ReasonedActivity(Id)
 {
-	public override AssetActivityKind Kind => AssetActivityKind.Service;
+	public override AssetActivityKind Kind { get; init; } = AssetActivityKind.Service;
 
 	public required ServiceType ServiceType { get; init; }
 
