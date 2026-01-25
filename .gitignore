@@ -87,3 +87,4 @@ CodeCoverage/
 [Bb]uild[Ll]og.*
 
 *.txt
+src/_Infra/.env
