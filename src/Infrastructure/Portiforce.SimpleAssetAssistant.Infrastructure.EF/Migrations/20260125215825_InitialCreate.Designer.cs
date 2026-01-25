@@ -13,7 +13,7 @@ using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260125153909_InitialCreate")]
+    [Migration("20260125215825_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -151,12 +151,12 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("UX_Asset_Code");
-
                     b.HasIndex("State")
                         .HasDatabaseName("IX_Asset_State");
+
+                    b.HasIndex("Code", "Kind")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Asset_Code_Kind");
 
                     b.ToTable("Asset", "pf");
                 });

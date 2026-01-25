@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj" />
+  </ItemGroup>
+
 </Project>

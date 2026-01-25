@@ -303,10 +303,10 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				column: "State");
 
 			migrationBuilder.CreateIndex(
-				name: "UX_Asset_Code",
+				name: "UX_Asset_Code_Kind",
 				schema: DbConstants.Domain.DefaultSchemaName,
 				table: "Asset",
-				column: "Code",
+				columns: new[] { "Code", "Kind" },
 				unique: true);
 
 			migrationBuilder.CreateIndex(
@@ -393,7 +393,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				table: "TenantRestrictedPlatform",
 				column: "TenantId");
 
-			// custom migrations start (not handled by automatic model creations)
+			// manually added custom indexes
 			migrationBuilder.CreateIndex(
 				name: "UX_Account_Tenant_ContactEmail",
 				schema: DbConstants.Domain.DefaultSchemaName,
@@ -416,7 +416,6 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				columns: new[] { "TenantId", "PlatformAccountId", "Kind", "Fingerprint" },
 				unique: true,
 				filter: "[Fingerprint] IS NOT NULL");
-			// custom migrations end 
 		}
 
 		/// <inheritdoc />

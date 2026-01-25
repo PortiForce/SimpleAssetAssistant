@@ -1,6 +1,7 @@
 using Portiforce.SimpleAssetAssistant.Application;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi;
@@ -62,6 +63,16 @@ public class Program
 		app.UseAuthorization();
 
 		app.MapControllers();
+
+		// ==========================================
+		// ? EXECUTE SEEDING HERE
+		// ==========================================
+		if (app.Environment.IsDevelopment())
+		{
+			// It is safe to run this on every startup in Dev
+			// It checks .Any() internally so it won't duplicate data
+			app.PopulateGlobalDictionaries();
+		}
 
 		app.Run();
 	}

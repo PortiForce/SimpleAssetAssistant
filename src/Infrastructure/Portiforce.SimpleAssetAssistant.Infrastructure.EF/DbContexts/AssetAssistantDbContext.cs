@@ -9,7 +9,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation.Seeders;
 using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
@@ -403,9 +403,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.IsRowVersion()
 			.IsConcurrencyToken();
 
-		e.HasIndex(x => x.Code)
+		e.HasIndex(x => new {x.Code, x.Kind})
 			.IsUnique()
-			.HasDatabaseName("UX_Asset_Code");
+			.HasDatabaseName("UX_Asset_Code_Kind");
 
 		e.HasIndex(x => x.State)
 			.HasDatabaseName("IX_Asset_State");
@@ -646,11 +646,5 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany()
 			.HasForeignKey(l => l.AssetId)
 			.OnDelete(DeleteBehavior.Restrict);
-	}
-
-	public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-	{
-		// setup common audit props (CreatedAt/UpdatedAt) if you have them
-		return base.SaveChangesAsync(cancellationToken);
 	}
 }

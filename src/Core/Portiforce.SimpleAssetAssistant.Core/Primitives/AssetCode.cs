@@ -44,7 +44,7 @@ public sealed record AssetCode
 		// Pragmatic rules:
 		// - 2–16 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
 		// - Allow letters, digits, dot, dash
-		if (code.Length < EntityConstraints.Domain.Asset.CodeMinLength || code.Length > EntityConstraints.Domain.Asset.CodeMaxLength)
+		if (code.Length is < EntityConstraints.Domain.Asset.CodeMinLength or > EntityConstraints.Domain.Asset.CodeMaxLength)
 		{
 			return false;
 		}

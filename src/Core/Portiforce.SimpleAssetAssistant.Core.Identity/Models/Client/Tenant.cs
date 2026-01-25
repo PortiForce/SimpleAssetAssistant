@@ -124,6 +124,13 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		Plan = plan;
 	}
 
+	public void UpdateSettings(TenantSettings newSettings)
+	{
+		EnsureEditable();
+
+		Settings = newSettings ?? throw new DomainValidationException("Settings cannot be null.");
+	}
+
 	private void SyncRestrictedAssetsFromEf()
 	{
 		_restrictedAssets.Clear();

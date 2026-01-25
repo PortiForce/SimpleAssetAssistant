@@ -30,10 +30,15 @@ public static class EntityConstraints
 	{
 		public static class Asset
 		{
-			public const int CodeMinLength = 2;
+			public const int CodeMinLength = 1;
 			public const int CodeMaxLength = 16;
-			public const int NativeDecimalsMaxLength = 18;
 			public const int NameMaxLength = 100;
+
+			public const int NativeDecimalsZeroLength = 0;
+			public const int NativeDecimalsFiatLength = 2;
+			public const int NativeDecimalsMinLength = 6;
+			public const int NativeDecimalsAvgLength = 12;
+			public const int NativeDecimalsMaxLength = 18;
 		}
 
 		public static class Tenant

@@ -151,12 +151,12 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 					b.HasKey("Id");
 
-					b.HasIndex("Code")
-						.IsUnique()
-						.HasDatabaseName("UX_Asset_Code");
-
 					b.HasIndex("State")
 						.HasDatabaseName("IX_Asset_State");
+
+					b.HasIndex("Code", "Kind")
+						.IsUnique()
+						.HasDatabaseName("UX_Asset_Code_Kind");
 
 					b.ToTable("Asset", DbConstants.Domain.DefaultSchemaName);
 				});
