@@ -12,4 +12,5 @@ public sealed record AccountDetails(
 	string Email,
 	AccountTier Tier,
 	AccountState State,
+	Role Role,
 	ContactInfo ContactInfo) : IDetailsProjection;

@@ -10,4 +10,9 @@ public interface IAccountReadRepository : IReadRepository<AccountDetails, Accoun
 		TenantId tenantId,
 		PageRequest pageRequest,
 		CancellationToken ct);
+
+	Task<AccountDetails?> GetByEmailAndTenantAsync(
+		string googleUserEmail,
+		TenantId requestTenantId,
+		CancellationToken ct);
 }

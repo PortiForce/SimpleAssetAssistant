@@ -14,11 +14,11 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
 			migrationBuilder.EnsureSchema(
-				name: DbConstants.Domain.DefaultSchemaName);
+				name: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.CreateTable(
 				name: "Asset",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -36,7 +36,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "Platform",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -53,7 +53,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "Tenant",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -80,7 +80,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "Account",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -104,7 +104,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_Account_Tenant_TenantId",
 						column: x => x.TenantId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Tenant",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
@@ -112,7 +112,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "TenantRestrictedAsset",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -124,7 +124,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_TenantRestrictedAsset_Tenant_TenantId",
 						column: x => x.TenantId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Tenant",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
@@ -132,7 +132,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "TenantRestrictedPlatform",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -144,7 +144,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_TenantRestrictedPlatform_Tenant_TenantId",
 						column: x => x.TenantId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Tenant",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
@@ -152,7 +152,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "PlatformAccount",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -171,21 +171,21 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_PlatformAccount_Account_AccountId",
 						column: x => x.AccountId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Account",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
 					table.ForeignKey(
 						name: "FK_PlatformAccount_Platform_PlatformId",
 						column: x => x.PlatformId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Platform",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
 					table.ForeignKey(
 						name: "FK_PlatformAccount_Tenant_TenantId",
 						column: x => x.TenantId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Tenant",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
@@ -193,7 +193,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "Activity",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -227,7 +227,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_Activity_PlatformAccount_PlatformAccountId",
 						column: x => x.PlatformAccountId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "PlatformAccount",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
@@ -235,7 +235,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateTable(
 				name: "ActivityLeg",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -253,14 +253,14 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					table.ForeignKey(
 						name: "FK_ActivityLeg_Activity_ActivityId",
 						column: x => x.ActivityId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Activity",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
 					table.ForeignKey(
 						name: "FK_ActivityLeg_Asset_AssetId",
 						column: x => x.AssetId,
-						principalSchema: DbConstants.Domain.DefaultSchemaName,
+						principalSchema: DbConstants.Domain.Entities.DefaultSchemaName,
 						principalTable: "Asset",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
@@ -268,114 +268,114 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Account_State",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Account",
 				column: "State");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Account_TenantId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Account",
 				column: "TenantId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Activity_PlatformAccount_OccurredAt_Id",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Activity",
 				columns: new[] { "PlatformAccountId", "OccurredAt", "Id" });
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Leg_ActivityId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "ActivityLeg",
 				column: "ActivityId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Leg_AssetId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "ActivityLeg",
 				column: "AssetId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Asset_State",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Asset",
 				column: "State");
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Asset_Code_Kind",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Asset",
 				columns: new[] { "Code", "Kind" },
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Platform_State",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Platform",
 				column: "State");
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Platform_Code",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Platform",
 				column: "Code",
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Platform_Name",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Platform",
 				column: "Name",
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_AccountId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "PlatformAccount",
 				column: "AccountId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_PlatformId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "PlatformAccount",
 				column: "PlatformId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_Tenant_Account",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "PlatformAccount",
 				columns: new[] { "TenantId", "AccountId" });
 
 			migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_Tenant_Platform",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "PlatformAccount",
 				columns: new[] { "TenantId", "PlatformId" });
 
 			migrationBuilder.CreateIndex(
 				name: "UX_PlatformAccount_Tenant_Account_Platform",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "PlatformAccount",
 				columns: new[] { "TenantId", "AccountId", "PlatformId" },
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "IX_Tenant_State",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Tenant",
 				column: "State");
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Tenant_Code",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Tenant",
 				column: "Code",
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Tenant_DomainPrefix",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "Tenant",
 				column: "DomainPrefix",
 				unique: true,
@@ -383,36 +383,36 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.CreateIndex(
 				name: "IX_TenantRestrictedAsset_TenantId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "TenantRestrictedAsset",
 				column: "TenantId");
 
 			migrationBuilder.CreateIndex(
 				name: "IX_TenantRestrictedPlatform_TenantId",
-				schema: DbConstants.Domain.DefaultSchemaName,
+				schema: DbConstants.Domain.Entities.DefaultSchemaName,
 				table: "TenantRestrictedPlatform",
 				column: "TenantId");
 
 			// manually added custom indexes
 			migrationBuilder.CreateIndex(
 				name: "UX_Account_Tenant_ContactEmail",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: "Account",
+				schema: DbConstants.Domain.Entities.CoreSchema.SchemaName,
+				table: DbConstants.Domain.Entities.CoreSchema.AccountTableName,
 				columns: new[] { "TenantId", "ContactEmail" },
 				unique: true);
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Activity_ExternalId",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: DbConstants.Domain.EntityNames.ActivityEntityName,
+				schema: DbConstants.Domain.Entities.LedgerSchema.SchemaName,
+				table: DbConstants.Domain.Entities.LedgerSchema.ActivityTableName,
 				columns: new[] { "TenantId", "PlatformAccountId", "Kind", "ExternalId" },
 				unique: true,
 				filter: "[ExternalId] IS NOT NULL");
 
 			migrationBuilder.CreateIndex(
 				name: "UX_Activity_Fingerprint",
-				schema: DbConstants.Domain.DefaultSchemaName,
-				table: DbConstants.Domain.EntityNames.ActivityEntityName,
+				schema: DbConstants.Domain.Entities.LedgerSchema.SchemaName,
+				table: DbConstants.Domain.Entities.LedgerSchema.ActivityTableName,
 				columns: new[] { "TenantId", "PlatformAccountId", "Kind", "Fingerprint" },
 				unique: true,
 				filter: "[Fingerprint] IS NOT NULL");
@@ -423,39 +423,39 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 		{
 			migrationBuilder.DropTable(
 				name: "ActivityLeg",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "TenantRestrictedAsset",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "TenantRestrictedPlatform",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "Activity",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "Asset",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "PlatformAccount",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "Account",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "Platform",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 
 			migrationBuilder.DropTable(
 				name: "Tenant",
-				schema: DbConstants.Domain.DefaultSchemaName);
+				schema: DbConstants.Domain.Entities.DefaultSchemaName);
 		}
 	}
 }

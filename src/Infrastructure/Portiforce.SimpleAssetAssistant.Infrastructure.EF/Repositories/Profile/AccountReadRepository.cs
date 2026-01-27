@@ -16,4 +16,9 @@ internal sealed class AccountReadRepository : IAccountReadRepository
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task<AccountDetails?> GetByEmailAndTenantAsync(string googleUserEmail, TenantId requestTenantId, CancellationToken ct)
+	{
+		throw new NotImplementedException();
+	}
 }

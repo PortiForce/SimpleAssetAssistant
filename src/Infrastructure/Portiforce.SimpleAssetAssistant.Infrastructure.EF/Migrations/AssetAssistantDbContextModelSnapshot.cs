@@ -21,7 +21,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 		{
 #pragma warning disable 612, 618
 			modelBuilder
-				.HasDefaultSchema(DbConstants.Domain.DefaultSchemaName)
+				.HasDefaultSchema(DbConstants.Domain.Entities.DefaultSchemaName)
 				.HasAnnotation("ProductVersion", "10.0.2")
 				.HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -75,7 +75,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("PlatformAccountId", "OccurredAt", "Id")
 						.HasDatabaseName("IX_Activity_PlatformAccount_OccurredAt_Id");
 
-					b.ToTable("Activity", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Activity", DbConstants.Domain.Entities.DefaultSchemaName);
 
 					b.HasDiscriminator<int>("Kind");
 
@@ -117,7 +117,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("AssetId")
 						.HasDatabaseName("IX_Leg_AssetId");
 
-					b.ToTable("ActivityLeg", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("ActivityLeg", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Asset", b =>
@@ -158,7 +158,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.IsUnique()
 						.HasDatabaseName("UX_Asset_Code_Kind");
 
-					b.ToTable("Asset", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Asset", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Platform", b =>
@@ -200,7 +200,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("State")
 						.HasDatabaseName("IX_Platform_State");
 
-					b.ToTable("Platform", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Platform", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.PlatformAccount", b =>
@@ -254,7 +254,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.IsUnique()
 						.HasDatabaseName("UX_PlatformAccount_Tenant_Account_Platform");
 
-					b.ToTable("PlatformAccount", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("PlatformAccount", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", b =>
@@ -369,7 +369,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("State")
 						.HasDatabaseName("IX_Tenant_State");
 
-					b.ToTable("Tenant", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Tenant", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedAsset", b =>
@@ -385,7 +385,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_TenantRestrictedAsset_TenantId");
 
-					b.ToTable("TenantRestrictedAsset", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("TenantRestrictedAsset", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedPlatform", b =>
@@ -401,7 +401,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_TenantRestrictedPlatform_TenantId");
 
-					b.ToTable("TenantRestrictedPlatform", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("TenantRestrictedPlatform", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", b =>
@@ -487,7 +487,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_Account_TenantId");
 
-					b.ToTable("Account", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Account", DbConstants.Domain.Entities.DefaultSchemaName);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.BurnActivity", b =>
@@ -702,7 +702,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 							b1.HasKey("TradeActivityId");
 
-							b1.ToTable("Activity", DbConstants.Domain.DefaultSchemaName);
+							b1.ToTable("Activity", DbConstants.Domain.Entities.DefaultSchemaName);
 
 							b1.WithOwner()
 								.HasForeignKey("TradeActivityId");
