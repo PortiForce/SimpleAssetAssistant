@@ -1,5 +1,5 @@
 ﻿
-namespace Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
+namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 internal static class DbConstants
 {

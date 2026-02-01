@@ -12,8 +12,11 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 {
 	public async Task<TenantDetails?> GetByIdAsync(TenantId id, CancellationToken ct)
 	{
-		var tenant = await db.Tenants
+		// AsSplitQuery: Prevents data duplication (Cartesian explosion) when loading multiple collections.
+		// RestrictedAssets, RestrictedPlatforms: EF Core handles these as separate efficient SQL queries now
+		var tenantData = await db.Tenants
 			.AsNoTracking()
+			.AsSplitQuery()
 			.Where(x => x.Id == id)
 			.Select(x => new
 			{
@@ -29,21 +32,38 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 			})
 			.SingleOrDefaultAsync(ct);
 
-		if (tenant is null)
+		if (tenantData is null)
 		{
 			return null;
 		}
 
+		// Mapping logic remains here because 'ReadOnlySet' is complex to construct inside LINQ
 		return new TenantDetails(
-			TenantId: tenant.Id,
-			Name: tenant.Name,
-			Code: tenant.Code,
-			BrandName: tenant.BrandName,
-			DomainPrefix: tenant.DomainPrefix,
-			Plan: tenant.Plan,
-			State: tenant.State,
-			RestrictedAssets: new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenant.RestrictedAssets)),
-			RestrictedPlatforms: new ReadOnlySet<PlatformId>(new HashSet<PlatformId>(tenant.RestrictedPlatforms))
+			TenantId: tenantData.Id,
+			Name: tenantData.Name,
+			Code: tenantData.Code,
+			BrandName: tenantData.BrandName,
+			DomainPrefix: tenantData.DomainPrefix,
+			Plan: tenantData.Plan,
+			State: tenantData.State,
+			RestrictedAssets: new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenantData.RestrictedAssets)),
+			RestrictedPlatforms: new ReadOnlySet<PlatformId>(new HashSet<PlatformId>(tenantData.RestrictedPlatforms))
 		);
+	}
+
+	public async Task<TenantSummary?> GetSummaryByIdAsync(TenantId id, CancellationToken ct)
+	{
+		// Direct Projection: Projects directly to the DTO, skipping the intermediate anonymous object.
+		return await db.Tenants
+			.AsNoTracking()
+			.Where(x => x.Id == id)
+			.Select(x => new TenantSummary(
+				x.Id,
+				x.Name,
+				x.DomainPrefix,
+				x.Plan,
+				x.State
+			))
+			.SingleOrDefaultAsync(ct);
 	}
 }

@@ -2,11 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
-using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Auth;
 
@@ -22,8 +20,10 @@ public sealed class PasskeyCredentialConfiguration : IEntityTypeConfiguration<Pa
 
 		// 2. Primary Key
 		builder.HasKey(x => x.Id);
+
 		builder.Property(x => x.Id)
-			.ValueGeneratedNever();
+			.ValueGeneratedNever()
+			.HasConversion(new StrongIdConverter<ExternalIdentityId>(x => x.Value, ExternalIdentityId.From));
 
 		// 3. Properties
 

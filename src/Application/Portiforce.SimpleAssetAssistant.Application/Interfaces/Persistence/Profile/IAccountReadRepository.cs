@@ -15,4 +15,20 @@ public interface IAccountReadRepository : IReadRepository<AccountDetails, Accoun
 		string googleUserEmail,
 		TenantId requestTenantId,
 		CancellationToken ct);
+
+	/// <summary>
+	/// Finds all accounts across all tenants that share this email
+	/// </summary>
+	/// <param name="email">email to check</param>
+	/// <param name="ct"></param>
+	/// <returns>list of accounts that match provided email address</returns>
+	Task<List<AccountListItem>> GetByEmailAsync(string email, CancellationToken ct);
+
+	/// <summary>
+	/// Returns number of users where State == Active
+	/// </summary>
+	/// <param name="tenantId">related tenantId</param>
+	/// <param name="ct"></param>
+	/// <returns></returns>
+	Task<int> GetActiveUserCountAsync(TenantId tenantId, CancellationToken ct);
 }

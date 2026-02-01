@@ -4,4 +4,11 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Actions.Commands;
 
-public sealed record LoginWithGoogleCommand(string IdToken, TenantId TenantId) : ICommand<AuthResponse>;
+/// <summary>
+/// 
+/// </summary>
+/// <param name="IdToken"></param>
+/// <param name="TenantId">if tenantId is null : this is global Login lookup flow </param>
+public sealed record LoginWithGoogleCommand(
+	string IdToken,
+	TenantId? TenantId) : ICommand<AuthResponse>;

@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
+﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
 
 namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
 
@@ -7,7 +7,7 @@ public interface ITokenGenerator
 	/// <summary>
 	/// Returns the JWT string
 	/// </summary>
-	/// <param name="account"></param>
+	/// <param name="accountInfo">account info model</param>
 	/// <returns></returns>
-	string Generate(Account account);
+	string Generate(IAccountInfo accountInfo);
 }

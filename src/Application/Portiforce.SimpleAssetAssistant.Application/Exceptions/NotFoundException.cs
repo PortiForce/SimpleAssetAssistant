@@ -6,4 +6,9 @@ public sealed class NotFoundException : Exception
 	{
 
 	}
+
+	public NotFoundException(string details) : base(details)
+	{
+
+	}
 }

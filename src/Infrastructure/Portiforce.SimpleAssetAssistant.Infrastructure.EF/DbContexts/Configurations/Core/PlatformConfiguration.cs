@@ -4,9 +4,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Portiforce.SimpleAssetAssistant.Core.Assets.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Core;
 

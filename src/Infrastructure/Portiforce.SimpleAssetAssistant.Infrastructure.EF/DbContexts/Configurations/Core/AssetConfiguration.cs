@@ -6,9 +6,8 @@ using Portiforce.SimpleAssetAssistant.Core.Assets.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Core;
 
@@ -16,7 +15,8 @@ public sealed class AssetConfiguration : IEntityTypeConfiguration<Asset>
 {
 	public void Configure(EntityTypeBuilder<Asset> builder)
 	{
-		builder.ToTable(DbConstants.Domain.Entities.CoreSchema.AssetTableName,
+		builder.ToTable(
+			DbConstants.Domain.Entities.CoreSchema.AssetTableName,
 			schema: DbConstants.Domain.Entities.CoreSchema.SchemaName);
 
 		builder.HasKey(x => x.Id);

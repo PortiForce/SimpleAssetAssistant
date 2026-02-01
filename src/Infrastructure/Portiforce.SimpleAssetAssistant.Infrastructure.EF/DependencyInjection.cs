@@ -1,13 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Activity;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Asset;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Client;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Platform;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.PlatformAccount;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Profile;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation.Seeders.Internal;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Activity;
@@ -65,6 +68,12 @@ public static class DependencyInjection
 
 		services.AddScoped<IActivityReadRepository, ActivityReadRepository>();
 		services.AddScoped<IActivityWriteRepository, ActivityWriteRepository>();
+
+		services.AddScoped<IExternalIdentityReadRepository, ExternalIdentityReadRepository>();
+		services.AddScoped<IExternalIdentityWriteRepository, ExternalIdentityWriteRepository>();
+
+		// data seeders:
+		services.AddScoped<DbUserSeeder>();
 
 		return services;
 	}

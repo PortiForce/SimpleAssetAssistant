@@ -9,13 +9,10 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.Auth;
 
 public class GoogleAuthProvider : IGoogleAuthProvider
 {
-	private readonly GoogleClientSettings _settings;
 	private readonly string _clientId;
-
-
+	
 	public GoogleAuthProvider(IOptions<GoogleClientSettings> settings)
 	{
-		_settings = settings.Value;
 		_clientId = settings.Value.ClientId;
 	}
 	

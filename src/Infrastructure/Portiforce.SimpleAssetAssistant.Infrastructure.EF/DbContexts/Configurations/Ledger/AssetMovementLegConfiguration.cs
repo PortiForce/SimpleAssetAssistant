@@ -5,9 +5,8 @@ using Portiforce.SimpleAssetAssistant.Core.Activities.Models.Legs;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Core.StaticResources;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Converters;
-
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Ledger;
 

@@ -13,7 +13,7 @@ using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260125215825_InitialCreate")]
+    [Migration("20260130182711_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -75,7 +75,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("PlatformAccountId", "OccurredAt", "Id")
                         .HasDatabaseName("IX_Activity_PlatformAccount_OccurredAt_Id");
 
-                    b.ToTable("Activity", "pf");
+                    b.ToTable("Activities", "ledger");
 
                     b.HasDiscriminator<int>("Kind");
 
@@ -117,7 +117,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("AssetId")
                         .HasDatabaseName("IX_Leg_AssetId");
 
-                    b.ToTable("ActivityLeg", "pf");
+                    b.ToTable("ActivityLegs", "ledger");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Asset", b =>
@@ -158,7 +158,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_Asset_Code_Kind");
 
-                    b.ToTable("Asset", "pf");
+                    b.ToTable("Assets", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Platform", b =>
@@ -200,7 +200,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("State")
                         .HasDatabaseName("IX_Platform_State");
 
-                    b.ToTable("Platform", "pf");
+                    b.ToTable("Platforms", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.PlatformAccount", b =>
@@ -254,7 +254,79 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_PlatformAccount_Tenant_Account_Platform");
 
-                    b.ToTable("PlatformAccount", "pf");
+                    b.ToTable("PlatformAccounts", "core");
+                });
+
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.ExternalIdentity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Provider")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderSubject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("Provider", "ProviderSubject")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ExternalIdentity_Provider_ExternalId");
+
+                    b.ToTable("ExternalIdentities", "auth");
+                });
+
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.PasskeyCredential", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CredentialId")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("LastUsedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("PublicKey")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<long>("SignatureCounter")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserHandle")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("CredentialId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PasskeyCredential_CredentialId");
+
+                    b.ToTable("PassKeyCredentials", "auth");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", b =>
@@ -369,7 +441,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("State")
                         .HasDatabaseName("IX_Tenant_State");
 
-                    b.ToTable("Tenant", "pf");
+                    b.ToTable("Tenants", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedAsset", b =>
@@ -385,7 +457,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("IX_TenantRestrictedAsset_TenantId");
 
-                    b.ToTable("TenantRestrictedAsset", "pf");
+                    b.ToTable("TenantRestrictedAssets", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedPlatform", b =>
@@ -401,7 +473,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("IX_TenantRestrictedPlatform_TenantId");
 
-                    b.ToTable("TenantRestrictedPlatform", "pf");
+                    b.ToTable("TenantRestrictedPlatforms", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", b =>
@@ -487,7 +559,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("IX_Account_TenantId");
 
-                    b.ToTable("Account", "pf");
+                    b.ToTable("Accounts", "core");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.BurnActivity", b =>
@@ -642,6 +714,24 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.ExternalIdentity", b =>
+                {
+                    b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.PasskeyCredential", b =>
+                {
+                    b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedAsset", b =>
                 {
                     b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", null)
@@ -702,7 +792,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
                             b1.HasKey("TradeActivityId");
 
-                            b1.ToTable("Activity", "pf");
+                            b1.ToTable("Activities", "ledger");
 
                             b1.WithOwner()
                                 .HasForeignKey("TradeActivityId");

@@ -5,11 +5,10 @@ using Portiforce.SimpleAssetAssistant.Core.Assets.Models;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Auth;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Core;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts.Configurations.Ledger;
-
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 
@@ -133,6 +132,12 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany() // Account doesn't need a list of these
 			.HasForeignKey(x => x.AccountId)
 			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the Google link
+
+		modelBuilder.Entity<ExternalIdentity>()
+			.HasOne<Tenant>()
+			.WithMany() // Tenant doesn't need a list of these
+			.HasForeignKey(x => x.TenantId)
+			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove the Google link
 
 		// PassKeysCredentials -> Account
 		modelBuilder.Entity<PasskeyCredential>()
