@@ -1,6 +1,6 @@
 ﻿namespace Portiforce.SimpleAssetAssistant.Core.Identity;
 
-internal static class CustomClaimTypes
+public static class CustomClaimTypes
 {
 	/// <summary>
 	/// user details
@@ -10,7 +10,7 @@ internal static class CustomClaimTypes
 	/// <summary>
 	/// Tenant reference
 	/// </summary>
-	public const string CompanyId = "cid";
+	public const string TenantId = "cid";
 
 
 	/// <summary>

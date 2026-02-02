@@ -2,6 +2,7 @@
 using Portiforce.SimpleAssetAssistant.Application.Exceptions;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Client;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Profile;
@@ -26,7 +27,8 @@ public sealed class LoginWithGoogleCommandHandler(
 	IAccountReadRepository accountReadRepository,
 	ITenantReadRepository tenantReadRepository,
 	IExternalIdentityReadRepository externalIdentityReadRepository,
-	IExternalIdentityWriteRepository externalIdentityWriteRepository
+	IExternalIdentityWriteRepository externalIdentityWriteRepository,
+	IUnitOfWork unitOfWork
 	) : IRequestHandler<LoginWithGoogleCommand, AuthResponse>
 {
 	public async ValueTask<AuthResponse> Handle(LoginWithGoogleCommand request, CancellationToken ct)
@@ -39,20 +41,20 @@ public sealed class LoginWithGoogleCommandHandler(
 
 		string token;
 		IAccountInfo accountInfo;
-		
-		if (identity != null)
+
+		if (identity is not null)
 		{
 			// Case A: User is already linked
 			TenantId resolvedTenantId = identity.TenantId;
 
 			// if Request specified a Tenant (e.g. subdomain), ensure it matches
-			if (request.TenantId is { IsEmpty: false } && request.TenantId != resolvedTenantId)
+			if (request.TenantId is { IsEmpty: false } t && t != resolvedTenantId)
 			{
 				throw new DomainValidationException($"User belongs to tenant {resolvedTenantId}, not {request.TenantId}");
 			}
 
 			// User has logged in before
-			AccountDetails?  accountDetails = await accountReadRepository.GetByIdAsync(identity.AccountId, ct);
+			AccountDetails? accountDetails = await accountReadRepository.GetByIdAsync(identity.AccountId, ct);
 			if (accountDetails == null)
 			{
 				throw new NotFoundException("AccountDetails", googleUser.Email);
@@ -72,71 +74,92 @@ public sealed class LoginWithGoogleCommandHandler(
 		else
 		{
 			// Case B: First time login (Auto-Link)
-
-			// We MUST rely on Email lookup.
-			// If Request.TenantId is null, we can't search (unless email is unique globally).
-			// Assuming Email is unique PER TENANT, Global Login is tricky here without a TenantId.
-
-			// For MVP: Let's assume Global Login requires finding ANY account with that email
-			// Or enforce TenantId for new users. 
-
-			// Let's go with: Try to find by Email.
-			List<AccountListItem> accounts = await accountReadRepository.GetByEmailAsync(googleUser.Email, ct);
-
-			if (!accounts.Any())
+			if (request.TenantId is { IsEmpty: false } tenantId)
 			{
-				throw new NotFoundException("Account", googleUser.Email);
+				var accountDetails = await accountReadRepository.GetByEmailAndTenantAsync(googleUser.Email, tenantId, ct);
+				if (accountDetails is null)
+				{
+					throw new NotFoundException("Account", googleUser.Email);
+				}
+
+				EnsureCanLoginByAccountState(accountDetails.State);
+
+				var tenantDetails = await tenantReadRepository.GetByIdAsync(tenantId, ct)
+								 ?? throw new NotFoundException("Tenant", tenantId);
+
+				EnsureCanLoginByTenantState(tenantDetails.State);
+
+				await LinkGoogleIdentityAsync(
+					accountDetails.Id,
+					accountDetails.TenantId,
+					googleUser.ExternalId,
+					ct);
+				accountInfo = accountDetails;
 			}
-
-			// todo tech
-			// If multiple tenants have this email, we might need to ask user to pick.
-			// For MVP, pick the first one or matches request.TenantId
-			AccountListItem? targetAccount = request.TenantId != null
-				? accounts.FirstOrDefault(a => a.TenantId == request.TenantId)
-				: accounts.FirstOrDefault();
-
-			if (targetAccount == null)
+			else
 			{
-				throw new NotFoundException("Account", googleUser.Email);
+				// global login: ambiguous emails must be rejected (don’t “pick first”)
+				var accounts = await accountReadRepository.GetByEmailAsync(googleUser.Email, ct);
+
+				if (accounts.Count == 0)
+				{
+					throw new NotFoundException("Account", googleUser.Email);
+				}
+
+				if (accounts.Count > 1)
+				{
+					throw new DomainValidationException("Multiple tenants use this email. Specify X-Tenant-ID.");
+				}
+
+				var accountListItem = accounts[0];
+				EnsureCanLoginByAccountState(accountListItem.State);
+
+				TenantSummary tenantSummary = await tenantReadRepository.GetSummaryByIdAsync(accountListItem.TenantId, ct)
+										   ?? throw new NotFoundException("Tenant", accountListItem.TenantId);
+
+				EnsureCanLoginByTenantState(tenantSummary.State);
+
+				if (accountListItem.State == AccountState.NotVerified)
+				{
+					await EnsureTenantCanActivateUserAsync(tenantSummary, ct);
+
+					// todo: handle change via domain model?
+					// targetAccount.State = AccountState.Active; 
+					// await accountWriteRepository.UpdateAsync(targetAccount, ct);
+				}
+
+				await LinkGoogleIdentityAsync(
+					accountListItem.Id,
+					accountListItem.TenantId,
+					googleUser.ExternalId,
+					ct);
+				accountInfo = accountListItem;
 			}
-
-			EnsureCanLoginByAccountState(targetAccount.State);
-			
-			// check tenant availability
-			var resolvedTenantId = targetAccount.TenantId;
-			TenantSummary? tenantInfo = await tenantReadRepository.GetSummaryByIdAsync(resolvedTenantId, ct);
-			if (tenantInfo == null)
-			{
-				throw new NotFoundException("Tenant", resolvedTenantId);
-			}
-			EnsureCanLoginByTenantState(tenantInfo.State);
-
-			if (targetAccount.State == AccountState.NotVerified)
-			{
-				// Pass the TenantID and the limit from the Plan
-				await EnsureTenantCanActivateUserAsync(tenantInfo, ct);
-
-				// todo: handle change via domain model?
-				// targetAccount.State = AccountState.Active; 
-				// await accountWriteRepository.UpdateAsync(targetAccount, ct);
-			}
-
-			// Create Link
-			ExternalIdentity newIdentity = ExternalIdentity.Create(
-				targetAccount.Id,
-				resolvedTenantId,
-				AuthProvider.Google,
-				googleUser.ExternalId); 
-
-			await externalIdentityWriteRepository.AddAsync(newIdentity, ct);
-
-			accountInfo = targetAccount;
 		}
 
 		// 4. Generate JWT
 		token = tokenGenerator.Generate(accountInfo);
 
 		return new AuthResponse(token, "dummy-refresh-token", 3600);
+	}
+
+	private async Task LinkGoogleIdentityAsync(AccountId accountId, TenantId tenantId, string googleUserExternalId, CancellationToken ct)
+	{
+		ExternalIdentity newIdentity = ExternalIdentity.Create(
+			accountId,
+			tenantId,
+			AuthProvider.Google,
+			googleUserExternalId);
+
+		try
+		{
+			await externalIdentityWriteRepository.AddAsync(newIdentity, ct);
+			await unitOfWork.SaveChangesAsync(ct);
+		}
+		catch (UniqueConstraintViolationException)
+		{
+			throw new ConflictException("Google identity already linked.");
+		}
 	}
 
 	private async Task EnsureTenantCanActivateUserAsync(TenantSummary tenant, CancellationToken ct)

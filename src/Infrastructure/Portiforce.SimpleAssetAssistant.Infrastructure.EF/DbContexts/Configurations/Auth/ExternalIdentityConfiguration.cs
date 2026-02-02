@@ -29,7 +29,7 @@ public sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<Ext
 		// 3. Properties: 
 		builder.Property(x => x.Provider)
 			.IsRequired()
-			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
+			.HasConversion<byte>();
 
 		builder.Property(x => x.ProviderSubject)
 			.IsRequired()

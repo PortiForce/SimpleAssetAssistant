@@ -20,7 +20,7 @@ public sealed class TradeActivityConfiguration : IEntityTypeConfiguration<TradeA
 
 			fb.Property(f => f.ContractKind)
 				.HasColumnName("Futures_ContractKind")
-				.HasConversion<int>();
+				.HasConversion<byte>();
 
 			fb.Property(f => f.BaseAssetCode)
 				.HasColumnName("Futures_BaseAssetCode")
@@ -32,7 +32,7 @@ public sealed class TradeActivityConfiguration : IEntityTypeConfiguration<TradeA
 
 			fb.Property(f => f.PositionEffect)
 				.HasColumnName("Futures_PositionEffect")
-				.HasConversion<int>();
+				.HasConversion<byte>();
 		});
 	}
 }

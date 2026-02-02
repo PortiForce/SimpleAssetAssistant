@@ -33,11 +33,11 @@ public sealed class PlatformConfiguration : IEntityTypeConfiguration<Platform>
 
 		builder.Property(x => x.Kind)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property(x => x.State)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property<byte[]>("RowVersion")
 			.IsRowVersion()

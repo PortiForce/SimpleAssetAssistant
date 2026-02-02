@@ -40,11 +40,11 @@ public sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 
 		builder.Property(x => x.Plan)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property(x => x.State)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		// ============================
 		// TenantSettings (owned root)

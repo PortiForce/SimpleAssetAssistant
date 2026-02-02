@@ -33,7 +33,7 @@ public sealed class AssetActivityBaseConfiguration : IEntityTypeConfiguration<As
 			.IsRequired();
 
 		builder.Property(x => x.Kind)
-			.HasConversion<int>()
+			.HasConversion<byte>()
 			.IsRequired();
 
 		// Discriminator: Kind

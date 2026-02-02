@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.Auth;
@@ -25,7 +26,7 @@ public class JwtTokenGenerator : ITokenGenerator
 		[
 			new(JwtRegisteredClaimNames.Sub, accountInfo.Id.ToString()),
 			new(JwtRegisteredClaimNames.Email, accountInfo.Email),
-			new(CustomClaimTypes.CompanyId, accountInfo.TenantId.ToString()),
+			new(CustomClaimTypes.TenantId, accountInfo.TenantId.ToString()),
 			new(CustomClaimTypes.RoleId, accountInfo.Role.ToString())
 		];
 

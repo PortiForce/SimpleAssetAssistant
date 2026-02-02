@@ -47,7 +47,7 @@ public sealed class PlatformAccountConfiguration : IEntityTypeConfiguration<Plat
 
 		builder.Property(x => x.State)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		// RowVersion: user might edit mapping/settings
 		builder.Property<byte[]>("RowVersion")

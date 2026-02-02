@@ -43,11 +43,11 @@ public sealed class AssetConfiguration : IEntityTypeConfiguration<Asset>
 
 		builder.Property(x => x.Kind)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property(x => x.State)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		// RowVersion: optional but safe for catalog edits
 		builder.Property<byte[]>("RowVersion")

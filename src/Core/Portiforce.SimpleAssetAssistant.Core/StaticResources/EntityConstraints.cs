@@ -18,7 +18,7 @@ public static class EntityConstraints
 		/// </summary>
 		public const int NameMaxLength = 100;
 
-		public const int ProviderSubjectMaxLength = 200;
+		public const int ProviderSubjectMaxLength = 256;
 
 		public const int ExternalIdMaxLength = 100;
 		public const int ExternalNotesMaxLength = 255;

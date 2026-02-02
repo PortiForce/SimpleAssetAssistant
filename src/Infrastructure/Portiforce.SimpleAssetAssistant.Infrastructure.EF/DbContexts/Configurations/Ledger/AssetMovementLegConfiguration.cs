@@ -34,15 +34,15 @@ public sealed class AssetMovementLegConfiguration : IEntityTypeConfiguration<Ass
 
 		builder.Property(x => x.Direction)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property(x => x.Role)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		builder.Property(x => x.Allocation)
 			.IsRequired()
-			.HasConversion<int>();
+			.HasConversion<byte>();
 
 		// Quantity is VO: map to decimal
 		builder.Property(x => x.Amount)
