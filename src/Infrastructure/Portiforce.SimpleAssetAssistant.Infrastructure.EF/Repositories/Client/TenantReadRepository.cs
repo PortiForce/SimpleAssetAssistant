@@ -39,7 +39,7 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 
 		// Mapping logic remains here because 'ReadOnlySet' is complex to construct inside LINQ
 		return new TenantDetails(
-			TenantId: tenantData.Id,
+			Id: tenantData.Id,
 			Name: tenantData.Name,
 			Code: tenantData.Code,
 			BrandName: tenantData.BrandName,
@@ -60,6 +60,7 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 			.Select(x => new TenantSummary(
 				x.Id,
 				x.Name,
+				x.Code,
 				x.DomainPrefix,
 				x.Plan,
 				x.State

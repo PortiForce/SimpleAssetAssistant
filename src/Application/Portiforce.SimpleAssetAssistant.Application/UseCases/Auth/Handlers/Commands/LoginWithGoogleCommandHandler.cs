@@ -1,12 +1,11 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Entitlements;
 using Portiforce.SimpleAssetAssistant.Application.Exceptions;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Client;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Profile;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Tenant;
 using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Actions.Commands;
@@ -16,6 +15,7 @@ using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Proje
 using Portiforce.SimpleAssetAssistant.Core.Exceptions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Handlers.Commands;
@@ -23,13 +23,13 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Handlers.Com
 public sealed class LoginWithGoogleCommandHandler(
 	IGoogleAuthProvider googleProvider,
 	ITokenGenerator tokenGenerator,
-	ITenantEntitlementsResolver tenantEntitlementsResolver,
+	ITenantLimitsService tenantLimitsService,
 	IAccountReadRepository accountReadRepository,
 	ITenantReadRepository tenantReadRepository,
 	IExternalIdentityReadRepository externalIdentityReadRepository,
 	IExternalIdentityWriteRepository externalIdentityWriteRepository,
-	IUnitOfWork unitOfWork
-	) : IRequestHandler<LoginWithGoogleCommand, AuthResponse>
+	IUnitOfWork unitOfWork) 
+	: IRequestHandler<LoginWithGoogleCommand, AuthResponse>
 {
 	public async ValueTask<AuthResponse> Handle(LoginWithGoogleCommand request, CancellationToken ct)
 	{
@@ -41,6 +41,12 @@ public sealed class LoginWithGoogleCommandHandler(
 
 		string token;
 		IAccountInfo accountInfo;
+
+		if (!Email.TryCreate(googleUser.Email, out Email userEmailModel))
+		{
+			// This is technically a "Bad Request" or "Validation Error".
+			throw new DomainValidationException($"Invalid email received from provider: {googleUser.Email}");
+		}
 
 		if (identity is not null)
 		{
@@ -76,7 +82,7 @@ public sealed class LoginWithGoogleCommandHandler(
 			// Case B: First time login (Auto-Link)
 			if (request.TenantId is { IsEmpty: false } tenantId)
 			{
-				var accountDetails = await accountReadRepository.GetByEmailAndTenantAsync(googleUser.Email, tenantId, ct);
+				AccountDetails? accountDetails = await accountReadRepository.GetByEmailAndTenantAsync(userEmailModel, tenantId, ct);
 				if (accountDetails is null)
 				{
 					throw new NotFoundException("Account", googleUser.Email);
@@ -84,10 +90,10 @@ public sealed class LoginWithGoogleCommandHandler(
 
 				EnsureCanLoginByAccountState(accountDetails.State);
 
-				var tenantDetails = await tenantReadRepository.GetByIdAsync(tenantId, ct)
-								 ?? throw new NotFoundException("Tenant", tenantId);
+				TenantSummary tenantSummary = await tenantReadRepository.GetSummaryByIdAsync(accountDetails.TenantId, ct)
+				                              ?? throw new NotFoundException("Tenant", accountDetails.TenantId);
 
-				EnsureCanLoginByTenantState(tenantDetails.State);
+				EnsureCanLoginByTenantState(tenantSummary.State);
 
 				await LinkGoogleIdentityAsync(
 					accountDetails.Id,
@@ -98,8 +104,7 @@ public sealed class LoginWithGoogleCommandHandler(
 			}
 			else
 			{
-				// global login: ambiguous emails must be rejected (don’t “pick first”)
-				var accounts = await accountReadRepository.GetByEmailAsync(googleUser.Email, ct);
+				List<AccountListItem> accounts = await accountReadRepository.GetByEmailAsync(userEmailModel, ct);
 
 				if (accounts.Count == 0)
 				{
@@ -119,9 +124,9 @@ public sealed class LoginWithGoogleCommandHandler(
 
 				EnsureCanLoginByTenantState(tenantSummary.State);
 
-				if (accountListItem.State == AccountState.NotVerified)
+				if (accountListItem.State == AccountState.PendingActivation)
 				{
-					await EnsureTenantCanActivateUserAsync(tenantSummary, ct);
+					await tenantLimitsService.EnsureTenantCanInviteOrActivateUserAsync(tenantSummary, ct);
 
 					// todo: handle change via domain model?
 					// targetAccount.State = AccountState.Active; 
@@ -161,26 +166,11 @@ public sealed class LoginWithGoogleCommandHandler(
 			throw new ConflictException("Google identity already linked.");
 		}
 	}
-
-	private async Task EnsureTenantCanActivateUserAsync(TenantSummary tenant, CancellationToken ct)
-	{
-		TenantEntitlements tenantEntitlements = tenantEntitlementsResolver.Resolve(tenant.Plan);
-
-		int maxUsers = tenantEntitlements.MaxUsers;
-
-		int currentActiveUsers = await accountReadRepository.GetActiveUserCountAsync(tenant.Id, ct);
-
-		if (currentActiveUsers >= maxUsers)
-		{
-			throw new DomainValidationException(
-				$"Tenant '{tenant.Name}' has reached the maximum of {maxUsers} active users. Please contact your admin to upgrade.");
-		}
-	}
-
+	
 	private void EnsureCanLoginByAccountState(AccountState accountState)
 	{
 		// use only cases and states when person is able to log in
-		bool canLogin = accountState is AccountState.Active or AccountState.NotVerified;
+		bool canLogin = accountState is AccountState.Active or AccountState.PendingActivation;
 
 		if (!canLogin)
 		{

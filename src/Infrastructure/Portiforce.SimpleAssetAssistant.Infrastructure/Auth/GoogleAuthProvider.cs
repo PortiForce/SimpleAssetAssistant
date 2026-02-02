@@ -1,7 +1,10 @@
 ﻿using System.Security.Authentication;
+
 using Google.Apis.Auth;
+
 using Microsoft.Extensions.Options;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
+
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 

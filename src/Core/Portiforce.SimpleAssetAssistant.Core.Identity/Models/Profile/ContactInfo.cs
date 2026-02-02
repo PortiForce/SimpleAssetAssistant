@@ -6,8 +6,8 @@ public sealed record ContactInfo
 {
 	public ContactInfo(
 		Email email,
-		PhoneNumber? phone,
-		Email? backupEmail)
+		PhoneNumber? phone = null,
+		Email? backupEmail = null)
 	{
 		Email = email;
 		Phone = phone;

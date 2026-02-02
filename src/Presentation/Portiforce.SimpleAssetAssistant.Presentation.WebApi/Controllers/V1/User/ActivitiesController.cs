@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
@@ -7,12 +8,13 @@ using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.Quer
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Mappers;
-using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
-namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1;
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Base;
 
-[Route("api/v1/[controller]")]
+
 [ApiController]
+[Route("api/v1/[controller]")]
 public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 {
 	[HttpPost("trades")]

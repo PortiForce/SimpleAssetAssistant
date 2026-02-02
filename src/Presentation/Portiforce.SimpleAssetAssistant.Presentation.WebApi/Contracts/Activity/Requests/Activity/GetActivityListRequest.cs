@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests;
+﻿namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
 public sealed record GetActivityListRequest(
 	Guid AccountId,

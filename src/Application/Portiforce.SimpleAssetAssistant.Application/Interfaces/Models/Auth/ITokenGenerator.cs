@@ -1,6 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
-
-namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
+﻿namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 
 public interface ITokenGenerator
 {

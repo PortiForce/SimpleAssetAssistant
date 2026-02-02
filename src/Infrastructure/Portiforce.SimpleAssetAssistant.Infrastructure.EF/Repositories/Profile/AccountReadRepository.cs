@@ -7,6 +7,7 @@ using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
+using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 
@@ -87,14 +88,14 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 	}
 
 	public async Task<AccountDetails?> GetByEmailAndTenantAsync(
-		string googleUserEmail,
+		Email googleUserEmail,
 		TenantId requestTenantId,
 		CancellationToken ct)
 	{
 		var data = await db.Accounts
 			.AsNoTracking()
 			.Where(x =>
-				x.Contact.Email.Value == googleUserEmail &&
+				x.Contact.Email == googleUserEmail &&
 				x.TenantId == requestTenantId)
 			.Select(x => new
 			{
@@ -126,11 +127,11 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 	}
 
 	
-	public async Task<List<AccountListItem>> GetByEmailAsync(string email, CancellationToken ct)
+	public async Task<List<AccountListItem>> GetByEmailAsync(Email email, CancellationToken ct)
 	{
 		return await db.Accounts
 			.AsNoTracking()
-			.Where(x => x.Contact.Email.Value == email)
+			.Where(x => x.Contact.Email == email)
 			.Select(ListItemSelector) 
 			.ToListAsync(ct);
 	}

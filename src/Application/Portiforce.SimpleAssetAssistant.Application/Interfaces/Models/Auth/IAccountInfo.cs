@@ -1,7 +1,7 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
-namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 
 /// <summary>
 /// A unifying interface for AccountDetails and AccountListItem

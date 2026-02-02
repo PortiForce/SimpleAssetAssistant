@@ -29,8 +29,6 @@
     <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />
     <Folder Include="UseCases\PlatformAccount\Handlers\Commands\" />
     <Folder Include="UseCases\PlatformAccount\Handlers\Queries\" />
-    <Folder Include="UseCases\Profile\Account\Handlers\Commands\" />
-    <Folder Include="UseCases\Profile\Account\Handlers\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

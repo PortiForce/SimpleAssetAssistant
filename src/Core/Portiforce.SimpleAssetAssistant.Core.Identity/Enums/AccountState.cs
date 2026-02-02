@@ -3,9 +3,9 @@
 public enum AccountState : byte
 {
 	/// <summary>
-	/// Account is created but not yet verified
+	/// Account is created but not yet verified/activated
 	/// </summary>
-	NotVerified = 1,
+	PendingActivation = 1,
 
 	/// <summary>
 	/// Account is active

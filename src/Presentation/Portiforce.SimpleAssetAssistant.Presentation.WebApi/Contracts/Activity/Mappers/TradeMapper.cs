@@ -2,7 +2,7 @@
 using Portiforce.SimpleAssetAssistant.Core.Activities.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
-using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Mappers;
 

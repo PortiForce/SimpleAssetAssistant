@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
+
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Auth;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration.Platform;

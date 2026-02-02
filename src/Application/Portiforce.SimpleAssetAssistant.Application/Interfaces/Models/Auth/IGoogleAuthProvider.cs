@@ -1,6 +1,6 @@
 ﻿using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 
-namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
+namespace Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 
 public interface IGoogleAuthProvider
 {

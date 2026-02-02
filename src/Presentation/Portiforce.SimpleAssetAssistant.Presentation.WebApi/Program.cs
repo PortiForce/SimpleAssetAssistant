@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Portiforce.SimpleAssetAssistant.Application;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
@@ -7,6 +8,8 @@ using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Interfaces;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Services;
 using Scalar.AspNetCore;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi;
@@ -63,6 +66,9 @@ public class Program
 
 		builder.Services.AddAuthorization();
 
+		// internal dependencies
+		RegisterServices(builder);
+
 		// registration of related flows
 		builder.Services.AddApplication();
 		builder.Services.AddCoreIdentity();
@@ -102,5 +108,10 @@ public class Program
 		}
 
 		await app.RunAsync();
+	}
+
+	private static void RegisterServices(WebApplicationBuilder builder)
+	{
+		builder.Services.AddScoped<ITenantIdServiceResolver, TenantIdServiceResolver>();
 	}
 }

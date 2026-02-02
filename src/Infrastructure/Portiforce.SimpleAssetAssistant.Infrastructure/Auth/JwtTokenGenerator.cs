@@ -5,8 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth;
-using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 

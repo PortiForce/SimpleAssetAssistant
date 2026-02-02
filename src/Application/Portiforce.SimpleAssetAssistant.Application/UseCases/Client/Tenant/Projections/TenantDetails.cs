@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Tenant;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -6,7 +7,7 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Projections;
 
 public sealed record TenantDetails(
-	TenantId TenantId,
+	TenantId Id,
 	string Name,
 	string Code,
 	string? BrandName,
@@ -14,4 +15,4 @@ public sealed record TenantDetails(
 	TenantPlan Plan,
 	TenantState State,
 	ReadOnlySet<AssetId> RestrictedAssets,
-	ReadOnlySet<PlatformId> RestrictedPlatforms) : IDetailsProjection;
+	ReadOnlySet<PlatformId> RestrictedPlatforms) : IDetailsProjection, ITenantInfo;

@@ -1,8 +1,8 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 
-namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests;
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
-public sealed record RegisterTradeRequest(
+public sealed record RegisterExchangeRequest(
 	Guid TenantId,
 	Guid PlatformAccountId,
 	DateTimeOffset OccurredAt,
@@ -14,6 +14,7 @@ public sealed record RegisterTradeRequest(
 	decimal? FeeAmount,
 	MarketKind MarketKind,
 	TradeExecutionType ExecutionType,
+	ExchangeType ExchangeType,
 	CompletionType CompletionType,
 	string Source,
 	string? ExternalId

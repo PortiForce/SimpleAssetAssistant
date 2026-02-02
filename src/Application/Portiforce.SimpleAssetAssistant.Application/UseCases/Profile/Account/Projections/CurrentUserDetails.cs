@@ -1,4 +1,4 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Auth.Models;
+﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
