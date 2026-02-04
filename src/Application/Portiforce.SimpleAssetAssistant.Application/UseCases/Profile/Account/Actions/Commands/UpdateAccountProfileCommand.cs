@@ -13,5 +13,6 @@ public sealed record UpdateAccountProfileCommand(
 	string Locale,
 	string DefaultCurrency,
 	AccountTier Tier,
-	Role Role
+	Role Role,
+	AccountState State
 ) : ICommand<CommandResult<AccountId>>;

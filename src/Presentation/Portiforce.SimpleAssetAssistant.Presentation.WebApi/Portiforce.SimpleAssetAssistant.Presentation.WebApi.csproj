@@ -17,11 +17,9 @@
     <Folder Include="Contracts\Activity\Requests\Profile\" />
     <Folder Include="Contracts\Activity\Responses\" />
     <Folder Include="Contracts\Asset\" />
-    <Folder Include="Contracts\Client\Tenant\" />
     <Folder Include="Contracts\PlatformAccount\" />
     <Folder Include="Contracts\Platform\" />
     <Folder Include="Contracts\Profile\Account\Responses\" />
-    <Folder Include="Controllers\V1\Platform\" />
   </ItemGroup>
 
   <ItemGroup>

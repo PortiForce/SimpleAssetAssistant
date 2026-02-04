@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
@@ -10,13 +10,16 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Mappers;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
-namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Base;
-
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.User;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/me/[controller]")]
+[Authorize]
 public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 {
+	// todo:
+	// 1. add other atomic actions: transfer, income, adjustment, etc
+
 	[HttpPost("trades")]
 	[ProducesResponseType(typeof(CommandResult<ActivityId>), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

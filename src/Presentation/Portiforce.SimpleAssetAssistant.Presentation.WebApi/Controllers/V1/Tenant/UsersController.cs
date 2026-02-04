@@ -8,19 +8,23 @@ using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Actio
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Client.Tenant.Requests;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Profile.Account.Mappers;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Profile.Account.Requests;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Interfaces;
 
-namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Admin;
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Tenant;
 
 [ApiController]
-[Route("api/v1/tenants/{tenantId}/users")]
-[Authorize] // Ensure user is logged in
-public class TenantUsersController(
+[Route("api/v1/tenants/{tenantId}/{controller}")]
+[Authorize]
+public sealed class UsersController(
 	ITenantIdServiceResolver tenantIdResolver,
 	IMediator mediator) : ControllerBase
 {
+	// todo: 
+	// 1 change user's plan and State (only for TenantAdmin)
+
 	[HttpPost]
 	[Authorize(Policy = "RequireTenantAdmin")]
 	[ProducesResponseType(typeof(CommandResult<AccountId>), StatusCodes.Status201Created)]
@@ -46,7 +50,7 @@ public class TenantUsersController(
 		CommandResult<AccountId> result = await mediator.Send(createAccountCommand, ct);
 
 		return CreatedAtAction(
-			nameof(GetUserDetails),
+			nameof(GetById),
 			new
 			{
 				tenantId = tenantId,
@@ -58,7 +62,7 @@ public class TenantUsersController(
 	[HttpGet]
 	[Authorize(Policy = "RequireTenantAdmin")]
 	[ProducesResponseType(typeof(PagedResult<AccountListItem>), StatusCodes.Status200OK)]
-	public async Task<IActionResult> GetListOfUsers(
+	public async Task<IActionResult> GetList(
 		[FromQuery] PageRequest pageRequest,
 		CancellationToken ct)
 	{
@@ -80,10 +84,11 @@ public class TenantUsersController(
 	}
 
 	[HttpGet("{userId}")]
-	// assume Members can see profiles (e.g. to collaborate).
+	[Authorize(Policy = "RequireTenantAdmin")]
+	// todo later: assume Members can see profiles (e.g. to collaborate).
 	[ProducesResponseType(typeof(AccountDetails), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<IActionResult> GetUserDetails(
+	public async Task<IActionResult> GetById(
 		[FromRoute] Guid tenantId, 
 		[FromRoute] Guid userId,
 		CancellationToken ct)
@@ -108,5 +113,40 @@ public class TenantUsersController(
 		AccountDetails result = await mediator.Send(query, ct);
 
 		return Ok(result);
+	}
+
+	[HttpPut("{userId}")]
+	[Authorize(Policy = "RequireTenantAdmin")]
+	public async Task<IActionResult> UpdateUser(
+		[FromRoute] Guid tenantId,
+		[FromRoute] Guid userId,
+		[FromBody] UpdateUserRequest request,
+		CancellationToken ct)
+	{
+		TenantId? resolvedTenantId = tenantIdResolver.GetTenantFromHeader(out var problem);
+		if (problem is not null)
+		{
+			return BadRequest(problem);
+		}
+
+		if (resolvedTenantId?.Value != tenantId)
+		{
+			return BadRequest("Tenant ID mismatch");
+		}
+
+		// 2. Dispatch
+		var command = new UpdateAccountProfileCommand(
+			new AccountId(userId),
+			request.Alias,
+			null,
+			null,
+			"GBP",
+			request.Tier,
+			request.Role,
+			request.State);
+
+		await mediator.Send(command, ct);
+
+		return NoContent();
 	}
 }
