@@ -26,6 +26,11 @@ internal sealed class ActivityReadRepository : IActivityReadRepository
 		throw new NotImplementedException();
 	}
 
+	public ValueTask<ActivityDetails?> GetDetailsAsync(ActivityId id, TenantId tenantId, AccountId accountId, CancellationToken ct)
+	{
+		throw new NotImplementedException();
+	}
+
 	public Task<PagedResult<ActivityListItem>> GetByAccountAsync(AccountId accountId, PageRequest pageRequest, CancellationToken ct)
 	{
 		throw new NotImplementedException();

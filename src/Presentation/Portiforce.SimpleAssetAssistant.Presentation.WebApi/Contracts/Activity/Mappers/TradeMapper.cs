@@ -8,8 +8,9 @@ namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity
 
 public static class TradeMapper
 {
-	public static RegisterTradeCommand ToCommand(this RegisterTradeRequest r) => new(
-		TenantId: TenantId.From(r.TenantId),
+	public static RegisterTradeCommand ToCommand(this RegisterTradeRequest r, AccountId accountId, TenantId tenantId) => new(
+		AccountId: accountId,
+		TenantId: tenantId,
 		PlatformAccountId: PlatformAccountId.From(r.PlatformAccountId),
 		OccurredAt: r.OccurredAt,
 		MarketKind: r.MarketKind,

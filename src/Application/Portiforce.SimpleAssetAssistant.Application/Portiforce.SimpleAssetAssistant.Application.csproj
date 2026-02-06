@@ -23,7 +23,6 @@
     <Folder Include="UseCases\ActivityLeg\Handlers\Queries\" />
     <Folder Include="UseCases\ActivityLeg\Handlers\" />
     <Folder Include="UseCases\ActivityLeg\Projections\" />
-    <Folder Include="UseCases\Activity\Handlers\Queries\" />
     <Folder Include="UseCases\Auth\Handlers\Queries\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
     <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />

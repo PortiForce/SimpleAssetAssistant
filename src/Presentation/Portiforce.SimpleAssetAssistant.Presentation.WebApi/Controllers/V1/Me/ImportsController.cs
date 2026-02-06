@@ -1,20 +1,35 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Core.Activities.Enums;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Me;
 
 [ApiController]
-[Route("api/v1/me/[controller]")]
+[Route("api/v1/me/{controller}")]
 [Authorize]
 public sealed class ImportsController(IMediator mediator) : ControllerBase
 {
-	[HttpPost("createimportjob")]
+	[HttpPost]
 	[Consumes("multipart/form-data")]
-	public async Task<IActionResult> CreateImportJob(IFormFile file, AssetActivityKind? activityKind)
+	public Task<IActionResult> CreateImportJob(
+		[FromServices] ICurrentUser currentUser,
+		[FromForm] IFormFile file,
+		[FromForm] AssetActivityKind? activityKind)
 	{
-		throw new NotImplementedException("Imports is not yet supported");
+		return Task.FromResult<IActionResult>(
+			StatusCode(StatusCodes.Status501NotImplemented, "Imports are not implemented yet."));
+	}
+
+	[HttpGet("{importId:guid}")]
+	public Task<IActionResult> GetImportById(
+		[FromServices] ICurrentUser currentUser,
+		[FromRoute] Guid importId,
+		CancellationToken ct)
+	{
+		return Task.FromResult<IActionResult>(
+			StatusCode(StatusCodes.Status501NotImplemented, "Import job details is not implemented yet."));
 	}
 }

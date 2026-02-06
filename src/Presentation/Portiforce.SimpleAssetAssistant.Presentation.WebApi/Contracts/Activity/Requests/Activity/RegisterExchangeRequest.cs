@@ -3,7 +3,6 @@
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
 public sealed record RegisterExchangeRequest(
-	Guid TenantId,
 	Guid PlatformAccountId,
 	DateTimeOffset OccurredAt,
 	Guid InAssetId,

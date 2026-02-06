@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Platform;
@@ -14,15 +16,26 @@ public sealed class TenantsController(IMediator mediator) : ControllerBase
 	// 2. load tenant details (only for platform admins/ owner)
 	// 3. change tenant plan/ state (only for platform admins/ owner)
 
-	public async Task<IActionResult> GetList(CancellationToken ct)
+	[Authorize(Policy = "RequirePlatformAdmin")]
+	[HttpGet]
+	public Task<IActionResult> GetList(
+		[FromServices] ICurrentUser currentUser,
+		CancellationToken ct)
 	{
 		// only for platform admins/ owner
-		throw new NotImplementedException();
+		return Task.FromResult<IActionResult>(
+			StatusCode(StatusCodes.Status501NotImplemented, "Tenant list is not implemented yet."));
 	}
 
-	public async Task<IActionResult> GetById(Guid tenantId, CancellationToken ct)
+	[Authorize(Policy = "RequirePlatformAdmin")]
+	[HttpGet("{tenantId:guid}")]
+	public Task<IActionResult> GetById(
+		[FromServices] ICurrentUser currentUser,
+		[FromRoute] Guid tenantId,
+		CancellationToken ct)
 	{
 		// only for platform admins/owner
-		throw new NotImplementedException();
+		return Task.FromResult<IActionResult>(
+			StatusCode(StatusCodes.Status501NotImplemented, "Tenant details is not implemented yet."));
 	}
 }

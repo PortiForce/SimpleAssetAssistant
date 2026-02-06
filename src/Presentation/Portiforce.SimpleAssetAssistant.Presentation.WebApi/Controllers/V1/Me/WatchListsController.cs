@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Me;
 
-[Route("api/[controller]")]
+[Route("api/v1/me/{controller}")]
 [ApiController]
 [Authorize]
 public sealed class WatchListsController : ControllerBase

@@ -22,7 +22,12 @@ public interface IActivityReadRepository : IReadRepository<ActivityDetails, Acti
 		PlatformAccountId platformAccountId,
 		CancellationToken ct);
 
-
+	public ValueTask<ActivityDetails?> GetDetailsAsync(
+		ActivityId id,
+		TenantId tenantId,
+		AccountId accountId,
+		CancellationToken ct);
+	
 	// Essential for the "Drill-down" requirement
 	Task<PagedResult<ActivityListItem>> GetByAccountAsync(
 		AccountId accountId,

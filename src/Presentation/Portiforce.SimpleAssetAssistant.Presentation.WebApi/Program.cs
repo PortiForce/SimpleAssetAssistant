@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Portiforce.SimpleAssetAssistant.Application;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
-using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation;
+using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Configuration;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Interfaces;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Services;

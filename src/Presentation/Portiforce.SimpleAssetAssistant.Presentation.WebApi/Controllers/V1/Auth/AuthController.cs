@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Projections;
@@ -55,12 +55,19 @@ public sealed class AuthController(
 		return Ok(result);
 	}
 
+	[AllowAnonymous]
 	[HttpPost("refresh")]
 	public async Task<ActionResult<AuthResponse>> Refresh(
 		[FromBody] RefreshTokenRequest request,
 		CancellationToken ct)
 	{
+		if (string.IsNullOrWhiteSpace(request.RefreshToken))
+		{
+			return BadRequest("Refresh token is required.");
+		}
+
 		var command = new RefreshTokenCommand(request.RefreshToken);
+
 		var result = await mediator.Send(command, ct);
 		return Ok(result);
 	}
@@ -68,10 +75,21 @@ public sealed class AuthController(
 	[HttpPost("logout")]
 	[Authorize]
 	public async Task<IActionResult> Logout(
+		[FromServices] ICurrentUser currentUser,
 		[FromBody] RefreshTokenRequest request,
 		CancellationToken ct)
 	{
-		await mediator.Send(new LogoutCommand(request.RefreshToken), ct);
+		if (string.IsNullOrWhiteSpace(request.RefreshToken))
+		{
+			return BadRequest("Refresh token is required.");
+		}
+		await mediator.Send(
+			new LogoutCommand(
+				request.RefreshToken,
+				currentUser.Id,
+				currentUser.TenantId),
+			ct);
+
 		return NoContent();
 	}
 }

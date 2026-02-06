@@ -7,6 +7,7 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.
 
 public sealed record GetActivityListQuery(
 	AccountId AccountId,
+	TenantId TenantId,
 	PageRequest PageRequest,
 	DateTimeOffset? FromDate = null,
 	DateTimeOffset? ToDate = null,

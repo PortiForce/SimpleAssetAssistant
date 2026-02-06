@@ -1,67 +1,48 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Commands;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Client.Tenant.Actions.Queries;
-using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Client.Tenant.Requests;
-using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Interfaces;
 
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Tenant;
 
 
-[Route("api/v1/tenants/{tenantId}")] 
+[Route("api/v1/tenant")] 
 [ApiController]
 [Authorize(Policy = "RequireTenantAdmin")]
-public sealed class ManageController(
-	ITenantIdServiceResolver tenantIdResolver,
+public sealed class SettingsController(
 	IMediator mediator) : ControllerBase
 {
 	[HttpGet]
-	public async Task<IActionResult> GetDetails([FromRoute] Guid tenantId, CancellationToken ct)
+	public async Task<IActionResult> GetDetails(
+		[FromServices] ICurrentUser currentUser,
+		CancellationToken ct)
 	{
-		TenantId? resolvedTenantId = tenantIdResolver.GetTenantFromHeader(out var problem);
-		if (problem is not null)
-		{
-			return BadRequest(problem);
-		}
-
-		if (resolvedTenantId?.Value != tenantId)
-		{
-			return BadRequest("Tenant ID mismatch");
-		}
-
-		var result = await mediator.Send(new GetTenantDetailsQuery(resolvedTenantId.Value), ct);
+		var result = await mediator.Send(new GetTenantDetailsQuery(currentUser.TenantId), ct);
 		return Ok(result);
 	}
 
 	[HttpPut]
 	public async Task<IActionResult> UpdateSettings(
-		[FromRoute] Guid tenantId,
+		[FromServices] ICurrentUser currentUser,
 		[FromBody] UpdateTenantRequest request,
 		CancellationToken ct)
 	{
-		TenantId? resolvedTenantId = tenantIdResolver.GetTenantFromHeader(out var problem);
-		if (problem is not null)
-		{
-			return BadRequest(problem);
-		}
-
-		if (resolvedTenantId?.Value != tenantId)
-		{
-			return BadRequest("Tenant ID mismatch");
-		}
-
-		var command = new UpdateTenantSettingsCommand(resolvedTenantId.Value, request.DefaultCurrency, request.EnforceTwoFactor);
+		var command = new UpdateTenantSettingsCommand(currentUser.TenantId, request.DefaultCurrency, request.EnforceTwoFactor);
 		await mediator.Send(command, ct);
 		return NoContent();
 	}
 
 	[HttpGet("stats")]
-	public async Task<IActionResult> GetStats([FromRoute] Guid tenantId, CancellationToken ct)
+	public Task<IActionResult> GetStats(
+		[FromServices] ICurrentUser currentUser,
+		CancellationToken ct)
 	{
 		// Implementation for onboarding stats...
-		throw new NotImplementedException();
+		return Task.FromResult<IActionResult>(
+			StatusCode(StatusCodes.Status501NotImplemented, "Tenant statistics summary is not implemented yet."));
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Portiforce.SimpleAssetAssistant.Application.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.Result;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
@@ -10,10 +11,10 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Mappers;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Activity.Requests.Activity;
 
-namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.User;
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Me;
 
 [ApiController]
-[Route("api/v1/me/[controller]")]
+[Route("api/v1/me/{controller}")]
 [Authorize]
 public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 {
@@ -26,10 +27,16 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
 	public async Task<ActionResult<CommandResult<ActivityId>>> RegisterTrade(
+		[FromServices] ICurrentUser currentUser,
 		[FromBody] RegisterTradeRequest request,
 		CancellationToken ct)
 	{
-		RegisterTradeCommand cmd = request.ToCommand();
+		if (currentUser.TenantId.IsEmpty || currentUser.Id.IsEmpty)
+		{
+			return Unauthorized();
+		}
+
+		RegisterTradeCommand cmd = request.ToCommand(currentUser.Id, currentUser.TenantId);
 		CommandResult<ActivityId> result = await mediator.Send(cmd, ct);
 
 		if (result.Id.IsEmpty)
@@ -49,10 +56,16 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
 	public async Task<ActionResult<CommandResult<ActivityId>>> RegisterExchange(
+		[FromServices] ICurrentUser currentUser,
 		[FromBody] RegisterExchangeRequest request,
 		CancellationToken ct)
 	{
-		RegisterExchangeCommand cmd = request.ToCommand();
+		if (currentUser.TenantId.IsEmpty || currentUser.Id.IsEmpty)
+		{
+			return Unauthorized();
+		}
+
+		RegisterExchangeCommand cmd = request.ToCommand(currentUser.Id, currentUser.TenantId);
 		CommandResult<ActivityId> result = await mediator.Send(cmd, ct);
 
 		if (result.Id.IsEmpty)
@@ -69,13 +82,29 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 	[HttpGet("{id:guid}")]
 	[ProducesResponseType(typeof(ActivityDetails), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<ActivityDetails>> GetById([FromRoute] Guid id, CancellationToken ct)
+	public async Task<ActionResult<ActivityDetails>> GetById(
+		[FromServices] ICurrentUser currentUser,
+		[FromRoute] Guid id,
+		CancellationToken ct)
 	{
+		if (currentUser.TenantId.IsEmpty || currentUser.Id.IsEmpty)
+		{
+			return Unauthorized();
+		}
+
 		var activityId = ActivityId.From(id);
 
-		// Prefer: handler throws NotFoundException (then controller stays thin)
-		// So the handler should return ActivityDetails (non-null) or throw.
-		ActivityDetails details = await mediator.Send(new GetActivityDetailsQuery(activityId), ct);
+		ActivityDetails? details = await mediator.Send(
+			new GetActivityDetailsQuery(
+				activityId,
+				currentUser.TenantId,
+				currentUser.Id),
+			ct);
+
+		if (details is null)
+		{
+			return NotFound();
+		}
 
 		return Ok(details);
 	}
@@ -84,11 +113,18 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 	[ProducesResponseType(typeof(PagedResult<ActivityListItem>), StatusCodes.Status200OK)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult<PagedResult<ActivityListItem>>> GetList(
+		[FromServices] ICurrentUser currentUser,
 		[FromQuery] GetActivityListRequest request,
 		CancellationToken ct)
 	{
+		if (currentUser.TenantId.IsEmpty || currentUser.Id.IsEmpty)
+		{
+			return Unauthorized();
+		}
+
 		var query = new GetActivityListQuery(
-			AccountId: AccountId.From(request.AccountId),
+			AccountId: currentUser.Id,
+			TenantId: currentUser.TenantId,
 			PageRequest: new PageRequest(request.PageNumber, request.PageSize),
 			FromDate: request.FromDate,
 			ToDate: request.ToDate,

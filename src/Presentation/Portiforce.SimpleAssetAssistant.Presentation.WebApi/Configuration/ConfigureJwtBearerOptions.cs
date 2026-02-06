@@ -3,9 +3,10 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
 using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
+
+namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Configuration;
 
 public sealed class ConfigureJwtBearerOptions : IConfigureOptions<JwtBearerOptions>
 {
