@@ -33,7 +33,11 @@ public static class DependencyInjection
 		{
 			opt.UseSqlServer(
 				configuration.GetConnectionString("AssetAssistantSQLDb"),
-				sql => sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName));
+				sql =>
+				{
+					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
+					sql.EnableRetryOnFailure();
+				});
 			opt.EnableDetailedErrors();
 
 #if DEBUG
@@ -44,9 +48,8 @@ public static class DependencyInjection
 
 		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
-		// Guards/services that are implemented in infrastructure (if any)
-		// if alternative to app-layer guard is required, use this:
-		// services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuardEf>(); 
+		// data seeders:
+		services.AddScoped<DbUserSeeder>();
 
 		// Repositories
 		services.AddScoped<ITenantReadRepository, TenantReadRepository>();
@@ -75,9 +78,6 @@ public static class DependencyInjection
 
 		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
 		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
-
-		// data seeders:
-		services.AddScoped<DbUserSeeder>();
 
 		return services;
 	}

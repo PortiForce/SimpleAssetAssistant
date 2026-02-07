@@ -13,7 +13,7 @@ using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Flow.Services;
 
-public sealed class AuthService(
+internal sealed class AuthService(
 	ITokenGenerator tokenGenerator,
 	IHashingService hashingService,
 	IClock clock,
@@ -30,7 +30,7 @@ public sealed class AuthService(
 	{
 		var now = clock.UtcNow;
 
-		string incomingHash = hashingService.HashRefreshToken(rawRefreshToken);
+		byte[] incomingHash = hashingService.HashRefreshToken(rawRefreshToken);
 
 		AuthSessionToken? existing = await sessionReadRepository.GetByHashAsync(incomingHash, ct);
 		if (existing is null)

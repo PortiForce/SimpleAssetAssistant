@@ -29,7 +29,8 @@ public class JwtTokenGenerator : ITokenGenerator
 			new(JwtRegisteredClaimNames.Sub, accountInfo.Id.ToString()),
 			new(JwtRegisteredClaimNames.Email, accountInfo.Email),
 			new(CustomClaimTypes.TenantId, accountInfo.TenantId.ToString()),
-			new(CustomClaimTypes.RoleId, accountInfo.Role.ToString())
+			new(CustomClaimTypes.RoleId, accountInfo.Role.ToString()),
+			new(CustomClaimTypes.State, accountInfo.State.ToString())
 		];
 
 		SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));

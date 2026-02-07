@@ -21,12 +21,10 @@ public static class EntityConstraints
 		public const int ProviderSubjectMaxLength = 256;
 
 		public const int ExternalIdMaxLength = 100;
-		public const int ExternalNotesMaxLength = 255;
+		public const int ExternalNotesMaxLength = 256;
 
 		public const int CodeMaxLength = 25;
-
-		public const int GuidMaxLength = 36;
-		public const int IpAddressMaxLength = 36;
+		public const int GuidLikeRowMaxLength = 36;
 	}
 
 	public static class Domain
@@ -87,7 +85,9 @@ public static class EntityConstraints
 
 		public static class AuthSessionToken
 		{
-			public const int TokenHashMaxLength = 255;
+			public const int IpAddressMaxLength = 45;
+			public const int UserAgentMaxLength = 256;
+			public const int UserAgentFingerprint = 32;
 		}
 	}
 }

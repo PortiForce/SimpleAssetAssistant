@@ -7,6 +7,7 @@ using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DataPopulation;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Services.Security;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Services.Time;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Configuration;
@@ -62,7 +63,7 @@ public class Program
 			.ValidateOnStart();
 
 		builder.Services.AddOptions<TokenHashingOptions>()
-			.BindConfiguration("TokenHashing")
+			.BindConfiguration("TokenHashingOptions")
 			.Validate(o => !string.IsNullOrWhiteSpace(o.Pepper), "TokenHashing:Pepper is required")
 			.ValidateOnStart();
 
@@ -114,7 +115,7 @@ public class Program
 		if (app.Environment.IsDevelopment())
 		{
 			// It is safe to run this on every startup in Dev (uncomment when restarting DB model)
-			// await app.PopulateGlobalDictionariesAndPrepareUserAsync();
+			await app.PopulateGlobalDictionariesAndPrepareUserAsync();
 		}
 
 		await app.RunAsync();

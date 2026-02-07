@@ -9,10 +9,12 @@ using Portiforce.SimpleAssetAssistant.Application.Interfaces.Guards;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Activity;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Asset;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Tenant;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Guards;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Services;
+using Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Flow.Services;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.SharedFlow.Services;
 
 namespace Portiforce.SimpleAssetAssistant.Application;
@@ -44,6 +46,8 @@ public static class DependencyInjection
 		services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
 		services.AddScoped<IAssetLookupService, AssetLookupService>();
 		services.AddScoped<ITenantLimitsService, TenantLimitsService>();
+
+		services.AddScoped<IAuthService, AuthService>();
 
 		return services;
 	}

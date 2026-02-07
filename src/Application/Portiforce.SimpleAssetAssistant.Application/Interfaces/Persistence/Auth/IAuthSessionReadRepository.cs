@@ -8,7 +8,7 @@ public interface IAuthSessionReadRepository
 	/// Finds a token by its secure hash.
 	/// Used during Refresh Token flow to validate the incoming token.
 	/// </summary>
-	Task<AuthSessionToken?> GetByHashAsync(string tokenHash, CancellationToken ct);
+	Task<AuthSessionToken?> GetByHashAsync(byte[] tokenHash, CancellationToken ct);
 
 	/// <summary>
 	/// Finds the entire chain of tokens for a specific session.

@@ -13,7 +13,7 @@ using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260201232539_InitialCreate")]
+    [Migration("20260207152034_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -59,8 +59,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                                 .HasColumnName("Fingerprint");
 
                             b1.Property<string>("Notes")
-                                .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
                                 .HasColumnName("ExternalNotes");
 
                             b1.Property<string>("Source")
@@ -255,6 +255,69 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                         .HasDatabaseName("UX_PlatformAccount_Tenant_Account_Platform");
 
                     b.ToTable("PlatformAccounts", "core");
+                });
+
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.AuthSessionToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("CreatedUserAgent")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("ReplacedByTokenHash")
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<byte?>("RevokedReason")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<string>("UserAgentFingerprint")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("SessionId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("SessionTokens", "auth");
                 });
 
             modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.ExternalIdentity", b =>
@@ -715,6 +778,21 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.AuthSessionToken", b =>
+                {
+                    b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

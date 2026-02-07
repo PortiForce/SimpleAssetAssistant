@@ -9,6 +9,7 @@ internal static class DbConstants
 		public const string DateTimeSecOnlyAccuracyFormat = "datetime2(0)";
 
 		public const string VarBinaryDataType = "varbinary(max)";
+		public const string Varbinary32DataType = "varbinary(32)";
 	}
 
 	public static class Domain

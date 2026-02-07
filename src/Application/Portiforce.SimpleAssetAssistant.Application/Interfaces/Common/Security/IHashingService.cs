@@ -2,5 +2,5 @@
 
 public interface IHashingService
 {
-	public string HashRefreshToken(string rawValue);
+	public byte[] HashRefreshToken(string rawValue);
 }

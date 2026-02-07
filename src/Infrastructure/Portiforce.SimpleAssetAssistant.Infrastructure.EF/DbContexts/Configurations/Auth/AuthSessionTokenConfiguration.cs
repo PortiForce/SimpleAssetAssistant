@@ -31,7 +31,10 @@ public sealed class AuthSessionTokenConfiguration : IEntityTypeConfiguration<Aut
 
 		builder.Property(x => x.TokenHash)
 			.IsRequired()
-			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.TokenHashMaxLength);
+			.HasColumnType(DbConstants.CommonSettings.Varbinary32DataType);
+
+		builder.Property(x => x.ReplacedByTokenHash)
+			.HasColumnType(DbConstants.CommonSettings.Varbinary32DataType);
 
 		builder.Property(x => x.CreatedAt).IsRequired();
 		builder.Property(x => x.ExpiresAt).IsRequired();
@@ -39,14 +42,17 @@ public sealed class AuthSessionTokenConfiguration : IEntityTypeConfiguration<Aut
 		builder.Property(x => x.RevokedReason)
 			.HasConversion<byte>();
 
-		builder.Property(x => x.ReplacedByTokenHash)
-			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.TokenHashMaxLength);
-
 		builder.Property(x => x.CreatedByIp)
-			.HasMaxLength(EntityConstraints.CommonSettings.IpAddressMaxLength);
+			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.IpAddressMaxLength);
 
 		builder.Property(x => x.RevokedByIp)
-			.HasMaxLength(EntityConstraints.CommonSettings.IpAddressMaxLength);
+			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.IpAddressMaxLength);
+
+		builder.Property(x => x.CreatedUserAgent)
+			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.UserAgentMaxLength);
+
+		builder.Property(x => x.UserAgentFingerprint)
+			.HasMaxLength(EntityConstraints.Domain.AuthSessionToken.UserAgentFingerprint);
 
 		// 4. Relationships
 		builder.Property(x => x.AccountId)
@@ -60,7 +66,5 @@ public sealed class AuthSessionTokenConfiguration : IEntityTypeConfiguration<Aut
 		// 5. Indexes
 		builder.HasIndex(x => x.TokenHash).IsUnique();
 		builder.HasIndex(x => x.SessionId);
-		builder.HasIndex(x => new { x.TenantId, x.AccountId, x.SessionId });
-		builder.HasIndex(x => x.ExpiresAt);
 	}
 }

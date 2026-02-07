@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Security;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
@@ -14,7 +13,7 @@ public sealed class TokenHashingService : IHashingService
 	public TokenHashingService(IOptions<TokenHashingOptions> jwt)
 		=> _key = Encoding.UTF8.GetBytes(jwt.Value.Pepper);
 
-	public string HashRefreshToken(string rawToken)
+	public byte[] HashRefreshToken(string rawToken)
 	{
 		if (string.IsNullOrWhiteSpace(rawToken))
 		{
@@ -24,6 +23,6 @@ public sealed class TokenHashingService : IHashingService
 		using var hmac = new HMACSHA256(_key);
 		byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawToken));
 
-		return WebEncoders.Base64UrlEncode(hash);
+		return hash;
 	}
 }

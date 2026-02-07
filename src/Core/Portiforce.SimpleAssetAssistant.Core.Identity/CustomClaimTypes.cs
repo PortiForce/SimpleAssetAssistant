@@ -3,18 +3,22 @@
 public static class CustomClaimTypes
 {
 	/// <summary>
-	/// user details
+	/// User details
 	/// </summary>
-	public const string UserId = "uid";
+	public const string UserId = "sub";
 
 	/// <summary>
 	/// Tenant reference
 	/// </summary>
-	public const string TenantId = "cid";
-
+	public const string TenantId = "tid";
 
 	/// <summary>
 	/// Role reference
 	/// </summary>
 	public const string RoleId = "r";
+
+	/// <summary>
+	/// State reference
+	/// </summary>
+	public const string State = "s";
 }

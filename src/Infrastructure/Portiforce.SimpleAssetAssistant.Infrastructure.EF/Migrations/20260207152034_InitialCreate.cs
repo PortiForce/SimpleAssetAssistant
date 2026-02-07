@@ -256,6 +256,45 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				});
 
 			migrationBuilder.CreateTable(
+				name: "SessionTokens",
+				schema: "auth",
+				columns: table => new
+				{
+					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					TokenHash = table.Column<byte[]>(type: "varbinary(32)", nullable: false),
+					CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+					ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+					CreatedByIp = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: true),
+					CreatedUserAgent = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+					UserAgentFingerprint = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+					RevokedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					RevokedByIp = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: true),
+					ReplacedByTokenHash = table.Column<byte[]>(type: "varbinary(32)", nullable: true),
+					RevokedReason = table.Column<byte>(type: "tinyint", nullable: true)
+				},
+				constraints: table =>
+				{
+					table.PrimaryKey("PK_SessionTokens", x => x.Id);
+					table.ForeignKey(
+						name: "FK_SessionTokens_Accounts_AccountId",
+						column: x => x.AccountId,
+						principalSchema: "core",
+						principalTable: "Accounts",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
+					table.ForeignKey(
+						name: "FK_SessionTokens_Tenants_TenantId",
+						column: x => x.TenantId,
+						principalSchema: "core",
+						principalTable: "Tenants",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
+				});
+
+			migrationBuilder.CreateTable(
 				name: "Activities",
 				schema: "ledger",
 				columns: table => new
@@ -267,7 +306,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					OccurredAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
 					ExternalId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
 					Fingerprint = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-					ExternalNotes = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+					ExternalNotes = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
 					ExternalSource = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
 					Reason = table.Column<byte>(type: "tinyint", nullable: true),
 					ExchangeType = table.Column<byte>(type: "tinyint", nullable: true),
@@ -457,6 +496,31 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				unique: true);
 
 			migrationBuilder.CreateIndex(
+				name: "IX_SessionTokens_AccountId",
+				schema: "auth",
+				table: "SessionTokens",
+				column: "AccountId");
+
+			migrationBuilder.CreateIndex(
+				name: "IX_SessionTokens_SessionId",
+				schema: "auth",
+				table: "SessionTokens",
+				column: "SessionId");
+
+			migrationBuilder.CreateIndex(
+				name: "IX_SessionTokens_TenantId",
+				schema: "auth",
+				table: "SessionTokens",
+				column: "TenantId");
+
+			migrationBuilder.CreateIndex(
+				name: "IX_SessionTokens_TokenHash",
+				schema: "auth",
+				table: "SessionTokens",
+				column: "TokenHash",
+				unique: true);
+
+			migrationBuilder.CreateIndex(
 				name: "IX_TenantRestrictedAsset_TenantId",
 				schema: "core",
 				table: "TenantRestrictedAssets",
@@ -489,7 +553,6 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 				unique: true,
 				filter: "[DomainPrefix] IS NOT NULL");
 
-			// manual uniquness enforcements
 			migrationBuilder.CreateIndex(
 				name: "UX_Account_Tenant_ContactEmail",
 				schema: DbConstants.Domain.Entities.CoreSchema.SchemaName,
@@ -528,6 +591,10 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 			migrationBuilder.DropTable(
 				name: "PassKeyCredentials",
+				schema: "auth");
+
+			migrationBuilder.DropTable(
+				name: "SessionTokens",
 				schema: "auth");
 
 			migrationBuilder.DropTable(

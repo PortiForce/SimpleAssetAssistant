@@ -1,4 +1,5 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Exceptions;
+using Portiforce.SimpleAssetAssistant.Core.Extensions;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Models;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -11,7 +12,7 @@ public sealed class AuthSessionToken : Entity<Guid>
 		TenantId tenantId,
 		AccountId accountId,
 		Guid sessionId,
-		string tokenHash,
+		byte[] tokenHash,
 		DateTimeOffset createdAt,
 		string createdByIp,
 		string createdUserAgent,
@@ -22,9 +23,9 @@ public sealed class AuthSessionToken : Entity<Guid>
 			throw new DomainValidationException("SessionId is not defined");
 		}
 
-		if (string.IsNullOrEmpty(tokenHash)) 
+		if (tokenHash is null || tokenHash.Length != 32) 
 		{
-			throw new DomainValidationException("tokenHash must be defined.");
+			throw new DomainValidationException("tokenHash must be defined as 32 bytes");
 		}
 
 		if (accountId.IsEmpty)
@@ -42,7 +43,7 @@ public sealed class AuthSessionToken : Entity<Guid>
 			throw new DomainValidationException("Invalid token live time");
 		}
 
-		Id = Guid.NewGuid();
+		Id = GuidExtensions.New();
 		TenantId = tenantId;
 		AccountId = accountId;
 		SessionId = sessionId;
@@ -62,26 +63,27 @@ public sealed class AuthSessionToken : Entity<Guid>
 	public TenantId TenantId { get; init; }
 	public AccountId AccountId { get; init; }
 	public Guid SessionId { get; init; }
-	public string TokenHash { get; private set; }
+	public byte[] TokenHash { get; private set; }
 
 	public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
 	public DateTimeOffset ExpiresAt { get; init; }
 
 	// Audit
-	public string CreatedByIp { get; init; }
-	public string CreatedUserAgent { get; init; }
+	public string? CreatedByIp { get; init; }
+	public string? CreatedUserAgent { get; private set; }
+	public string? UserAgentFingerprint { get; private set; }
 
 	// Revocation / Rotation
 	public DateTimeOffset? RevokedAt { get; private set; }
 	public string? RevokedByIp { get; private set; }
-	public string? ReplacedByTokenHash { get; private set; }
+	public byte[]? ReplacedByTokenHash { get; private set; }
 	public TokenRevokeReason? RevokedReason { get; private set; }
 
 	public static AuthSessionToken Create(
 		TenantId tenantId,
 		AccountId accountId,
 		Guid sessionId,
-		string tokenHash,
+		byte[] tokenHash,
 		string createdByIp,
 		string createdUserAgent,
 		DateTimeOffset nowUtc,
@@ -106,7 +108,7 @@ public sealed class AuthSessionToken : Entity<Guid>
 		DateTimeOffset nowUtc,
 		TokenRevokeReason reason,
 		string ip,
-		string? replacedByHash = null)
+		byte[]? replacedByHash = null)
 	{
 		// idempotent flow check
 		if (IsRevoked)
