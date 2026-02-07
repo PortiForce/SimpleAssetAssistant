@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\Persistence\ActivityLeg\" />
+    <Folder Include="Tech\Common\" />
     <Folder Include="UseCases\ActivityLeg\Actions\Commands\" />
     <Folder Include="UseCases\ActivityLeg\Actions\Queries\" />
     <Folder Include="UseCases\ActivityLeg\Handlers\Commands\" />

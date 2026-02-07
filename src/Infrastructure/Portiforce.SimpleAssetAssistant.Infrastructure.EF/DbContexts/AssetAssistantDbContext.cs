@@ -32,6 +32,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 	// Auth
 	public DbSet<ExternalIdentity> ExternalIdentities => Set<ExternalIdentity>();
 	public DbSet<PasskeyCredential> PasskeyCredentials => Set<PasskeyCredential>();
+	public DbSet<AuthSessionToken> AuthSessionTokens => Set<AuthSessionToken>();
 
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -70,6 +71,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		// Auth
 		modelBuilder.ApplyConfiguration(new ExternalIdentityConfiguration());
 		modelBuilder.ApplyConfiguration(new PasskeyCredentialConfiguration());
+		modelBuilder.ApplyConfiguration(new AuthSessionTokenConfiguration());
 
 		// relationships
 		ConfigureRelationships(modelBuilder);
@@ -131,13 +133,13 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasOne<Account>()
 			.WithMany() // Account doesn't need a list of these
 			.HasForeignKey(x => x.AccountId)
-			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the Google link
+			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the Provuder link
 
 		modelBuilder.Entity<ExternalIdentity>()
 			.HasOne<Tenant>()
 			.WithMany() // Tenant doesn't need a list of these
 			.HasForeignKey(x => x.TenantId)
-			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove the Google link
+			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove the Provider link
 
 		// PassKeysCredentials -> Account
 		modelBuilder.Entity<PasskeyCredential>()
@@ -145,5 +147,19 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany()
 			.HasForeignKey(x => x.AccountId)
 			.OnDelete(DeleteBehavior.Cascade);  // If Account is deleted, remove the Passkey credentials
+
+		// AuthSessionToken -> Account
+		modelBuilder.Entity<AuthSessionToken>()
+			.HasOne<Account>()
+			.WithMany() // Account doesn't need a list of these
+			.HasForeignKey(x => x.AccountId)
+			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the AuthSessionTokens link
+
+		// AuthSessionToken->Tenant
+		modelBuilder.Entity<AuthSessionToken>()
+			.HasOne<Tenant>()
+			.WithMany() // Tenant doesn't need a list of these
+			.HasForeignKey(x => x.TenantId)
+			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove the AuthSessionTokens link
 	}
 }

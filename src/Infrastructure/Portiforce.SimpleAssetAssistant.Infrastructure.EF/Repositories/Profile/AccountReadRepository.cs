@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using Microsoft.EntityFrameworkCore;
-
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Persistence.Profile;
 using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Projections;
@@ -142,5 +142,35 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 			.AsNoTracking()
 			.Where(x => x.TenantId == tenantId && x.State == AccountState.Active)
 			.CountAsync(ct);
+	}
+
+	public async Task<IAccountInfo?> GetForAuthAsync(TenantId tenantId, AccountId accountId, CancellationToken ct)
+	{
+		// using anonymous projection to fetch only needed columns before hydrating the heavy Domain DTO.
+		var data = await db.Accounts
+			.AsNoTracking()
+			.Where(x => x.Id == accountId 
+			            && x.TenantId == tenantId)
+			.Select(x => new
+			{
+				x.TenantId,
+				x.Id,
+				Email = x.Contact.Email.Value,
+				x.State,
+				x.Role
+			})
+			.SingleOrDefaultAsync(ct);
+
+		if (data is null)
+		{
+			return null;
+		}
+
+		return new AccountSummary(
+			data.TenantId,
+			data.Id,
+			data.Email,
+			data.State,
+			data.Role);
 	}
 }

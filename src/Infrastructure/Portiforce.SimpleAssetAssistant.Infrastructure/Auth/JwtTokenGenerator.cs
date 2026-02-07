@@ -1,12 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
+using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.Auth;
@@ -19,7 +22,7 @@ public class JwtTokenGenerator : ITokenGenerator
 	}
 	private readonly JwtSettings _settings;
 
-	public string Generate(IAccountInfo accountInfo)
+	public string GenerateAccessToken(IAccountInfo accountInfo)
 	{
 		List<Claim> claims =
 		[
@@ -41,5 +44,12 @@ public class JwtTokenGenerator : ITokenGenerator
 		);
 
 		return new JwtSecurityTokenHandler().WriteToken(token);
+	}
+
+	public string GenerateRefreshToken()
+	{
+		Span<byte> bytes = stackalloc byte[32];
+		RandomNumberGenerator.Fill(bytes);
+		return WebEncoders.Base64UrlEncode(bytes);
 	}
 }

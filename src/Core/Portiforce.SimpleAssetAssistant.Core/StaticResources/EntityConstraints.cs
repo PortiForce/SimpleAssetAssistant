@@ -24,6 +24,9 @@ public static class EntityConstraints
 		public const int ExternalNotesMaxLength = 255;
 
 		public const int CodeMaxLength = 25;
+
+		public const int GuidMaxLength = 36;
+		public const int IpAddressMaxLength = 36;
 	}
 
 	public static class Domain
@@ -80,6 +83,11 @@ public static class EntityConstraints
 		public static class ActivityLeg
 		{
 			public const int InstrumentKeyMaxLength = 100;
+		}
+
+		public static class AuthSessionToken
+		{
+			public const int TokenHashMaxLength = 255;
 		}
 	}
 }

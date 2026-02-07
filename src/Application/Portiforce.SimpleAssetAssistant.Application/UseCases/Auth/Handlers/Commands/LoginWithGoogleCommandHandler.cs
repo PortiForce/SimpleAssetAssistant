@@ -143,9 +143,9 @@ public sealed class LoginWithGoogleCommandHandler(
 		}
 
 		// 4. Generate JWT
-		token = tokenGenerator.Generate(accountInfo);
+		token = tokenGenerator.GenerateAccessToken(accountInfo);
 
-		return new AuthResponse(token, "dummy-refresh-token", 3600);
+		return new AuthResponse(token, "dummy-refresh-token", DateTime.Now.AddDays(7));
 	}
 
 	private async Task LinkGoogleIdentityAsync(AccountId accountId, TenantId tenantId, string googleUserExternalId, CancellationToken ct)

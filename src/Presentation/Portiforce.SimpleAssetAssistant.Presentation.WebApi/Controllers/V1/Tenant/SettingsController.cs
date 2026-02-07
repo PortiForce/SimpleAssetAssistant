@@ -10,7 +10,7 @@ using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Contracts.Client.Tenan
 namespace Portiforce.SimpleAssetAssistant.Presentation.WebApi.Controllers.V1.Tenant;
 
 
-[Route("api/v1/tenant")] 
+[Route("api/v1/tenant/{controller}")] 
 [ApiController]
 [Authorize(Policy = "RequireTenantAdmin")]
 public sealed class SettingsController(

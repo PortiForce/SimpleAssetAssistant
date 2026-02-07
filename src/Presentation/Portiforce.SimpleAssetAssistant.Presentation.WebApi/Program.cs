@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Portiforce.SimpleAssetAssistant.Application;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Security;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Time;
 using Portiforce.SimpleAssetAssistant.Core.Identity;
 using Portiforce.SimpleAssetAssistant.Infrastructure;
 using Portiforce.SimpleAssetAssistant.Infrastructure.Configuration;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF;
+using Portiforce.SimpleAssetAssistant.Infrastructure.Services.Security;
+using Portiforce.SimpleAssetAssistant.Infrastructure.Services.Time;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Configuration;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.ErrorHandling;
 using Portiforce.SimpleAssetAssistant.Presentation.WebApi.Interfaces;
@@ -57,7 +61,14 @@ public class Program
 				"JwtSettings are invalid. Issuer/Audience/Secret are required; Secret should be >= 32 chars.")
 			.ValidateOnStart();
 
+		builder.Services.AddOptions<TokenHashingOptions>()
+			.BindConfiguration("TokenHashing")
+			.Validate(o => !string.IsNullOrWhiteSpace(o.Pepper), "TokenHashing:Pepper is required")
+			.ValidateOnStart();
+
 		builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+		builder.Services.AddSingleton<IClock, SystemClock>();
+		builder.Services.AddSingleton<IHashingService, TokenHashingService>();
 
 		builder.Services
 			.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -12,7 +12,7 @@ internal sealed class LogoutCommandHandler(
 	public async ValueTask<Unit> Handle(LogoutCommand request, CancellationToken ct)
 	{
 		// 1. Revoke the specific refresh token
-		await authService.RevokeRefreshTokenAsync(request.RefreshToken, ct);
+		await authService.RevokeRefreshTokenAsync(request.RefreshToken, request.IpAddress, ct);
 
 		// 2. todo: Audit log that User X logged out
 		// logger.LogInformation("User {Id} logged out", currentUser.Id);

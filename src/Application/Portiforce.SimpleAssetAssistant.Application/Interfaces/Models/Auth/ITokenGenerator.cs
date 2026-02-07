@@ -7,5 +7,7 @@ public interface ITokenGenerator
 	/// </summary>
 	/// <param name="accountInfo">account info model</param>
 	/// <returns></returns>
-	string Generate(IAccountInfo accountInfo);
+	string GenerateAccessToken(IAccountInfo accountInfo);
+
+	string GenerateRefreshToken();
 }

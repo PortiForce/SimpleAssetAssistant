@@ -3,4 +3,7 @@ using Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Projections;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Auth.Actions.Commands;
 
-public sealed record RefreshTokenCommand(string RefreshToken) : ICommand<AuthResponse>;
+public sealed record RefreshTokenCommand(
+	string RefreshToken,
+	string IpAddress,
+	string UserAgent) : ICommand<AuthResponse>;

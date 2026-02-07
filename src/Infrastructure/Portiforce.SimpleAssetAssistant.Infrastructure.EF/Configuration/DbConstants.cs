@@ -46,6 +46,7 @@ internal static class DbConstants
 
 				public const string ExternalIdentityTableName = "ExternalIdentities";
 				public const string PasskeyCredentialsTableName = "PassKeyCredentials";
+				public const string SessionTokenTableName = "SessionTokens";
 			}
 		}
 	}

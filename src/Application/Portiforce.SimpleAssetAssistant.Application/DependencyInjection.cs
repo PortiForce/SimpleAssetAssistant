@@ -3,13 +3,13 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using Portiforce.SimpleAssetAssistant.Application.Entitlements.Resolvers;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Security;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Common.Time;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Guards;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Resolvers;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Activity;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Asset;
 using Portiforce.SimpleAssetAssistant.Application.Interfaces.Services.Tenant;
-using Portiforce.SimpleAssetAssistant.Application.Tech.Common.Time;
 using Portiforce.SimpleAssetAssistant.Application.Tech.Messaging;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Guards;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Flow.Services;
@@ -37,7 +37,6 @@ public static class DependencyInjection
 
 		// 3. Remaining services registration
 		// Core tech
-		services.AddSingleton<IClock, SystemClock>();
 		services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
 
 		// UseCases: guards/services

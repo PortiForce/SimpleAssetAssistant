@@ -1,4 +1,5 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
+﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
+using Portiforce.SimpleAssetAssistant.Application.Models.Common.DataAccess;
 using Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Primitives;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -29,7 +30,12 @@ public interface IAccountReadRepository : IReadRepository<AccountDetails, Accoun
 	/// Returns number of users where State == Active
 	/// </summary>
 	/// <param name="tenantId">related tenantId</param>
-	/// <param name="ct"></param>
+	/// <param name="ct"></param>	
 	/// <returns></returns>
 	Task<int> GetActiveUserCountAsync(TenantId tenantId, CancellationToken ct);
+
+	Task<IAccountInfo?> GetForAuthAsync(
+		TenantId tenantId,
+		AccountId accountId,
+		CancellationToken ct);
 }

@@ -66,7 +66,10 @@ public sealed class AuthController(
 			return BadRequest("Refresh token is required.");
 		}
 
-		var command = new RefreshTokenCommand(request.RefreshToken);
+		var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+		var userAgent = Request.Headers.UserAgent.ToString();
+
+		var command = new RefreshTokenCommand(request.RefreshToken, ipAddress, userAgent);
 
 		var result = await mediator.Send(command, ct);
 		return Ok(result);
@@ -83,11 +86,15 @@ public sealed class AuthController(
 		{
 			return BadRequest("Refresh token is required.");
 		}
+
+		var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
 		await mediator.Send(
 			new LogoutCommand(
 				request.RefreshToken,
 				currentUser.Id,
-				currentUser.TenantId),
+				currentUser.TenantId,
+				ipAddress),
 			ct);
 
 		return NoContent();

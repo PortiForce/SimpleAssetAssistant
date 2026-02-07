@@ -15,6 +15,7 @@ using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Activity;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Asset;
+using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Auth;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Client;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.Platform;
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.Repositories.PlatformAccount;
@@ -71,6 +72,9 @@ public static class DependencyInjection
 
 		services.AddScoped<IExternalIdentityReadRepository, ExternalIdentityReadRepository>();
 		services.AddScoped<IExternalIdentityWriteRepository, ExternalIdentityWriteRepository>();
+
+		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
+		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
 
 		// data seeders:
 		services.AddScoped<DbUserSeeder>();
