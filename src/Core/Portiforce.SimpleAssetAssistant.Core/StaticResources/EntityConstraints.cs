@@ -18,12 +18,13 @@ public static class EntityConstraints
 		/// </summary>
 		public const int NameMaxLength = 100;
 
-		public const int ProviderSubjectMaxLength = 200;
+		public const int ProviderSubjectMaxLength = 256;
 
 		public const int ExternalIdMaxLength = 100;
-		public const int ExternalNotesMaxLength = 255;
+		public const int ExternalNotesMaxLength = 256;
 
 		public const int CodeMaxLength = 25;
+		public const int GuidLikeRowMaxLength = 36;
 	}
 
 	public static class Domain
@@ -80,6 +81,13 @@ public static class EntityConstraints
 		public static class ActivityLeg
 		{
 			public const int InstrumentKeyMaxLength = 100;
+		}
+
+		public static class AuthSessionToken
+		{
+			public const int IpAddressMaxLength = 45;
+			public const int UserAgentMaxLength = 256;
+			public const int UserAgentFingerprint = 32;
 		}
 	}
 }

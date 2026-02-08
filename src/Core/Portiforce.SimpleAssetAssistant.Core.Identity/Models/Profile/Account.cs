@@ -63,7 +63,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		string alias,
 		ContactInfo contact,
 		Role role = Role.TenantUser,
-		AccountState state = AccountState.NotVerified,
+		AccountState state = AccountState.PendingActivation,
 		AccountTier tier = AccountTier.Demo,
 		AccountSettings? settings = null,
 		AccountId id = default)

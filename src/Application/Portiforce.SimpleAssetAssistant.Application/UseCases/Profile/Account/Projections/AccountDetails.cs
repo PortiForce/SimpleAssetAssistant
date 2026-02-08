@@ -1,4 +1,5 @@
-﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Projections;
+﻿using Portiforce.SimpleAssetAssistant.Application.Interfaces.Models.Auth;
+using Portiforce.SimpleAssetAssistant.Application.Interfaces.Projections;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Enums;
 using Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile;
 using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
@@ -12,4 +13,5 @@ public sealed record AccountDetails(
 	string Email,
 	AccountTier Tier,
 	AccountState State,
-	ContactInfo ContactInfo) : IDetailsProjection;
+	Role Role,
+	ContactInfo ContactInfo) : IDetailsProjection, IAccountInfo;

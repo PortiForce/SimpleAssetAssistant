@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
 
+/// <summary>
+/// A factory to be able to run migrations from command line
+/// </summary>
 public sealed class AssetAssistantDbContextFactory
 	: IDesignTimeDbContextFactory<AssetAssistantDbContext>
 {

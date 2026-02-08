@@ -1,15 +1,14 @@
 ﻿using Portiforce.SimpleAssetAssistant.Core.Extensions;
-using Portiforce.SimpleAssetAssistant.Core.Primitives.Internal;
 
 namespace Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 public readonly record struct LegId(Guid Value)
 {
-	public static LegId New() => new(GuidIdUtil.New());
+	public static LegId New() => new(GuidExtensions.New());
 	public static LegId Empty => new(Guid.Empty);
 	public static LegId From(Guid value) => new(value);
 	public bool IsEmpty => Value == Guid.Empty;
-	public override string ToString() => GuidIdUtil.ToString(Value);
+	public override string ToString() => GuidExtensions.ToString(Value);
 
 	/// <summary>
 	/// Parse requires non-empty GUID to avoid silently accepting "00000000-..."
@@ -37,7 +36,7 @@ public readonly record struct LegId(Guid Value)
 	/// <returns><see langword="true"/> if the string was successfully parsed; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse(string? raw, out LegId id)
 	{
-		if (GuidIdUtil.TryParse(raw, out var g))
+		if (GuidExtensions.TryParse(raw, out var g))
 		{
 			id = From(g);
 			return true;

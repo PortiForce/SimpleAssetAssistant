@@ -21,13 +21,17 @@ param(
 
     # Logical category folders to scan under $RootPath
    	# Core model: essentials only mode)
-	[string[]] $CategoryFolders = @("Enums", "Models", "Primitives" ),
+	# [string[]] $CategoryFolders = @("Enums", "Models", "Primitives" ),
 
 	# Core model: full model
 	# [string[]] $CategoryFolders = @("Enums", "Interfaces", "Models", "Primitives", "Rules", "Extensions"),
 
 	# Application model:
 	# [string[]] $CategoryFolders = @("Entitlements", "Enums", "Exceptions", "Interfaces", "Models", "Result", "Tech", "UseCases"),
+
+	# Presentation -> WebApi model:
+	[string[]] $CategoryFolders = @("Contracts", "Controllers"),
+
 
     # Output extension: txt, tzt, md, etc.
     [string] $OutExtension = "txt",

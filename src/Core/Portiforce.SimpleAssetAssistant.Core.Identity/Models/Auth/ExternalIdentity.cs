@@ -11,6 +11,7 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 	private ExternalIdentity(
 		ExternalIdentityId id,
 		AccountId accountId,
+		TenantId tenantId,
 		AuthProvider provider,
 		string providerSubject,
 		bool isPrimary) : base(id)
@@ -25,9 +26,15 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 			throw new DomainValidationException("AccountId must be defined.");
 		}
 
+		if (tenantId.IsEmpty)
+		{
+			throw new DomainValidationException("TenantId must be defined.");
+		}
+
 		string providerSubjectValue = NormalizeAndValidateProviderSubject(providerSubject);
 
 		AccountId = accountId;
+		TenantId = tenantId;
 		Provider = provider;
 		ProviderSubject = providerSubjectValue;
 		IsPrimary = isPrimary;
@@ -38,7 +45,7 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 	{
 
 	}
-
+	public TenantId TenantId { get; init; }
 	public AccountId AccountId { get; init; }
 	public AuthProvider Provider { get; init; }
 	public string ProviderSubject { get; init; }
@@ -47,6 +54,7 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 
 	public static ExternalIdentity Create(
 		AccountId accountId,
+		TenantId tenantId,
 		AuthProvider provider,
 		string providerSubject,
 		bool isPrimary = false,
@@ -54,6 +62,7 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		=> new(
 			id.IsEmpty ? ExternalIdentityId.New() : id,
 			accountId,
+			tenantId,
 			provider,
 			providerSubject,
 			isPrimary);
