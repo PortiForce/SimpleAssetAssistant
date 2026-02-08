@@ -9,15 +9,17 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.3.9" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.29" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Contracts\Activity\Requests\Profile\" />
     <Folder Include="Contracts\Activity\Responses\" />
     <Folder Include="Contracts\Asset\" />
-    <Folder Include="Contracts\Client\Tenant\" />
     <Folder Include="Contracts\PlatformAccount\" />
     <Folder Include="Contracts\Platform\" />
-    <Folder Include="Contracts\Profile\Account\" />
+    <Folder Include="Contracts\Profile\Account\Responses\" />
   </ItemGroup>
 
   <ItemGroup>

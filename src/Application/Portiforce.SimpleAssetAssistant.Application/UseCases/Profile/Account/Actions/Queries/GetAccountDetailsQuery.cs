@@ -4,6 +4,5 @@ using Portiforce.SimpleAssetAssistant.Core.Primitives.Ids;
 
 namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Profile.Account.Actions.Queries;
 
-public sealed record GetAccountDetailsQuery(AccountId Id) : IQuery<AccountDetails>
-{
-}
+public sealed record GetAccountDetailsQuery(AccountId Id, TenantId TenantId) : IQuery<AccountDetails>;
+

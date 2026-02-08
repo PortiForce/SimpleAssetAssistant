@@ -12,6 +12,7 @@ namespace Portiforce.SimpleAssetAssistant.Application.UseCases.Activity.Actions.
 /// The Handler will convert this into the complex "Legs" structure.
 /// </summary>
 public sealed record RegisterTradeCommand(
+	AccountId AccountId,
 	TenantId TenantId,
 	PlatformAccountId PlatformAccountId,
 	DateTimeOffset OccurredAt,

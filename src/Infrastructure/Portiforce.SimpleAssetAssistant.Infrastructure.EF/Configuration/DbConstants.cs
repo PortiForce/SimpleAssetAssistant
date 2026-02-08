@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
+﻿
+namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 internal static class DbConstants
 {
@@ -8,26 +7,48 @@ internal static class DbConstants
 	{
 		public const string DateTimeDateOnlyFormat = "date";
 		public const string DateTimeSecOnlyAccuracyFormat = "datetime2(0)";
+
+		public const string VarBinaryDataType = "varbinary(max)";
+		public const string Varbinary32DataType = "varbinary(32)";
 	}
 
 	public static class Domain
 	{
-		public const string DefaultSchemaName = "pf";
-
-		public static class EntityNames
+		public static class Entities
 		{
-			public const string TenantEntityName = "Tenant";
-			public const string TenantRestrictedAssetEntityName = "TenantRestrictedAsset";
-			public const string TenantRestrictedPlatformEntityName = "TenantRestrictedPlatform";
+			public const string DefaultSchemaName = "pf";
 
-			public const string PlatformEntityName = "Platform";
-			public const string PlatformAccountEntityName = "PlatformAccount";
-			public const string AccountEntityName = "Account";
+			public static class CoreSchema
+			{
+				public const string SchemaName = "core";
 
-			public const string AssetEntityName = "Asset";
+				public const string TenantTableName = "Tenants";
+				public const string TenantRestrictedAssetTableName = "TenantRestrictedAssets";
+				public const string TenantRestrictedPlatformTableName = "TenantRestrictedPlatforms";
 
-			public const string ActivityEntityName = "Activity";
-			public const string ActivityLegEntityName = "ActivityLeg";
+				public const string PlatformTableName = "Platforms";
+				public const string PlatformAccountTableName = "PlatformAccounts";
+				public const string AccountTableName = "Accounts";
+
+				public const string AssetTableName = "Assets";
+			}
+
+			public static class LedgerSchema
+			{
+				public const string SchemaName = "ledger";
+
+				public const string ActivityTableName = "Activities";
+				public const string ActivityLegTableName = "ActivityLegs";
+			}
+
+			public static class AuthSchema
+			{
+				public const string SchemaName = "auth";
+
+				public const string ExternalIdentityTableName = "ExternalIdentities";
+				public const string PasskeyCredentialsTableName = "PassKeyCredentials";
+				public const string SessionTokenTableName = "SessionTokens";
+			}
 		}
 	}
 }

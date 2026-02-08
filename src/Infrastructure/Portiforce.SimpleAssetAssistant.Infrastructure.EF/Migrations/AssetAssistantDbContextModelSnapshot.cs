@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 using Portiforce.SimpleAssetAssistant.Infrastructure.EF.DbContexts;
-using Povrtiforce.SimpleAssetAssistant.Infrastructure.EF.Configuration;
 
 #nullable disable
 
@@ -21,7 +20,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 		{
 #pragma warning disable 612, 618
 			modelBuilder
-				.HasDefaultSchema(DbConstants.Domain.DefaultSchemaName)
+				.HasDefaultSchema("pf")
 				.HasAnnotation("ProductVersion", "10.0.2")
 				.HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -32,8 +31,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.Property<Guid>("Id")
 						.HasColumnType("uniqueidentifier");
 
-					b.Property<int>("Kind")
-						.HasColumnType("int");
+					b.Property<byte>("Kind")
+						.HasColumnType("tinyint");
 
 					b.Property<DateTimeOffset>("OccurredAt")
 						.HasColumnType("datetimeoffset");
@@ -59,8 +58,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 								.HasColumnName("Fingerprint");
 
 							b1.Property<string>("Notes")
-								.HasMaxLength(255)
-								.HasColumnType("nvarchar(255)")
+								.HasMaxLength(256)
+								.HasColumnType("nvarchar(256)")
 								.HasColumnName("ExternalNotes");
 
 							b1.Property<string>("Source")
@@ -75,9 +74,9 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("PlatformAccountId", "OccurredAt", "Id")
 						.HasDatabaseName("IX_Activity_PlatformAccount_OccurredAt_Id");
 
-					b.ToTable("Activity", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Activities", "ledger");
 
-					b.HasDiscriminator<int>("Kind");
+					b.HasDiscriminator<byte>("Kind");
 
 					b.UseTphMappingStrategy();
 				});
@@ -90,8 +89,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.Property<Guid>("ActivityId")
 						.HasColumnType("uniqueidentifier");
 
-					b.Property<int>("Allocation")
-						.HasColumnType("int");
+					b.Property<byte>("Allocation")
+						.HasColumnType("tinyint");
 
 					b.Property<decimal>("Amount")
 						.HasColumnType("decimal(38, 18)");
@@ -99,15 +98,15 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.Property<Guid>("AssetId")
 						.HasColumnType("uniqueidentifier");
 
-					b.Property<int>("Direction")
-						.HasColumnType("int");
+					b.Property<byte>("Direction")
+						.HasColumnType("tinyint");
 
 					b.Property<string>("InstrumentKey")
 						.HasMaxLength(100)
 						.HasColumnType("nvarchar(100)");
 
-					b.Property<int>("Role")
-						.HasColumnType("int");
+					b.Property<byte>("Role")
+						.HasColumnType("tinyint");
 
 					b.HasKey("Id");
 
@@ -117,7 +116,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("AssetId")
 						.HasDatabaseName("IX_Leg_AssetId");
 
-					b.ToTable("ActivityLeg", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("ActivityLegs", "ledger");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Asset", b =>
@@ -130,8 +129,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.HasMaxLength(16)
 						.HasColumnType("nvarchar(16)");
 
-					b.Property<int>("Kind")
-						.HasColumnType("int");
+					b.Property<byte>("Kind")
+						.HasColumnType("tinyint");
 
 					b.Property<string>("Name")
 						.IsRequired()
@@ -146,8 +145,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnAddOrUpdate()
 						.HasColumnType("rowversion");
 
-					b.Property<int>("State")
-						.HasColumnType("int");
+					b.Property<byte>("State")
+						.HasColumnType("tinyint");
 
 					b.HasKey("Id");
 
@@ -158,7 +157,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.IsUnique()
 						.HasDatabaseName("UX_Asset_Code_Kind");
 
-					b.ToTable("Asset", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Assets", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.Platform", b =>
@@ -171,8 +170,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.HasMaxLength(25)
 						.HasColumnType("nvarchar(25)");
 
-					b.Property<int>("Kind")
-						.HasColumnType("int");
+					b.Property<byte>("Kind")
+						.HasColumnType("tinyint");
 
 					b.Property<string>("Name")
 						.IsRequired()
@@ -184,8 +183,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnAddOrUpdate()
 						.HasColumnType("rowversion");
 
-					b.Property<int>("State")
-						.HasColumnType("int");
+					b.Property<byte>("State")
+						.HasColumnType("tinyint");
 
 					b.HasKey("Id");
 
@@ -200,7 +199,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("State")
 						.HasDatabaseName("IX_Platform_State");
 
-					b.ToTable("Platform", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Platforms", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Assets.Models.PlatformAccount", b =>
@@ -232,8 +231,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnAddOrUpdate()
 						.HasColumnType("rowversion");
 
-					b.Property<int>("State")
-						.HasColumnType("int");
+					b.Property<byte>("State")
+						.HasColumnType("tinyint");
 
 					b.Property<Guid>("TenantId")
 						.HasColumnType("uniqueidentifier");
@@ -254,7 +253,146 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.IsUnique()
 						.HasDatabaseName("UX_PlatformAccount_Tenant_Account_Platform");
 
-					b.ToTable("PlatformAccount", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("PlatformAccounts", "core");
+				});
+
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.AuthSessionToken", b =>
+				{
+					b.Property<Guid>("Id")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<Guid>("AccountId")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<DateTimeOffset>("CreatedAt")
+						.HasColumnType("datetimeoffset");
+
+					b.Property<string>("CreatedByIp")
+						.HasMaxLength(45)
+						.HasColumnType("nvarchar(45)");
+
+					b.Property<string>("CreatedUserAgent")
+						.HasMaxLength(256)
+						.HasColumnType("nvarchar(256)");
+
+					b.Property<DateTimeOffset>("ExpiresAt")
+						.HasColumnType("datetimeoffset");
+
+					b.Property<byte[]>("ReplacedByTokenHash")
+						.HasColumnType("varbinary(32)");
+
+					b.Property<DateTimeOffset?>("RevokedAt")
+						.HasColumnType("datetimeoffset");
+
+					b.Property<string>("RevokedByIp")
+						.HasMaxLength(45)
+						.HasColumnType("nvarchar(45)");
+
+					b.Property<byte?>("RevokedReason")
+						.HasColumnType("tinyint");
+
+					b.Property<Guid>("SessionId")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<Guid>("TenantId")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<byte[]>("TokenHash")
+						.IsRequired()
+						.HasColumnType("varbinary(32)");
+
+					b.Property<string>("UserAgentFingerprint")
+						.HasMaxLength(32)
+						.HasColumnType("nvarchar(32)");
+
+					b.HasKey("Id");
+
+					b.HasIndex("AccountId");
+
+					b.HasIndex("SessionId");
+
+					b.HasIndex("TenantId");
+
+					b.HasIndex("TokenHash")
+						.IsUnique();
+
+					b.ToTable("SessionTokens", "auth");
+				});
+
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.ExternalIdentity", b =>
+				{
+					b.Property<Guid>("Id")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<Guid>("AccountId")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<bool>("IsPrimary")
+						.HasColumnType("bit");
+
+					b.Property<byte>("Provider")
+						.HasColumnType("tinyint");
+
+					b.Property<string>("ProviderSubject")
+						.IsRequired()
+						.HasMaxLength(256)
+						.HasColumnType("nvarchar(256)");
+
+					b.Property<Guid>("TenantId")
+						.HasColumnType("uniqueidentifier");
+
+					b.HasKey("Id");
+
+					b.HasIndex("AccountId");
+
+					b.HasIndex("TenantId");
+
+					b.HasIndex("Provider", "ProviderSubject")
+						.IsUnique()
+						.HasDatabaseName("UX_ExternalIdentity_Provider_ExternalId");
+
+					b.ToTable("ExternalIdentities", "auth");
+				});
+
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.PasskeyCredential", b =>
+				{
+					b.Property<Guid>("Id")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<Guid>("AccountId")
+						.HasColumnType("uniqueidentifier");
+
+					b.Property<DateTimeOffset>("CreatedAt")
+						.HasColumnType("datetimeoffset");
+
+					b.Property<string>("CredentialId")
+						.IsRequired()
+						.HasMaxLength(500)
+						.HasColumnType("nvarchar(500)");
+
+					b.Property<DateTimeOffset?>("LastUsedAt")
+						.HasColumnType("datetimeoffset");
+
+					b.Property<byte[]>("PublicKey")
+						.IsRequired()
+						.HasColumnType("varbinary(max)");
+
+					b.Property<long>("SignatureCounter")
+						.HasColumnType("bigint");
+
+					b.Property<string>("UserHandle")
+						.HasMaxLength(128)
+						.HasColumnType("nvarchar(128)");
+
+					b.HasKey("Id");
+
+					b.HasIndex("AccountId");
+
+					b.HasIndex("CredentialId")
+						.IsUnique()
+						.HasDatabaseName("UX_PasskeyCredential_CredentialId");
+
+					b.ToTable("PassKeyCredentials", "auth");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", b =>
@@ -281,16 +419,16 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.HasMaxLength(100)
 						.HasColumnType("nvarchar(100)");
 
-					b.Property<int>("Plan")
-						.HasColumnType("int");
+					b.Property<byte>("Plan")
+						.HasColumnType("tinyint");
 
 					b.Property<byte[]>("RowVersion")
 						.IsConcurrencyToken()
 						.ValueGeneratedOnAddOrUpdate()
 						.HasColumnType("rowversion");
 
-					b.Property<int>("State")
-						.HasColumnType("int");
+					b.Property<byte>("State")
+						.HasColumnType("tinyint");
 
 					b.ComplexProperty(typeof(Dictionary<string, object>), "Settings", "Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant.Settings#TenantSettings", b1 =>
 						{
@@ -369,7 +507,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("State")
 						.HasDatabaseName("IX_Tenant_State");
 
-					b.ToTable("Tenant", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Tenants", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedAsset", b =>
@@ -385,7 +523,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_TenantRestrictedAsset_TenantId");
 
-					b.ToTable("TenantRestrictedAsset", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("TenantRestrictedAssets", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedPlatform", b =>
@@ -401,7 +539,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_TenantRestrictedPlatform_TenantId");
 
-					b.ToTable("TenantRestrictedPlatform", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("TenantRestrictedPlatforms", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", b =>
@@ -487,7 +625,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.HasIndex("TenantId")
 						.HasDatabaseName("IX_Account_TenantId");
 
-					b.ToTable("Account", DbConstants.Domain.DefaultSchemaName);
+					b.ToTable("Accounts", "core");
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.BurnActivity", b =>
@@ -498,7 +636,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnUpdateSometimes()
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(5);
+					b.HasDiscriminator().HasValue((byte)5);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.ExchangeActivity", b =>
@@ -516,7 +654,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnUpdateSometimes()
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(2);
+					b.HasDiscriminator().HasValue((byte)2);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.IncomeActivity", b =>
@@ -527,7 +665,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnUpdateSometimes()
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(4);
+					b.HasDiscriminator().HasValue((byte)4);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.ServiceActivity", b =>
@@ -541,7 +679,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.Property<byte>("ServiceType")
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(6);
+					b.HasDiscriminator().HasValue((byte)6);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.TradeActivity", b =>
@@ -562,7 +700,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnUpdateSometimes()
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(1);
+					b.HasDiscriminator().HasValue((byte)1);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.TransferActivity", b =>
@@ -583,7 +721,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 					b.Property<byte>("TransferKind")
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(3);
+					b.HasDiscriminator().HasValue((byte)3);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.UserCorrectionActivity", b =>
@@ -594,7 +732,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.ValueGeneratedOnUpdateSometimes()
 						.HasColumnType("tinyint");
 
-					b.HasDiscriminator().HasValue(7);
+					b.HasDiscriminator().HasValue((byte)7);
 				});
 
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Activities.Models.Activities.AssetActivityBase", b =>
@@ -642,6 +780,45 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 						.IsRequired();
 				});
 
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.AuthSessionToken", b =>
+				{
+					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+						.WithMany()
+						.HasForeignKey("AccountId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
+
+					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", null)
+						.WithMany()
+						.HasForeignKey("TenantId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
+				});
+
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.ExternalIdentity", b =>
+				{
+					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+						.WithMany()
+						.HasForeignKey("AccountId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
+
+					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", null)
+						.WithMany()
+						.HasForeignKey("TenantId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
+				});
+
+			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Auth.PasskeyCredential", b =>
+				{
+					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Profile.Account", null)
+						.WithMany()
+						.HasForeignKey("AccountId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
+				});
+
 			modelBuilder.Entity("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.TenantRestrictedAsset", b =>
 				{
 					b.HasOne("Portiforce.SimpleAssetAssistant.Core.Identity.Models.Client.Tenant", null)
@@ -681,8 +858,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 								.HasColumnType("nvarchar(16)")
 								.HasColumnName("Futures_BaseAssetCode");
 
-							b1.Property<int>("ContractKind")
-								.HasColumnType("int")
+							b1.Property<byte>("ContractKind")
+								.HasColumnType("tinyint")
 								.HasColumnName("Futures_ContractKind");
 
 							b1.Property<string>("InstrumentKey")
@@ -691,8 +868,8 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 								.HasColumnType("nvarchar(100)")
 								.HasColumnName("Futures_InstrumentKey");
 
-							b1.Property<int?>("PositionEffect")
-								.HasColumnType("int")
+							b1.Property<byte?>("PositionEffect")
+								.HasColumnType("tinyint")
 								.HasColumnName("Futures_PositionEffect");
 
 							b1.Property<string>("QuoteAssetCode")
@@ -702,7 +879,7 @@ namespace Portiforce.SimpleAssetAssistant.Infrastructure.EF.Migrations
 
 							b1.HasKey("TradeActivityId");
 
-							b1.ToTable("Activity", DbConstants.Domain.DefaultSchemaName);
+							b1.ToTable("Activities", "ledger");
 
 							b1.WithOwner()
 								.HasForeignKey("TradeActivityId");
