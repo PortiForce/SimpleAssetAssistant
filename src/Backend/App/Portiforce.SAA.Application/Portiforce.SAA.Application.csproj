@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="UseCases\Client\NewFolder\**" />
+    <Compile Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Client\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <None Remove="UseCases\Client\NewFolder\**" />
+    <None Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\Persistence\ActivityLeg\" />
+    <Folder Include="Tech\Common\" />
+    <Folder Include="UseCases\ActivityLeg\Actions\Commands\" />
+    <Folder Include="UseCases\ActivityLeg\Actions\Queries\" />
+    <Folder Include="UseCases\ActivityLeg\Handlers\Commands\" />
+    <Folder Include="UseCases\ActivityLeg\Handlers\Queries\" />
+    <Folder Include="UseCases\ActivityLeg\Handlers\" />
+    <Folder Include="UseCases\ActivityLeg\Projections\" />
+    <Folder Include="UseCases\Auth\Handlers\Queries\" />
+    <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
+    <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />
+    <Folder Include="UseCases\PlatformAccount\Handlers\Commands\" />
+    <Folder Include="UseCases\PlatformAccount\Handlers\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Portiforce.SAA.Core.Activities\Portiforce.SAA.Core.Activities.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SAA.Core.Assets\Portiforce.SAA.Core.Assets.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SAA.Core.Identity\Portiforce.SAA.Core.Identity.csproj" />
+    <ProjectReference Include="..\..\Core\Portiforce.SAA.Core\Portiforce.SAA.Core.csproj" />
+  </ItemGroup>
+
+</Project>

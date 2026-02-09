@@ -3,35 +3,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Identity", "Core\Portiforce.SimpleAssetAssistant.Core.Identity\Portiforce.SimpleAssetAssistant.Core.Identity.csproj", "{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core.Identity", "Backend\Core\Portiforce.SAA.Core.Identity\Portiforce.SAA.Core.Identity.csproj", "{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Core", "01 - Core", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Assets", "Core\Portiforce.SimpleAssetAssistant.Core.Assets\Portiforce.SimpleAssetAssistant.Core.Assets.csproj", "{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core.Assets", "Backend\Core\Portiforce.SAA.Core.Assets\Portiforce.SAA.Core.Assets.csproj", "{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core.Activities", "Core\Portiforce.SimpleAssetAssistant.Core.Activities\Portiforce.SimpleAssetAssistant.Core.Activities.csproj", "{D08DB0AB-846F-4A43-AB1B-4D0128051501}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core.Activities", "Backend\Core\Portiforce.SAA.Core.Activities\Portiforce.SAA.Core.Activities.csproj", "{D08DB0AB-846F-4A43-AB1B-4D0128051501}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{2FC42C76-6BA7-4006-946D-400D1A11B647}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Api", "Backend\Api\Portiforce.SAA.Api\Portiforce.SAA.Api.csproj", "{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Presentation.WebApi", "Presentation\Portiforce.SimpleAssetAssistant.Presentation.WebApi\Portiforce.SimpleAssetAssistant.Presentation.WebApi.csproj", "{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Core", "Core\Portiforce.SimpleAssetAssistant.Core\Portiforce.SimpleAssetAssistant.Core.csproj", "{DE17966E-D143-4E97-820A-33131934AD52}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projections", "Projections", "{6E31B63C-4567-4993-B7CE-536BA29E276C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Projections.Core", "Projections\Portiforce.SimpleAssetAssistant.Projections.Core\Portiforce.SimpleAssetAssistant.Projections.Core.csproj", "{7A42093C-AE03-41D7-AAD3-5FE655146768}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core", "Backend\Core\Portiforce.SAA.Core\Portiforce.SAA.Core.csproj", "{DE17966E-D143-4E97-820A-33131934AD52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Application", "02 - Application", "{A11A108D-FB20-4BDA-BA01-A466DA27CE09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.csproj", "{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Infrastructure", "Backend\Infra\Portiforce.SAA.Infrastructure\Portiforce.SAA.Infrastructure.csproj", "{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Infrastructure", "03 - Infrastructure", "{B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.Identity", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.Identity\Portiforce.SimpleAssetAssistant.Infrastructure.Identity.csproj", "{31C583C8-67A1-42BD-B4CE-A03422AF9B47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Application", "Backend\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj", "{89855405-B39D-C740-EEA1-837E5ABF3FAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Application", "Application\Portiforce.SimpleAssetAssistant.Application\Portiforce.SimpleAssetAssistant.Application.csproj", "{89855405-B39D-C740-EEA1-837E5ABF3FAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Infrastructure.EF", "Backend\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj", "{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SimpleAssetAssistant.Infrastructure.EF", "Infrastructure\Portiforce.SimpleAssetAssistant.Infrastructure.EF\Portiforce.SimpleAssetAssistant.Infrastructure.EF.csproj", "{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{4A0B79B1-3E85-4236-8082-2AEFBAB949DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{EBD927AE-F167-4E40-998B-778E7CE28793}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{01119CC1-C521-437B-BAD6-4906B3D58F55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{BFD582AA-460D-4FBB-91B3-E9D280137C77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Web", "Frontend\UI\Portiforce.SAA.Web\Portiforce.SAA.Web\Portiforce.SAA.Web.csproj", "{E2BB4738-2A9B-4706-889E-5F01017C96D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Web.Client", "Frontend\UI\Portiforce.SAA.Web\Portiforce.SAA.Web.Client\Portiforce.SAA.Web.Client.csproj", "{CF75B9B6-C47A-41F1-9412-4989BF66CB17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,18 +63,10 @@ Global
 		{DE17966E-D143-4E97-820A-33131934AD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE17966E-D143-4E97-820A-33131934AD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE17966E-D143-4E97-820A-33131934AD52}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A42093C-AE03-41D7-AAD3-5FE655146768}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31C583C8-67A1-42BD-B4CE-A03422AF9B47}.Release|Any CPU.Build.0 = Release|Any CPU
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,21 +75,34 @@ Global
 		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2BB4738-2A9B-4706-889E-5F01017C96D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2BB4738-2A9B-4706-889E-5F01017C96D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2BB4738-2A9B-4706-889E-5F01017C96D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2BB4738-2A9B-4706-889E-5F01017C96D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
+		{A27A6353-8686-4E7A-949E-02F45FE35F4D} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
 		{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
 		{D08DB0AB-846F-4A43-AB1B-4D0128051501} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
-		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687} = {2FC42C76-6BA7-4006-946D-400D1A11B647}
+		{29FFBD72-0D26-4CDC-AF47-CA28DDF6A687} = {EBD927AE-F167-4E40-998B-778E7CE28793}
 		{DE17966E-D143-4E97-820A-33131934AD52} = {A27A6353-8686-4E7A-949E-02F45FE35F4D}
-		{7A42093C-AE03-41D7-AAD3-5FE655146768} = {6E31B63C-4567-4993-B7CE-536BA29E276C}
+		{A11A108D-FB20-4BDA-BA01-A466DA27CE09} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
 		{FD4B18E1-804D-4D81-A3C1-292E76ED0B94} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
-		{31C583C8-67A1-42BD-B4CE-A03422AF9B47} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
+		{B215ABF8-9A2C-4BB6-8BDD-382A4B80C744} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
 		{89855405-B39D-C740-EEA1-837E5ABF3FAD} = {A11A108D-FB20-4BDA-BA01-A466DA27CE09}
 		{74D8A382-F2EF-4C5B-A890-F637FAC8FEFB} = {B215ABF8-9A2C-4BB6-8BDD-382A4B80C744}
+		{EBD927AE-F167-4E40-998B-778E7CE28793} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
+		{BFD582AA-460D-4FBB-91B3-E9D280137C77} = {01119CC1-C521-437B-BAD6-4906B3D58F55}
+		{E2BB4738-2A9B-4706-889E-5F01017C96D4} = {BFD582AA-460D-4FBB-91B3-E9D280137C77}
+		{CF75B9B6-C47A-41F1-9412-4989BF66CB17} = {BFD582AA-460D-4FBB-91B3-E9D280137C77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}
