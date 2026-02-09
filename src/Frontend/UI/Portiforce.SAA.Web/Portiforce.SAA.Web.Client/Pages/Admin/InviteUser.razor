@@ -1,0 +1,26 @@
+﻿@page "/admin/users/invite"
+@using Portiforce.SAA.Contracts.User.Requests
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+@inject IAdminApiClient ApiClient
+
+<h3>Invite New User</h3>
+
+<EditForm Model="@inviteModel" OnValidSubmit="HandleInvite">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText @bind-Value="inviteModel.Email" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Send Invite</button>
+</EditForm>
+
+@code {
+    private InviteUserRequest inviteModel = new();
+
+    private async Task HandleInvite()
+    {
+        await ApiClient.InviteUserAsync(inviteModel);
+        // todo: Handle success/fail UI...
+    }
+}

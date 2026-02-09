@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Web", "Front
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Web.Client", "Frontend\UI\Portiforce.SAA.Web\Portiforce.SAA.Web.Client\Portiforce.SAA.Web.Client.csproj", "{CF75B9B6-C47A-41F1-9412-4989BF66CB17}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{AADBC8E8-288F-47A6-B908-5700C93386E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Contracts", "Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj", "{217F2B2B-01E1-402F-9290-CC7E21506E0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,10 @@ Global
 		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF75B9B6-C47A-41F1-9412-4989BF66CB17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217F2B2B-01E1-402F-9290-CC7E21506E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217F2B2B-01E1-402F-9290-CC7E21506E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217F2B2B-01E1-402F-9290-CC7E21506E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217F2B2B-01E1-402F-9290-CC7E21506E0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +111,7 @@ Global
 		{BFD582AA-460D-4FBB-91B3-E9D280137C77} = {01119CC1-C521-437B-BAD6-4906B3D58F55}
 		{E2BB4738-2A9B-4706-889E-5F01017C96D4} = {BFD582AA-460D-4FBB-91B3-E9D280137C77}
 		{CF75B9B6-C47A-41F1-9412-4989BF66CB17} = {BFD582AA-460D-4FBB-91B3-E9D280137C77}
+		{217F2B2B-01E1-402F-9290-CC7E21506E0B} = {AADBC8E8-288F-47A6-B908-5700C93386E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}

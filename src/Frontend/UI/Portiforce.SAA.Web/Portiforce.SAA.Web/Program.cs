@@ -1,43 +1,68 @@
 using Portiforce.SAA.Web.Components;
+using Yarp.ReverseProxy.Transforms;
 
 namespace Portiforce.SAA.Web;
 
 public class Program
 {
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
+	public static void Main(string[] args)
+	{
+		var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents()
-            .AddInteractiveWebAssemblyComponents();
+		builder.Services.AddReverseProxy()
+			.LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+			.AddTransforms(builderContext =>
+			{
+				// Extract Tenant from Subdomain and pass as Header
+				builderContext.AddRequestTransform(transformContext =>
+				{
+					var host = transformContext.HttpContext.Request.Host.Host;
 
-        var app = builder.Build();
+					// Configurable base domain
+					var baseDomain = "dev.localhost";
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseWebAssemblyDebugging();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
+					if (host.EndsWith(baseDomain, StringComparison.OrdinalIgnoreCase))
+					{
+						var prefixLength = host.Length - baseDomain.Length - 1;
 
-        app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-        app.UseHttpsRedirection();
+						if (prefixLength > 0)
+						{
+							var prefix = host.Substring(0, prefixLength);
+							transformContext.ProxyRequest.Headers.Add("X-Tenant", prefix);
+						}
+					}
 
-        app.UseAntiforgery();
+					return ValueTask.CompletedTask;
+				});
+			});
 
-        app.MapStaticAssets();
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode()
-            .AddInteractiveWebAssemblyRenderMode()
-            .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+		builder.Services.AddRazorComponents()
+			.AddInteractiveServerComponents()
+			.AddInteractiveWebAssemblyComponents();
 
-        app.Run();
-    }
+		var app = builder.Build();
+
+		if (app.Environment.IsDevelopment())
+		{
+			app.UseWebAssemblyDebugging();
+		}
+		else
+		{
+			app.UseExceptionHandler("/Error");
+			app.UseHsts();
+		}
+
+		app.UseHttpsRedirection();
+		app.UseStaticFiles();
+		app.UseAntiforgery();
+
+		app.MapReverseProxy();
+
+		app.MapRazorComponents<App>()
+			.AddInteractiveServerRenderMode()
+			.AddInteractiveWebAssemblyRenderMode()
+			.AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+
+		app.Run();
+	}
 }

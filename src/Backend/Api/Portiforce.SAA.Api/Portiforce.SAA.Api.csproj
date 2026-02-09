@@ -9,20 +9,39 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Contracts\Activity\Requests\Profile\**" />
+	  <Compile Remove="Contracts\Activity\Responses\**" />
+	  <Compile Remove="Contracts\Asset\**" />
+	  <Compile Remove="Contracts\PlatformAccount\**" />
+	  <Compile Remove="Contracts\Platform\**" />
+	  <Content Remove="Contracts\Activity\Requests\Profile\**" />
+	  <Content Remove="Contracts\Activity\Responses\**" />
+	  <Content Remove="Contracts\Asset\**" />
+	  <Content Remove="Contracts\PlatformAccount\**" />
+	  <Content Remove="Contracts\Platform\**" />
+	  <EmbeddedResource Remove="Contracts\Activity\Requests\Profile\**" />
+	  <EmbeddedResource Remove="Contracts\Activity\Responses\**" />
+	  <EmbeddedResource Remove="Contracts\Asset\**" />
+	  <EmbeddedResource Remove="Contracts\PlatformAccount\**" />
+	  <EmbeddedResource Remove="Contracts\Platform\**" />
+	  <None Remove="Contracts\Activity\Requests\Profile\**" />
+	  <None Remove="Contracts\Activity\Responses\**" />
+	  <None Remove="Contracts\Asset\**" />
+	  <None Remove="Contracts\PlatformAccount\**" />
+	  <None Remove="Contracts\Platform\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
 		<PackageReference Include="Scalar.AspNetCore" Version="2.12.36" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Contracts\Activity\Requests\Profile\" />
-		<Folder Include="Contracts\Activity\Responses\" />
-		<Folder Include="Contracts\Asset\" />
-		<Folder Include="Contracts\PlatformAccount\" />
-		<Folder Include="Contracts\Platform\" />
 		<Folder Include="Contracts\Profile\Account\Responses\" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
 		<ProjectReference Include="..\..\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj" />
 		<ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
 	</ItemGroup>
