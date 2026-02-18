@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives;
@@ -10,4 +10,4 @@ public sealed record CreateTenantCommand(
 	string Name,
 	Email AdminEmail,
 	TenantPlan Plan
-) : ICommand<CommandResult<TenantId>>;
+) : ICommand<TypedResult<TenantId>>;

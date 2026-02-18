@@ -20,7 +20,7 @@ public static class EntityConstraints
 
 		public const int ProviderSubjectMaxLength = 256;
 
-		public const int ExternalIdMaxLength = 100;
+		public const int ExternalIdMaxLength = 256;
 		public const int ExternalNotesMaxLength = 256;
 
 		public const int CodeMaxLength = 25;
@@ -56,7 +56,7 @@ public static class EntityConstraints
 		public static class Account
 		{
 			public const int AliasMinLength = 3;
-			public const int AliasMaxLength = 50;
+			public const int AliasMaxLength = 105;
 			public const int EmailMaxLength = 100;
 			public const int PhoneNumberMaxLength = 15;
 		}

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -8,4 +8,4 @@ public sealed record UpdateTenantSettingsCommand(
 	TenantId Id,
 	string DefaultCurrency,
 	bool EnforceTwoFactor
-) : ICommand<BaseCommandResult>;
+) : ICommand<Result>;

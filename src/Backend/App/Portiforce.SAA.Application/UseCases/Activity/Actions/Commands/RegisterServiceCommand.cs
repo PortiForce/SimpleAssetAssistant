@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Activities.Enums;
 using Portiforce.SAA.Core.Activities.Models;
@@ -16,4 +16,4 @@ public sealed record RegisterServiceCommand(
 	Quantity Amount,
 	AssetActivityReason FeeReason,
 	ExternalMetadata Metadata
-) : ICommand<CommandResult<ActivityId>>;
+) : ICommand<TypedResult<ActivityId>>;

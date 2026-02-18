@@ -5,22 +5,22 @@ public enum Role : byte
 	None = 0,
 
 	/// <summary>
-	/// Platform scoped role with full control over the tenant including billing and structure
+	/// Tenant scoped role for user who is associated with a particular tenant in a multi-tenant system.
 	/// </summary>
-	PlatformOwner = 1,
-
-	/// <summary>
-	/// Platform scoped role to allow to configure tenants and their structure
-	/// </summary>
-	PlatformAdmin = 2,
+	TenantUser = 1,
 
 	/// <summary>
 	/// Tenant scoped  role to configure tenant params and users
 	/// </summary>
-	TenantAdmin = 10,
+	TenantAdmin = 2,
 
 	/// <summary>
-	/// Tenant scoped role for user who is associated with a particular tenant in a multi-tenant system.
+	/// Platform scoped role to allow to configure tenants and their structure
 	/// </summary>
-	TenantUser = 15
+	PlatformAdmin = 10,
+
+	/// <summary>
+	/// Platform scoped role with full control over the tenant including billing and structure
+	/// </summary>
+	PlatformOwner = 15
 }

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Activities.Enums;
 using Portiforce.SAA.Core.Primitives;
@@ -18,4 +18,4 @@ public sealed record RegisterTransferCommand(
 	string? Reference,
 	string? Counterparty,
 	string Source
-) : ICommand<CommandResult<ActivityId>>;
+) : ICommand<TypedResult<ActivityId>>;

@@ -25,7 +25,7 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		// an ability to use user secrets for local runs
-		if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Local"))
+		if (builder.Environment.IsDevelopment())
 		{
 			builder.Configuration.AddUserSecrets<Program>(optional: true);
 		}
@@ -88,7 +88,7 @@ public class Program
 
 		var app = builder.Build();
 
-		if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
+		if (app.Environment.IsDevelopment())
 		{
 			app.MapOpenApi();
 			app.MapScalarApiReference(options =>

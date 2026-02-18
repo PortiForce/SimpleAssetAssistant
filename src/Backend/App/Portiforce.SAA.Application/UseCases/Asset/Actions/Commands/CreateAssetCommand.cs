@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Primitives;
@@ -11,4 +11,4 @@ public sealed record CreateAssetCommand(
 	AssetCode Code,
 	AssetKind AssetKind,
 	byte NativeDecimals
-) : ICommand<CommandResult<AssetId>>;
+) : ICommand<TypedResult<AssetId>>;

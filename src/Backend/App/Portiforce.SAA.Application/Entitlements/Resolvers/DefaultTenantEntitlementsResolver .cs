@@ -5,10 +5,13 @@ namespace Portiforce.SAA.Application.Entitlements.Resolvers;
 
 public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResolver
 {
+	// MaxPendingInvites: usually 2x MaxActiveUsers, but for demo we want to allow more invites to let users try the product with more people
+
 	public TenantEntitlements Resolve(TenantPlan plan) => plan switch
 	{
 		TenantPlan.Demo => new TenantEntitlements(
-			MaxUsers: 10,
+			MaxActiveUsers: 10,
+			MaxPendingInvites: 30,
 			MaxPlatforms: 5,
 			MaxDistinctAssets: 20,
 			MaxImportRows: 5_000,
@@ -16,7 +19,8 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 			AllowAdvancedAnalytics: false),
 
 		TenantPlan.Basic => new TenantEntitlements(
-			MaxUsers: 50,
+			MaxActiveUsers: 50,
+			MaxPendingInvites: 100,
 			MaxPlatforms: 10,
 			MaxDistinctAssets: 200,
 			MaxImportRows: 10_000,
@@ -25,7 +29,8 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 
 
 		TenantPlan.Advanced => new TenantEntitlements(
-			MaxUsers: 100,
+			MaxActiveUsers: 100,
+			MaxPendingInvites: 200,
 			MaxPlatforms: 20,
 			MaxDistinctAssets: 500,
 			MaxImportRows: 12_000,
@@ -33,7 +38,8 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 			AllowAdvancedAnalytics: false),
 
 		TenantPlan.Pro => new TenantEntitlements(
-			MaxUsers: 200,
+			MaxActiveUsers: 200,
+			MaxPendingInvites: 500,
 			MaxPlatforms: 50,
 			MaxDistinctAssets: 1000,
 			MaxImportRows: 20_000,
@@ -41,7 +47,8 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 			AllowAdvancedAnalytics: true),
 
 		TenantPlan.Custom => new TenantEntitlements(
-			MaxUsers: 5,
+			MaxActiveUsers: 25,
+			MaxPendingInvites: 50,
 			MaxPlatforms: 50,
 			MaxDistinctAssets: 1000,
 			MaxImportRows: 20_000,

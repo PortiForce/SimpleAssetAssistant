@@ -1,7 +1,7 @@
-﻿using Portiforce.SAA.Application.Interfaces.Guards;
+﻿using Portiforce.SAA.Application.FlowResult;
+using Portiforce.SAA.Application.Interfaces.Guards;
 using Portiforce.SAA.Application.Interfaces.Services.Activity;
 using Portiforce.SAA.Application.Interfaces.Services.Asset;
-using Portiforce.SAA.Application.Result;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Activity.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Factories;
@@ -19,9 +19,9 @@ public sealed class RegisterTradeCommandHandler(
 	IActivityIdempotencyGuard activityIdempotencyGuard,
 	IAssetLookupService assetLookupService,
 	IActivityPersistenceService activityPersistenceService
-) : IRequestHandler<RegisterTradeCommand, CommandResult<ActivityId>>
+) : IRequestHandler<RegisterTradeCommand, TypedResult<ActivityId>>
 {
-	public async ValueTask<CommandResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
+	public async ValueTask<TypedResult<ActivityId>> Handle(RegisterTradeCommand request, CancellationToken ct)
 	{
 		// 0) Validation and preparation
 		ActivityCommandGuards.EnsureFeeConsistency(request.FeeAmount, request.FeeAssetId);

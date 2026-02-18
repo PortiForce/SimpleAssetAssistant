@@ -9,12 +9,13 @@ internal sealed class AuthSessionWriteRepository(AssetAssistantDbContext db) : I
 {
 	public Task AddAsync(AuthSessionToken token, CancellationToken ct)
 	{
-		throw new NotImplementedException();
+		return db.AuthSessionTokens.AddAsync(token, ct).AsTask();
 	}
 
 	public Task UpdateAsync(AuthSessionToken token, CancellationToken ct)
 	{
-		throw new NotImplementedException();
+		db.AuthSessionTokens.Update(token);
+		return Task.CompletedTask;
 	}
 
 	public Task RevokeAllForUserAsync(AccountId accountId, CancellationToken ct)

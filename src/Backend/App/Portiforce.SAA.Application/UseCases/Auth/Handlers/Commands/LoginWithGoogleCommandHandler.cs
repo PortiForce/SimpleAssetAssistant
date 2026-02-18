@@ -125,7 +125,7 @@ public sealed class LoginWithGoogleCommandHandler(
 
 				if (accountListItem.State == AccountState.PendingActivation)
 				{
-					await tenantLimitsService.EnsureTenantCanInviteOrActivateUserAsync(tenantSummary, ct);
+					await tenantLimitsService.EnsureTenantInvitesAndAccountLimitsAsync(tenantSummary, ct);
 
 					// todo: handle change via domain model?
 					// targetAccount.State = AccountState.Active; 

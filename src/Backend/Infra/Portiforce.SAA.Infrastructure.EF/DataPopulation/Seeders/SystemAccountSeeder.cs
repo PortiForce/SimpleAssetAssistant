@@ -8,7 +8,7 @@ using Portiforce.SAA.Infrastructure.Configuration.Platform;
 
 namespace Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
 
-public class PlatformAccountSeeder(IOptions<PlatformUsers> platformUsersOptions)
+public class SystemAccountSeeder(IOptions<PlatformUsers> platformUsersOptions)
 {
 	private readonly PlatformUsers _config = platformUsersOptions.Value;
 

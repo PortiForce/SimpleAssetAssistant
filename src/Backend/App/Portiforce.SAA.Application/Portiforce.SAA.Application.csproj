@@ -7,32 +7,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\Persistence\ActivityLeg\**" />
+    <Compile Remove="UseCases\ActivityLeg\**" />
+    <Compile Remove="UseCases\Auth\Handlers\Queries\**" />
     <Compile Remove="UseCases\Client\NewFolder\**" />
     <Compile Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <Compile Remove="UseCases\Client\Tenant\Handlers\**" />
+    <Compile Remove="UseCases\PlatformAccount\Handlers\**" />
+    <EmbeddedResource Remove="Interfaces\Persistence\ActivityLeg\**" />
+    <EmbeddedResource Remove="UseCases\ActivityLeg\**" />
+    <EmbeddedResource Remove="UseCases\Auth\Handlers\Queries\**" />
     <EmbeddedResource Remove="UseCases\Client\NewFolder\**" />
     <EmbeddedResource Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Client\Tenant\Handlers\**" />
+    <EmbeddedResource Remove="UseCases\PlatformAccount\Handlers\**" />
+    <None Remove="Interfaces\Persistence\ActivityLeg\**" />
+    <None Remove="UseCases\ActivityLeg\**" />
+    <None Remove="UseCases\Auth\Handlers\Queries\**" />
     <None Remove="UseCases\Client\NewFolder\**" />
     <None Remove="UseCases\Client\Tenant\Actions\NewFolder\**" />
+    <None Remove="UseCases\Client\Tenant\Handlers\**" />
+    <None Remove="UseCases\PlatformAccount\Handlers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\Persistence\ActivityLeg\" />
     <Folder Include="Tech\Common\" />
-    <Folder Include="UseCases\ActivityLeg\Actions\Commands\" />
-    <Folder Include="UseCases\ActivityLeg\Actions\Queries\" />
-    <Folder Include="UseCases\ActivityLeg\Handlers\Commands\" />
-    <Folder Include="UseCases\ActivityLeg\Handlers\Queries\" />
-    <Folder Include="UseCases\ActivityLeg\Handlers\" />
-    <Folder Include="UseCases\ActivityLeg\Projections\" />
-    <Folder Include="UseCases\Auth\Handlers\Queries\" />
-    <Folder Include="UseCases\Client\Tenant\Handlers\Commands\" />
-    <Folder Include="UseCases\Client\Tenant\Handlers\Queries\" />
-    <Folder Include="UseCases\PlatformAccount\Handlers\Commands\" />
-    <Folder Include="UseCases\PlatformAccount\Handlers\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>

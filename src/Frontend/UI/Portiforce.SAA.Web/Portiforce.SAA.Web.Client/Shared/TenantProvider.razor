@@ -1,0 +1,37 @@
+﻿@using Portiforce.SAA.Contracts.Models.Client
+@inject NavigationManager Nav
+
+<CascadingValue Value="Tenant">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private TenantInfo Tenant = new();
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Nav.Uri);
+        var host = uri.Host;
+
+        // todo tech: baseDomain = dev.localhost (read from config later)
+        const string baseDomain = "dev.localhost";
+        var suffix = "." + baseDomain;
+
+        if (string.Equals(host, baseDomain, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(host, "www." + baseDomain, StringComparison.OrdinalIgnoreCase))
+        {
+            Tenant.IsLanding = true;
+            Tenant.Prefix = null;
+            return;
+        }
+
+        if (host.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+        {
+            Tenant.IsLanding = false;
+            Tenant.Prefix = host[..^suffix.Length];
+            if (Tenant.Prefix.Contains('.')) Tenant.Prefix = null;
+        }
+    }
+}

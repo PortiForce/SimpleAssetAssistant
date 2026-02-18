@@ -4,8 +4,10 @@ using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Identity.Models.Auth;
 using Portiforce.SAA.Core.Identity.Models.Client;
+using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Identity.Models.Profile;
 using Portiforce.SAA.Infrastructure.EF.Configuration;
+using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Auth;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Core;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Ledger;
@@ -34,6 +36,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 	public DbSet<PasskeyCredential> PasskeyCredentials => Set<PasskeyCredential>();
 	public DbSet<AuthSessionToken> AuthSessionTokens => Set<AuthSessionToken>();
 
+	// Functionality
+	public DbSet<TenantInvite> Invites => Set<TenantInvite>();
+
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
@@ -50,7 +55,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.HasDefaultSchema(DbConstants.Domain.Entities.DefaultSchemaName);
+		modelBuilder.HasDefaultSchema(DbConstants.Domain.Entities.DefaultSchema.SchemaName);
 
 		// Core
 		modelBuilder.ApplyConfiguration(new TenantConfiguration());
@@ -72,6 +77,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		modelBuilder.ApplyConfiguration(new ExternalIdentityConfiguration());
 		modelBuilder.ApplyConfiguration(new PasskeyCredentialConfiguration());
 		modelBuilder.ApplyConfiguration(new AuthSessionTokenConfiguration());
+
+		// flow
+		modelBuilder.ApplyConfiguration(new TenantInviteConfiguration());
 
 		// relationships
 		ConfigureRelationships(modelBuilder);
@@ -133,7 +141,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.HasOne<Account>()
 			.WithMany() // Account doesn't need a list of these
 			.HasForeignKey(x => x.AccountId)
-			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the Provuder link
+			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove the Provider link
 
 		modelBuilder.Entity<ExternalIdentity>()
 			.HasOne<Tenant>()
@@ -161,5 +169,26 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany() // Tenant doesn't need a list of these
 			.HasForeignKey(x => x.TenantId)
 			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove the AuthSessionTokens link
+
+		// Tenant -> Invites
+		modelBuilder.Entity<TenantInvite>()
+			.HasOne<Tenant>()
+			.WithMany()
+			.HasForeignKey(pa => pa.TenantId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		// Account (who sent invite) -> Invite (same account can send many invites)
+		modelBuilder.Entity<TenantInvite>()
+			.HasOne<Account>()
+			.WithMany()
+			.HasForeignKey(x => x.InvitedByAccountId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		// Account (who accepted invite) -> Invite
+		modelBuilder.Entity<TenantInvite>()
+			.HasOne<Account>()
+			.WithMany()
+			.HasForeignKey(x => x.AcceptedAccountId)
+			.OnDelete(DeleteBehavior.Restrict);
 	}
 }

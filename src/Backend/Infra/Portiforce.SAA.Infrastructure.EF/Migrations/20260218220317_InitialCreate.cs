@@ -21,6 +21,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
             migrationBuilder.EnsureSchema(
                 name: "auth");
 
+            migrationBuilder.EnsureSchema(
+                name: "pf");
+
             migrationBuilder.CreateTable(
                 name: "Assets",
                 schema: "core",
@@ -90,7 +93,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Alias = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Alias = table.Column<string>(type: "nvarchar(105)", maxLength: 105, nullable: false),
                     Role = table.Column<byte>(type: "tinyint", nullable: false),
                     State = table.Column<byte>(type: "tinyint", nullable: false),
                     Tier = table.Column<byte>(type: "tinyint", nullable: false),
@@ -187,6 +190,56 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Invites",
+                schema: "pf",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    InvitedByAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IntendedRole = table.Column<int>(type: "int", nullable: false),
+                    IntendedTier = table.Column<int>(type: "int", nullable: false),
+                    TokenHash = table.Column<byte[]>(type: "varbinary(32)", fixedLength: true, maxLength: 32, nullable: false),
+                    State = table.Column<int>(type: "int", nullable: false),
+                    CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ExpiresAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    SentAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    SendCount = table.Column<int>(type: "int", nullable: false),
+                    AcceptedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    AcceptedAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RevokedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    RevokedByAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    InviteTargetType = table.Column<int>(type: "int", nullable: false),
+                    InviteTargetValue = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invites", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invites_Accounts_AcceptedAccountId",
+                        column: x => x.AcceptedAccountId,
+                        principalSchema: "core",
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Invites_Accounts_InvitedByAccountId",
+                        column: x => x.InvitedByAccountId,
+                        principalSchema: "core",
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Invites_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "core",
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PassKeyCredentials",
                 schema: "auth",
                 columns: table => new
@@ -223,8 +276,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     PlatformId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     State = table.Column<byte>(type: "tinyint", nullable: false),
-                    ExternalAccountId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ExternalUserId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ExternalAccountId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ExternalUserId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
@@ -262,7 +315,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TokenHash = table.Column<byte[]>(type: "varbinary(32)", nullable: false),
+                    TokenHash = table.Column<byte[]>(type: "varbinary(32)", fixedLength: true, maxLength: 32, nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedByIp = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: true),
@@ -302,10 +355,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     PlatformAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Kind = table.Column<byte>(type: "tinyint", nullable: false),
                     OccurredAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    ExternalId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Fingerprint = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ExternalId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Fingerprint = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ExternalNotes = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ExternalSource = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExternalSource = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Reason = table.Column<byte>(type: "tinyint", nullable: true),
                     ExchangeType = table.Column<byte>(type: "tinyint", nullable: true),
                     CompletionType = table.Column<byte>(type: "tinyint", nullable: true),
@@ -319,8 +372,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     Futures_PositionEffect = table.Column<byte>(type: "tinyint", nullable: true),
                     TransferKind = table.Column<byte>(type: "tinyint", nullable: true),
                     Direction = table.Column<byte>(type: "tinyint", nullable: true),
-                    Reference = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Counterparty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    Reference = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Counterparty = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -428,6 +481,36 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                 table: "ExternalIdentities",
                 columns: new[] { "Provider", "ProviderSubject" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invite_State",
+                schema: "pf",
+                table: "Invites",
+                column: "State");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invite_TenantId",
+                schema: "pf",
+                table: "Invites",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invite_TenantId_State_ExpiresAt",
+                schema: "pf",
+                table: "Invites",
+                columns: new[] { "TenantId", "State", "ExpiresAtUtc" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invites_AcceptedAccountId",
+                schema: "pf",
+                table: "Invites",
+                column: "AcceptedAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invites_InvitedByAccountId",
+                schema: "pf",
+                table: "Invites",
+                column: "InvitedByAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PassKeyCredentials_AccountId",
@@ -551,12 +634,18 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                 unique: true,
                 filter: "[DomainPrefix] IS NOT NULL");
 
-            // MANUALLY ADD THIS BLOCK AT THE END OF Up():
             migrationBuilder.CreateIndex(
 	            name: "UX_Account_Tenant_ContactEmail",
 	            schema: DbConstants.Domain.Entities.CoreSchema.SchemaName,
 	            table: DbConstants.Domain.Entities.CoreSchema.AccountTableName,
 	            columns: new[] { "TenantId", "ContactEmail" },
+	            unique: true);
+
+            migrationBuilder.CreateIndex(
+	            name: "UX_Invite_Tenant_InviteTarger",
+	            schema: DbConstants.Domain.Entities.DefaultSchema.SchemaName,
+	            table: DbConstants.Domain.Entities.DefaultSchema.InviteTableName,
+	            columns: new[] { "TenantId", "InviteTargetValue" },
 	            unique: true);
 
             migrationBuilder.CreateIndex(
@@ -587,6 +676,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
             migrationBuilder.DropTable(
                 name: "ExternalIdentities",
                 schema: "auth");
+
+            migrationBuilder.DropTable(
+                name: "Invites",
+                schema: "pf");
 
             migrationBuilder.DropTable(
                 name: "PassKeyCredentials",

@@ -1,4 +1,6 @@
 ﻿
+using System.Reflection.Metadata;
+
 namespace Portiforce.SAA.Infrastructure.EF.Configuration;
 
 internal static class DbConstants
@@ -16,8 +18,6 @@ internal static class DbConstants
 	{
 		public static class Entities
 		{
-			public const string DefaultSchemaName = "pf";
-
 			public static class CoreSchema
 			{
 				public const string SchemaName = "core";
@@ -48,6 +48,13 @@ internal static class DbConstants
 				public const string ExternalIdentityTableName = "ExternalIdentities";
 				public const string PasskeyCredentialsTableName = "PassKeyCredentials";
 				public const string SessionTokenTableName = "SessionTokens";
+			}
+
+			public static class DefaultSchema
+			{
+				public const string SchemaName = "pf";
+
+				public const string InviteTableName = "Invites";
 			}
 		}
 	}

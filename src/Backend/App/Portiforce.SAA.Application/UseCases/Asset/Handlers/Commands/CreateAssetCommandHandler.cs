@@ -1,7 +1,7 @@
 ﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
-using Portiforce.SAA.Application.Result;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Asset.Actions.Commands;
 using Portiforce.SAA.Core.Assets.Enums;
@@ -13,9 +13,9 @@ public sealed class CreateAssetCommandHandler(
 	IAssetReadRepository assetReadRepository,
 	IAssetWriteRepository assetWriteRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<CreateAssetCommand, CommandResult<AssetId>>
+) : IRequestHandler<CreateAssetCommand, TypedResult<AssetId>>
 {
-	public async ValueTask<CommandResult<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
+	public async ValueTask<TypedResult<AssetId>> Handle(CreateAssetCommand request, CancellationToken ct)
 	{
 		// 1. Validate Business Rules (Uniqueness)
 		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
@@ -49,10 +49,6 @@ public sealed class CreateAssetCommandHandler(
 		}
 
 		// 6. Response
-		return new CommandResult<AssetId>
-		{
-			Id = asset.Id,
-			Message = "Asset created successfully."
-		};
+		return TypedResult<AssetId>.Ok(asset.Id);
 	}
 }

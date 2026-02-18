@@ -46,6 +46,16 @@ public class JwtTokenGenerator : ITokenGenerator
 
 	public string GenerateRefreshToken()
 	{
+		return GenerateRandomToken();
+	}
+
+	public string GenerateInviteToken()
+	{
+		return GenerateRandomToken();
+	}
+
+	private string GenerateRandomToken()
+	{
 		Span<byte> bytes = stackalloc byte[32];
 		RandomNumberGenerator.Fill(bytes);
 		return WebEncoders.Base64UrlEncode(bytes);

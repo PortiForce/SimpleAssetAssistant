@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Portiforce.SAA.Api.Contracts.Activity.Mappers;
 using Portiforce.SAA.Api.Contracts.Activity.Requests.Activity;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Result;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Activity.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Activity.Actions.Queries;
@@ -22,11 +22,11 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 	// 1. add other atomic actions: transfer, income, adjustment, etc
 
 	[HttpPost("trades")]
-	[ProducesResponseType(typeof(CommandResult<ActivityId>), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(TypedResult<ActivityId>), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-	public async Task<ActionResult<CommandResult<ActivityId>>> RegisterTrade(
+	public async Task<ActionResult<TypedResult<ActivityId>>> RegisterTrade(
 		[FromServices] ICurrentUser currentUser,
 		[FromBody] RegisterTradeRequest request,
 		CancellationToken ct)
@@ -37,25 +37,25 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 		}
 
 		RegisterTradeCommand cmd = request.ToCommand(currentUser.Id, currentUser.TenantId);
-		CommandResult<ActivityId> result = await mediator.Send(cmd, ct);
+		TypedResult<ActivityId> result = await mediator.Send(cmd, ct);
 
-		if (result.Id.IsEmpty)
+		if (result.Value.IsEmpty)
 		{
-			throw new InvalidOperationException("CommandResult.Id was null for successful RegisterTrade.");
+			throw new InvalidOperationException("TypedResult.Id was null for successful RegisterTrade.");
 		}
 
 		return CreatedAtAction(
 			actionName: nameof(GetById),
-			routeValues: new { id = result.Id.Value },
+			routeValues: new { id = result.Value.Value },
 			value: result);
 	}
 
 	[HttpPost("exchanges")]
-	[ProducesResponseType(typeof(CommandResult<ActivityId>), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(TypedResult<ActivityId>), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-	public async Task<ActionResult<CommandResult<ActivityId>>> RegisterExchange(
+	public async Task<ActionResult<TypedResult<ActivityId>>> RegisterExchange(
 		[FromServices] ICurrentUser currentUser,
 		[FromBody] RegisterExchangeRequest request,
 		CancellationToken ct)
@@ -66,16 +66,16 @@ public sealed class ActivitiesController(IMediator mediator) : ControllerBase
 		}
 
 		RegisterExchangeCommand cmd = request.ToCommand(currentUser.Id, currentUser.TenantId);
-		CommandResult<ActivityId> result = await mediator.Send(cmd, ct);
+		TypedResult<ActivityId> result = await mediator.Send(cmd, ct);
 
-		if (result.Id.IsEmpty)
+		if (result.Value.IsEmpty)
 		{
-			throw new InvalidOperationException("CommandResult.Id was null for successful RegisterExchange.");
+			throw new InvalidOperationException("TypedResult.Id was null for successful RegisterExchange.");
 		}
 
 		return CreatedAtAction(
 			actionName: nameof(GetById),
-			routeValues: new { id = result.Id.Value },
+			routeValues: new { id = result.Value.Value },
 			value: result);
 	}
 

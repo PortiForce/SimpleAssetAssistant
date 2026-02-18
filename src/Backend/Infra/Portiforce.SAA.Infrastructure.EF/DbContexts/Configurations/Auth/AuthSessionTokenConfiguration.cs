@@ -29,6 +29,8 @@ public sealed class AuthSessionTokenConfiguration : IEntityTypeConfiguration<Aut
 			.IsRequired();
 
 		builder.Property(x => x.TokenHash)
+			.HasMaxLength(32)
+			.IsFixedLength()
 			.IsRequired()
 			.HasColumnType(DbConstants.CommonSettings.Varbinary32DataType);
 

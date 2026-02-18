@@ -25,4 +25,16 @@ public sealed class TokenHashingService : IHashingService
 
 		return hash;
 	}
+
+	public byte[] HashInviteToken(string rawValue)
+	{
+		if (string.IsNullOrWhiteSpace(rawValue))
+		{
+			throw new ArgumentException("Token is required.", nameof(rawValue));
+		}
+
+		var hash = SHA256.HashData(Encoding.UTF8.GetBytes(rawValue));
+
+		return hash;
+	}
 }

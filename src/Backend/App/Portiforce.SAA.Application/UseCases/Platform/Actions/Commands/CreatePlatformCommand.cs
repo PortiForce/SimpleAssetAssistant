@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -9,4 +9,4 @@ public sealed record CreatePlatformCommand(
 	string Name,
 	string Code,
 	PlatformKind Kind 
-) : ICommand<CommandResult<PlatformId>>;
+) : ICommand<TypedResult<PlatformId>>;

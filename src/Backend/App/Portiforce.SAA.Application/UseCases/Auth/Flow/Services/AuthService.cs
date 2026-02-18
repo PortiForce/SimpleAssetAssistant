@@ -65,7 +65,7 @@ internal sealed class AuthService(
 		var newRawRefresh = tokenGenerator.GenerateRefreshToken();
 		var newTokenHash = hashingService.HashRefreshToken(newRawRefresh);
 
-		var expiresAt = now.AddHours( /* from settings */ 168);
+		var expiresAt = now.AddHours( /*todo tech: from settings */ 168);
 
 		var newEntity = AuthSessionToken.Create(
 			tenantId,

@@ -1,5 +1,6 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.UseCases.Profile.Result;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -7,7 +8,7 @@ using Portiforce.SAA.Core.Primitives.Ids;
 namespace Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Commands;
 
 /// <summary>
-/// Invite user flow
+/// Create account flow
 /// </summary>
 /// <param name="TenantId"></param>
 /// <param name="Email"></param>
@@ -20,4 +21,4 @@ public sealed record CreateAccountCommand(
 	string Alias,
 	Role Role,
 	AccountTier Tier
-) : ICommand<CommandResult<AccountId>>;
+) : ICommand<TypedResult<CreateAccountResult>>;

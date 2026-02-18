@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+
 using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
@@ -26,39 +28,28 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 			x.State
 		);
 
+	private static Expression<Func<Account, AccountDetails>> DetailsSelector =>
+	x => new AccountDetails(
+
+			x.TenantId,
+			x.Id,
+			x.Alias,
+			x.Contact.Email.Value,
+			x.Tier,
+			x.State,
+			x.Role,
+			x.Contact);
+
 	public async Task<AccountDetails?> GetByIdAsync(AccountId id, CancellationToken ct)
 	{
 		// using anonymous projection to fetch only needed columns before hydrating the heavy Domain DTO.
 		var data = await db.Accounts
 			.AsNoTracking()
 			.Where(x => x.Id == id)
-			.Select(x => new
-			{
-				x.TenantId,
-				x.Id,
-				x.Alias,
-				Email = x.Contact.Email.Value,
-				x.Tier,
-				x.State,
-				x.Role,
-				x.Contact
-			})
+			.Select(DetailsSelector)
 			.SingleOrDefaultAsync(ct);
 
-		if (data is null)
-		{
-			return null;
-		}
-
-		return new AccountDetails(
-			data.TenantId,
-			data.Id,
-			data.Alias,
-			data.Email,
-			data.Tier,
-			data.State,
-			data.Role,
-			data.Contact);
+		return data;
 	}
 
 	public async Task<PagedResult<AccountListItem>> GetByTenantIdAsync(
@@ -73,10 +64,10 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 		int totalCount = await query.CountAsync(ct);
 
 		List<AccountListItem> items = await query
-			.OrderBy(x => x.Alias) 
+			.OrderBy(x => x.Alias)
 			.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
 			.Take(pageRequest.PageSize)
-			.Select(ListItemSelector) 
+			.Select(ListItemSelector)
 			.ToListAsync(ct);
 
 		return new PagedResult<AccountListItem>(
@@ -87,51 +78,28 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 	}
 
 	public async Task<AccountDetails?> GetByEmailAndTenantAsync(
-		Email googleUserEmail,
+		Email email,
 		TenantId requestTenantId,
 		CancellationToken ct)
 	{
 		var data = await db.Accounts
 			.AsNoTracking()
 			.Where(x =>
-				x.Contact.Email == googleUserEmail &&
+				x.Contact.Email == email &&
 				x.TenantId == requestTenantId)
-			.Select(x => new
-			{
-				x.TenantId,
-				x.Id,
-				x.Alias,
-				Email = x.Contact.Email.Value,
-				x.Tier,
-				x.State,
-				x.Role,
-				x.Contact
-			})
+			.Select(DetailsSelector)
 			.SingleOrDefaultAsync(ct);
 
-		if (data is null)
-		{
-			return null;
-		}
-
-		return new AccountDetails(
-			data.TenantId,
-			data.Id,
-			data.Alias,
-			data.Email,
-			data.Tier,
-			data.State,
-			data.Role,
-			data.Contact);
+		return data;
 	}
 
-	
+
 	public async Task<List<AccountListItem>> GetByEmailAsync(Email email, CancellationToken ct)
 	{
 		return await db.Accounts
 			.AsNoTracking()
 			.Where(x => x.Contact.Email == email)
-			.Select(ListItemSelector) 
+			.Select(ListItemSelector)
 			.ToListAsync(ct);
 	}
 
@@ -148,8 +116,8 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 		// using anonymous projection to fetch only needed columns before hydrating the heavy Domain DTO.
 		var data = await db.Accounts
 			.AsNoTracking()
-			.Where(x => x.Id == accountId 
-			            && x.TenantId == tenantId)
+			.Where(x => x.Id == accountId
+						&& x.TenantId == tenantId)
 			.Select(x => new
 			{
 				x.TenantId,

@@ -1,7 +1,7 @@
 ﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
-using Portiforce.SAA.Application.Result;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Platform.Actions.Commands;
 using Portiforce.SAA.Core.Assets.Enums;
@@ -13,9 +13,9 @@ public sealed class CreatePlatformCommandHandler(
 	IPlatformReadRepository platformReadRepository,
 	IPlatformWriteRepository platformWriteRepository,
 	IUnitOfWork unitOfWork
-) : IRequestHandler<CreatePlatformCommand, CommandResult<PlatformId>>
+) : IRequestHandler<CreatePlatformCommand, TypedResult<PlatformId>>
 {
-	public async ValueTask<CommandResult<PlatformId>> Handle(CreatePlatformCommand request, CancellationToken ct)
+	public async ValueTask<TypedResult<PlatformId>> Handle(CreatePlatformCommand request, CancellationToken ct)
 	{
 		// 1. Validate Business Rules (Uniqueness)
 		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
@@ -48,10 +48,6 @@ public sealed class CreatePlatformCommandHandler(
 		}
 
 		// 6. Response
-		return new CommandResult<PlatformId>
-		{
-			Id = platform.Id,
-			Message = "Platform created successfully."
-		};
+		return TypedResult<PlatformId>.Ok(platform.Id);
 	}
 }

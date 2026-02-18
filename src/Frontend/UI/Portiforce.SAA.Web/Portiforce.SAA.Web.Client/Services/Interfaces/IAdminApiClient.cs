@@ -1,8 +1,8 @@
-﻿using Portiforce.SAA.Contracts.User.Requests;
+﻿using Portiforce.SAA.Contracts.Models.Invite;
 
 namespace Portiforce.SAA.Web.Client.Services.Interfaces;
 
 public interface IAdminApiClient
 {
-	Task InviteUserAsync(InviteUserRequest request);
+	Task InviteUserAsync(CreateInviteRequest request);
 }

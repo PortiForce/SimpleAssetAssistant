@@ -1,51 +1,65 @@
 ﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 using Portiforce.SAA.Application.Interfaces.Services.Activity;
-using Portiforce.SAA.Application.Result;
-using Portiforce.SAA.Core.Activities.Enums;
 using Portiforce.SAA.Core.Activities.Models.Activities;
 using Portiforce.SAA.Core.Primitives.Ids;
-
-namespace Portiforce.SAA.Application.UseCases.Activity.Flow.Services;
 
 internal sealed class ActivityPersistenceService(
 	IActivityWriteRepository activityWriteRepository,
 	IUnitOfWork unitOfWork) : IActivityPersistenceService
 {
-	public async Task<CommandResult<ActivityId>> PersistNewAsync(
+	public async Task<TypedResult<ActivityId>> PersistNewAsync(
 		AssetActivityBase activity,
 		string extPrimaryId,
 		CancellationToken ct)
 	{
-		if (activity == null)
+		if (activity.TenantId == TenantId.Empty)
 		{
-			throw new ArgumentNullException(nameof(activity));
+			return TypedResult<ActivityId>.Fail(ResultError.Validation("TenantId is required."));
 		}
 
-		AssetActivityKind activityKind = activity.Kind;
+		if (activity.PlatformAccountId == PlatformAccountId.Empty)
+		{
+			return TypedResult<ActivityId>.Fail(ResultError.Validation("Platform Account is required."));
+		}
 
-		int affectedRows = 0;
+		if (string.IsNullOrWhiteSpace(extPrimaryId))
+		{
+			return TypedResult<ActivityId>.Fail(ResultError.Validation("extPrimaryId is required."));
+		}
+
+		var activityKind = activity.Kind;
+
 		try
 		{
-			// Persist : do not forget about race conditions here, as activity might be already added
 			await activityWriteRepository.AddAsync(activity, ct);
-			affectedRows = await unitOfWork.SaveChangesAsync(ct);
+			var affectedRows = await unitOfWork.SaveChangesAsync(ct);
+
+			if (affectedRows <= 0)
+			{
+				// Treat as persistence failure; conflict is arguable, but keep it simple.
+				return TypedResult<ActivityId>.Fail(ResultError.Conflict(
+					$"No changes were persisted for {activityKind} (possible concurrency issue). Id: {extPrimaryId}",
+					details: new Dictionary<string, object?>
+					{
+						["kind"] = activityKind.ToString(),
+						["extPrimaryId"] = extPrimaryId
+					}));
+			}
+
+			return TypedResult<ActivityId>.Ok(activity.Id);
 		}
 		catch (UniqueConstraintViolationException)
 		{
-			throw new ConflictException($"{activityKind} activity already exists. Id: {extPrimaryId}");
+			return TypedResult<ActivityId>.Fail(ResultError.Conflict(
+				$"{activityKind} activity already exists. Id: {extPrimaryId}",
+				details: new Dictionary<string, object?>
+				{
+					["kind"] = activityKind.ToString(),
+					["extPrimaryId"] = extPrimaryId
+				}));
 		}
-
-		if (affectedRows == 0)
-		{
-			throw new ConflictException($"No changes were persisted (possible concurrency issue). {activityKind} activity Id: {extPrimaryId}");
-		}
-
-		return new CommandResult<ActivityId>
-		{
-			Id = activity.Id,
-			Message = $"{activityKind} registered successfully"
-		};
 	}
 }

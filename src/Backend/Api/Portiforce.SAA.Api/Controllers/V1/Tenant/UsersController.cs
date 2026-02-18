@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Portiforce.SAA.Api.Contracts.Client.Tenant.Requests;
 using Portiforce.SAA.Api.Contracts.Profile.Account.Mappers;
 using Portiforce.SAA.Api.Contracts.Profile.Account.Requests;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Result;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
+using Portiforce.SAA.Application.UseCases.Profile.Result;
 using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Api.Controllers.V1.Tenant;
@@ -20,12 +21,9 @@ namespace Portiforce.SAA.Api.Controllers.V1.Tenant;
 public sealed class UsersController(
 	IMediator mediator) : ControllerBase
 {
-	// todo: 
-	// 1 change user's plan and State (only for TenantAdmin)
-
 	[HttpPost]
 	[Authorize(Policy = "RequireTenantAdmin")]
-	[ProducesResponseType(typeof(CommandResult<AccountId>), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(TypedResult<AccountId>), StatusCodes.Status201Created)]
 	[ProducesResponseType(StatusCodes.Status409Conflict)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<IActionResult> InviteUser(
@@ -35,15 +33,19 @@ public sealed class UsersController(
 	{
 		CreateAccountCommand createAccountCommand = request.ToCommand(currentUser.TenantId);
 
-		CommandResult<AccountId> result = await mediator.Send(createAccountCommand, ct);
-
-		return CreatedAtAction(
-			nameof(GetById),
-			new
-			{
-				userId = result.Id.Value
-			},
-			result);
+		TypedResult<CreateAccountResult> result = await mediator.Send(createAccountCommand, ct);
+		if (result.IsSuccess)
+		{
+			return CreatedAtAction(
+				nameof(GetById),
+				new
+				{
+					userId = result.Value.AccountId.Value
+				},
+				result);
+		}
+		return Ok(result);
+		
 	}
 
 	[HttpGet]

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -10,4 +10,4 @@ public sealed record AddPlatformAccountCommand(
 	PlatformId PlatformId,
 	string AccountName,
 	string? ExternalUserId
-) : ICommand<CommandResult<PlatformAccountId>>;
+) : ICommand<TypedResult<PlatformAccountId>>;

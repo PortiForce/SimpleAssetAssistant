@@ -1,39 +1,72 @@
-﻿namespace Portiforce.SAA.Web.Middleware;
+﻿using Microsoft.Extensions.Options;
+using Portiforce.SAA.Contracts.Models.Client;
+using Portiforce.SAA.Contracts.Services;
+using Portiforce.SAA.Web.Security;
+using Portiforce.SAA.Web.Services;
 
-public sealed class TenantResolutionMiddleware(RequestDelegate next, IConfiguration config)
+namespace Portiforce.SAA.Web.Middleware;
+
+public sealed class TenantResolutionMiddleware
 {
-	// Defined in appsettings: "BaseDomain": "dev.localhost"
-	private readonly string _baseDomain = config["Tenancy:BaseDomain"] ?? "dev.localhost";
+	private readonly RequestDelegate _next;
+	private readonly TenancyOptions _options;
 
-	public async Task InvokeAsync(HttpContext context)
+	public TenantResolutionMiddleware(RequestDelegate next, IOptions<TenancyOptions> options)
+	{
+		_next = next;
+		_options = options.Value;
+	}
+
+	public async Task InvokeAsync(HttpContext context, TenantContext tenantContext, ITenantResolver tenantResolver)
 	{
 		var host = context.Request.Host.Host;
 
-		// 1. Check for Landing Page (Root Domain)
-		if (host.Equals(_baseDomain, StringComparison.OrdinalIgnoreCase) ||
-		    host.Equals($"www.{_baseDomain}", StringComparison.OrdinalIgnoreCase))
+		// 1) Landing host (no tenant)
+		if (string.Equals(host, _options.BaseDomain, StringComparison.OrdinalIgnoreCase) ||
+			string.Equals(host, $"www.{_options.BaseDomain}", StringComparison.OrdinalIgnoreCase))
 		{
-			// No tenant context. Proceed as "Landing Page".
-			await next(context);
+			tenantContext.IsLanding = true;
+			tenantContext.Prefix = null;
+			tenantContext.TenantId = null;
+
+			await _next(context);
 			return;
 		}
 
-		// 2. Check for Subdomain
-		if (host.EndsWith($".{_baseDomain}", StringComparison.OrdinalIgnoreCase))
+		// 2) Tenant host: {prefix}.{BaseDomain}
+		var suffix = "." + _options.BaseDomain;
+		if (host.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
 		{
-			// Extract "app" from "app.dev.localhost"
-			var prefix = host.Substring(0, host.Length - _baseDomain.Length - 1);
+			var prefix = host[..^suffix.Length];
 
-			// TODO: Validate against DB cache here (Phase 2)
-			// For now, valid format = valid tenant
-			context.Items["TenantPrefix"] = prefix;
+			// Basic prefix validation (no nested subdomains)
+			if (string.IsNullOrWhiteSpace(prefix) || prefix.Contains('.'))
+			{
+				context.Response.StatusCode = StatusCodes.Status400BadRequest;
+				await context.Response.WriteAsync("Invalid tenant prefix.");
+				return;
+			}
 
-			await next(context);
+			tenantContext.IsLanding = false;
+			tenantContext.Prefix = prefix;
+
+			TenantResolution? resolved = await tenantResolver.ResolveByPrefixAsync(prefix, context.RequestAborted);
+			if (resolved is null)
+			{
+				context.Response.StatusCode = StatusCodes.Status404NotFound;
+				await context.Response.WriteAsync("Unknown tenant.");
+				return;
+			}
+
+			tenantContext.TenantId = resolved.TenantId;
+			tenantContext.PublicName = resolved.Name;
+
+			await _next(context);
 			return;
 		}
 
-		// 3. Invalid Host (e.g. random IP access)
-		context.Response.StatusCode = 404;
-		await context.Response.WriteAsync("Unknown Tenant Host");
+		// 3) Invalid host for this environment
+		context.Response.StatusCode = StatusCodes.Status404NotFound;
+		await context.Response.WriteAsync("Unknown tenant host.");
 	}
 }

@@ -10,4 +10,6 @@ public interface ITokenGenerator
 	string GenerateAccessToken(IAccountInfo accountInfo);
 
 	string GenerateRefreshToken();
+
+	string GenerateInviteToken();
 }

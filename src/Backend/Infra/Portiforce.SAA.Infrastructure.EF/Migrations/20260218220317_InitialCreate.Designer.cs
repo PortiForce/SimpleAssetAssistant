@@ -13,7 +13,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 namespace Portiforce.SAA.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260209204843_InitialCreate")]
+    [Migration("20260218220317_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,7 +22,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("pf")
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -49,13 +49,13 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                             b1.IsRequired();
 
                             b1.Property<string>("ExternalId")
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
                                 .HasColumnName("ExternalId");
 
                             b1.Property<string>("Fingerprint")
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
                                 .HasColumnName("Fingerprint");
 
                             b1.Property<string>("Notes")
@@ -65,8 +65,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                             b1.Property<string>("Source")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
                                 .HasColumnName("ExternalSource");
                         });
 
@@ -217,12 +217,12 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ExternalAccountId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("ExternalUserId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<Guid>("PlatformId")
                         .HasColumnType("uniqueidentifier");
@@ -300,7 +300,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                     b.Property<byte[]>("TokenHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(32)");
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)")
+                        .IsFixedLength();
 
                     b.Property<string>("UserAgentFingerprint")
                         .HasMaxLength(32)
@@ -543,6 +545,94 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.ToTable("TenantRestrictedPlatforms", "core");
                 });
 
+            modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Invite.TenantInvite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AcceptedAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("AcceptedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("IntendedRole")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IntendedTier")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("InvitedByAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("RevokedByAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("SendCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("SentAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)")
+                        .IsFixedLength();
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "InviteTarget", "Portiforce.SAA.Core.Identity.Models.Invite.TenantInvite.InviteTarget#InviteTarget", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Type")
+                                .HasColumnType("int")
+                                .HasColumnName("InviteTargetType");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
+                                .HasColumnName("InviteTargetValue");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcceptedAccountId");
+
+                    b.HasIndex("InvitedByAccountId");
+
+                    b.HasIndex("State")
+                        .HasDatabaseName("IX_Invite_State");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Invite_TenantId");
+
+                    b.HasIndex("TenantId", "State", "ExpiresAtUtc")
+                        .HasDatabaseName("IX_Invite_TenantId_State_ExpiresAt");
+
+                    b.ToTable("Invites", "pf");
+                });
+
             modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Profile.Account", b =>
                 {
                     b.Property<Guid>("Id")
@@ -550,8 +640,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                     b.Property<string>("Alias")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(105)
+                        .HasColumnType("nvarchar(105)");
 
                     b.Property<byte>("Role")
                         .HasColumnType("tinyint");
@@ -709,15 +799,15 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
 
                     b.Property<string>("Counterparty")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<byte>("Direction")
                         .HasColumnType("tinyint");
 
                     b.Property<string>("Reference")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<byte>("TransferKind")
                         .HasColumnType("tinyint");
@@ -835,6 +925,26 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .WithMany("RestrictedPlatforms")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Invite.TenantInvite", b =>
+                {
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AcceptedAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedByAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Client.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Result;
+﻿using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Core.Primitives;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -12,4 +12,4 @@ public sealed record UpdateProfileCommand(
 	Email? BackupEmail,
 	string Locale,
 	string DefaultCurrency
-) : ICommand<CommandResult<AccountId>>;
+) : ICommand<TypedResult<AccountId>>;

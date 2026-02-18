@@ -3,4 +3,6 @@
 public interface IHashingService
 {
 	public byte[] HashRefreshToken(string rawValue);
+
+	public byte[] HashInviteToken(string rawValue);
 }

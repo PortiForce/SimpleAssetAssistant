@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Client;
+using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
 using Portiforce.SAA.Application.Interfaces.Persistence.PlatformAccount;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
@@ -17,6 +19,7 @@ using Portiforce.SAA.Infrastructure.EF.Repositories.Activity;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Asset;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Client;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Platform;
 using Portiforce.SAA.Infrastructure.EF.Repositories.PlatformAccount;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Profile;
@@ -50,11 +53,14 @@ public static class DependencyInjection
 
 		// data seeders:
 		services.AddScoped<DbUserSeeder>();
-		services.AddScoped<PlatformAccountSeeder>();
+		services.AddScoped<SystemAccountSeeder>();
 
 		// Repositories
 		services.AddScoped<ITenantReadRepository, TenantReadRepository>();
 		services.AddScoped<ITenantWriteRepository, TenantWriteRepository>();
+
+		services.AddScoped<IInviteReadRepository, InviteReadRepository>();
+		services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
 
 		services.AddScoped<IAccountReadRepository, AccountReadRepository>();
 		services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();

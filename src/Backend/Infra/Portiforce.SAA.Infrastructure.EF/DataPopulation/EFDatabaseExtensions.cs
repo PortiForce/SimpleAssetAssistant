@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Portiforce.SAA.Core.Assets.Models;
@@ -13,6 +12,8 @@ namespace Portiforce.SAA.Infrastructure.EF.DataPopulation;
 
 public static class EFDatabaseExtensions
 {
+	private const string DefaultRootTenantCode = "PORTIFORCE";
+
 	public static async Task PopulateGlobalDictionariesAndPrepareUserAsync(this WebApplication app)
 	{
 		using var scope = app.Services.CreateScope();
@@ -57,7 +58,7 @@ public static class EFDatabaseExtensions
 				Console.WriteLine("Seeding Tenants.");
 				List<Tenant> tenants = TenantDataSeeder.BuildTenants();
 				dbContext.Tenants.AddRange(tenants);
-				rootTenant = tenants.FirstOrDefault(x => x.Code == "PORTIFORCE");
+				rootTenant = tenants.FirstOrDefault(x => x.Code.ToUpper() == DefaultRootTenantCode);
 
 				await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {tenants.Count} Tenants.");
@@ -65,7 +66,7 @@ public static class EFDatabaseExtensions
 			else
 			{
 				var tenants = dbContext.Tenants;
-				rootTenant = tenants.FirstOrDefault(x => x.Code == "PORTIFORCE");
+				rootTenant = tenants.FirstOrDefault(x => x.Code.ToUpper() == DefaultRootTenantCode);
 			}
 		}
 		catch (Exception ex)
@@ -76,18 +77,17 @@ public static class EFDatabaseExtensions
 			throw;
 		}
 
-		if (rootTenant != null)
+		if (rootTenant != null && !dbContext.Accounts.Any(x => x.TenantId == rootTenant.Id))
 		{
 			try
 			{
-				PlatformAccountSeeder platformAccountsSeeder = services.GetRequiredService<PlatformAccountSeeder>();
+				SystemAccountSeeder platformAccountsSeeder = services.GetRequiredService<SystemAccountSeeder>();
 
 				// create Users (Dynamic credentials!)
 				List<Account> platformUsers = platformAccountsSeeder.BuildPlatformAccounts(rootTenant);
 				dbContext.Accounts.AddRange(platformUsers);
 				await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {platformUsers.Count} Platform Accounts.");
-
 			}
 			catch (Exception ex)
 			{

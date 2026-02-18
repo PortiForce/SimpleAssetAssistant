@@ -14,7 +14,7 @@ public interface IAccountReadRepository : IReadRepository<AccountDetails, Accoun
 		CancellationToken ct);
 
 	Task<AccountDetails?> GetByEmailAndTenantAsync(
-		Email googleUserEmail,
+		Email email,
 		TenantId requestTenantId,
 		CancellationToken ct);
 
