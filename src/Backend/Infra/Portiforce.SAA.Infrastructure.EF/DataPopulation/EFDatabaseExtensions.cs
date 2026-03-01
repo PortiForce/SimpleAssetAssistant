@@ -1,12 +1,19 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+using Portiforce.SAA.Application.Interfaces.Common.Security;
+using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Identity.Models.Client;
+using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Identity.Models.Profile;
+using Portiforce.SAA.Infrastructure.Auth;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders.Internal;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
+using Portiforce.SAA.Infrastructure.Services.Security;
 
 namespace Portiforce.SAA.Infrastructure.EF.DataPopulation;
 
@@ -71,28 +78,55 @@ public static class EFDatabaseExtensions
 		}
 		catch (Exception ex)
 		{
-			// since I in static cotext: resolve logger
-			// var logger = services.GetRequiredService<ILogger<Program>>();
-			// logger.LogError(ex, "Failed to updated global dictionaries");
+			Console.WriteLine($"Failed to updated global dictionaries, ex: {ex}");
 			throw;
 		}
 
+		Account platformSystemAccount;
 		if (rootTenant != null && !dbContext.Accounts.Any(x => x.TenantId == rootTenant.Id))
 		{
 			try
 			{
 				SystemAccountSeeder platformAccountsSeeder = services.GetRequiredService<SystemAccountSeeder>();
 
-				// create Users (Dynamic credentials!)
-				List<Account> platformUsers = platformAccountsSeeder.BuildPlatformAccounts(rootTenant);
-				dbContext.Accounts.AddRange(platformUsers);
+				platformSystemAccount = platformAccountsSeeder.BuildPlatformSystemAccount(rootTenant);
+				dbContext.Accounts.Add(platformSystemAccount);
 				await dbContext.SaveChangesAsync();
-				Console.WriteLine($"Seeded {platformUsers.Count} Platform Accounts.");
+				Console.WriteLine($"Seeded Platform System Account.");
 			}
 			catch (Exception ex)
 			{
-				// since I in static cotext: resolve logger
-				// var logger = services.GetRequiredService<ILogger<Program>>();
+				Console.WriteLine($"Failed to populate platform system account, ex: {ex}");
+				throw;
+			}
+		}
+		else
+		{
+			platformSystemAccount = dbContext.Accounts.Single(x => x.Alias == "SYS" && x.TenantId == rootTenant.Id);
+		}
+
+		if (rootTenant != null && !dbContext.Invites.Any(x => x.TenantId == rootTenant.Id))
+		{
+			try
+			{
+				InviteSeeder platformAccountsSeeder = services.GetRequiredService<InviteSeeder>();
+				JwtTokenGenerator tokenGeneratorService = services.GetRequiredService<JwtTokenGenerator>();
+				TokenHashingService tokenHashingService = services.GetRequiredService<TokenHashingService>();
+
+				// create invites 
+				List<TenantInvite> platformUserInvites = platformAccountsSeeder.BuildPlatformInvites(
+					rootTenant,
+					platformSystemAccount,
+					tokenGeneratorService,
+					tokenHashingService);
+
+				dbContext.Invites.AddRange(platformUserInvites);
+				await dbContext.SaveChangesAsync();
+				Console.WriteLine($"Seeded {platformUserInvites.Count} Platform Invites.");
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Failed to populate accounts, ex: {ex}");
 				throw;
 			}
 		}

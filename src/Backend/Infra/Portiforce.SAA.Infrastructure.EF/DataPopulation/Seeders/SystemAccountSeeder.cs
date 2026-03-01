@@ -12,54 +12,21 @@ public class SystemAccountSeeder(IOptions<PlatformUsers> platformUsersOptions)
 {
 	private readonly PlatformUsers _config = platformUsersOptions.Value;
 
-	public List<Account> BuildPlatformAccounts(Tenant rootTenant)
+	public Account BuildPlatformSystemAccount(Tenant rootTenant)
 	{
-		var platformUsers = new List<Account>();
+		Enum.TryParse(_config.PlatformBackground.Tier, out AccountTier accountTier);
 
-		var platformOwner = BuildPlatformOwner(rootTenant, _config.PlatformOwner);
-		var platformAdmin = BuildPlatformAdmin(rootTenant, _config.PlatformAdmin);
-
-		platformUsers.Add(platformOwner);
-		platformUsers.Add(platformAdmin);
-
-		return platformUsers;
-	}
-
-	private static Account BuildPlatformOwner(Tenant rootTenant, PlatformUser owner)
-	{
-		Enum.TryParse(owner.Tier, out AccountTier accountTier);
-		
 		return Account.Create(
 			rootTenant.Id,
-			owner.Alias,
-			new ContactInfo(Email.Create(owner.Email)),
-			Role.PlatformOwner,
+			_config.PlatformBackground.Alias,
+			new ContactInfo(Email.Create(_config.PlatformBackground.Email)),
+			Role.TenantBackground,
 			AccountState.Active,
 			accountTier,
 			settings: new AccountSettings
 			{
-				DefaultCurrency = FiatCurrency.GBP,
-				Locale = "en-GB",
-				TimeZoneId = "UTC",
-				TwoFactorPreferred = true
-			});
-	}
-
-	private static Account BuildPlatformAdmin(Tenant rootTenant, PlatformUser admin)
-	{
-		Enum.TryParse(admin.Tier, out AccountTier accountTier);
-
-		return Account.Create(
-			rootTenant.Id,
-			admin.Alias,
-			new ContactInfo(Email.Create(admin.Email)),
-			Role.PlatformAdmin,
-			AccountState.Active,
-			accountTier,
-			settings: new AccountSettings
-			{
-				DefaultCurrency = FiatCurrency.EUR,
-				Locale = "en-GB",
+				DefaultCurrency = FiatCurrency.UAH,
+				Locale = "uk-UA",
 				TimeZoneId = "UTC",
 				TwoFactorPreferred = true
 			});

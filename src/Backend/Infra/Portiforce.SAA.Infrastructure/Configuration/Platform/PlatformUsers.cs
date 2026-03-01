@@ -7,4 +7,6 @@ public sealed class PlatformUsers
 	public PlatformUser PlatformOwner { get; set; }
 
 	public PlatformUser PlatformAdmin { get; set; }
+
+	public PlatformUser PlatformBackground { get; set; }
 }

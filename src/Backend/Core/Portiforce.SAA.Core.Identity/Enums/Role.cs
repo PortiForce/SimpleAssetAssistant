@@ -15,6 +15,11 @@ public enum Role : byte
 	TenantAdmin = 2,
 
 	/// <summary>
+	/// Tenant scoped background worker role
+	/// </summary>
+	TenantBackground = 5,
+
+	/// <summary>
 	/// Platform scoped role to allow to configure tenants and their structure
 	/// </summary>
 	PlatformAdmin = 10,
@@ -22,5 +27,5 @@ public enum Role : byte
 	/// <summary>
 	/// Platform scoped role with full control over the tenant including billing and structure
 	/// </summary>
-	PlatformOwner = 15
+	PlatformOwner = 21,
 }
