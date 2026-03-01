@@ -1,9 +1,9 @@
-﻿using System.Linq.Expressions;
-using Portiforce.SAA.Application.Exceptions;
+﻿using Portiforce.SAA.Application.Exceptions;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Interfaces.Persistence;
+using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
@@ -12,13 +12,14 @@ using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Core.Identity.Models.Auth;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Identity.Models.Profile;
 using Portiforce.SAA.Core.Primitives;
 
 namespace Portiforce.SAA.Application.UseCases.Invite.Handlers;
 
-public sealed class AcceptInviteCommandHandler(
+public sealed class AcceptInviteWithGoogleCommandHandler(
 	IHashingService hashing,
 	IClock clock,
 	ITenantLimitsService tenantLimitsService,
@@ -26,10 +27,11 @@ public sealed class AcceptInviteCommandHandler(
 	IInviteWriteRepository inviteWriteRepository,
 	IAccountReadRepository accountReadRepository,
 	IAccountWriteRepository accountWriteRepository,
+	IExternalIdentityWriteRepository externalIdentityWriteRepository,
 	IUnitOfWork unitOfWork)
-	: IRequestHandler<AcceptInviteCommand, TypedResult<AcceptInviteResult>>
+	: IRequestHandler<AcceptInviteWithGoogleCommand, TypedResult<AcceptInviteResult>>
 {
-	public async ValueTask<TypedResult<AcceptInviteResult>> Handle(AcceptInviteCommand request, CancellationToken ct)
+	public async ValueTask<TypedResult<AcceptInviteResult>> Handle(AcceptInviteWithGoogleCommand request, CancellationToken ct)
 	{
 		byte[] tokenHash;
 		try
@@ -68,13 +70,6 @@ public sealed class AcceptInviteCommandHandler(
 			return TypedResult<AcceptInviteResult>.Fail(ResultError.Conflict("Invite already accepted."));
 		}
 
-		var role = MapRole(invite.IntendedRole);
-		var tier = MapTier(invite.IntendedTier);
-		if (role == Role.None || tier == AccountTier.None)
-		{
-			return TypedResult<AcceptInviteResult>.Fail(ResultError.Validation("Invalid invite role or tier."));
-		}
-
 		FlowResult.Result limitChecksResult = await tenantLimitsService.EnsureTenantCanInviteOrActivateAccountAsync(request.TenantId, ct);
 		if (!limitChecksResult.IsSuccess)
 		{
@@ -92,27 +87,34 @@ public sealed class AcceptInviteCommandHandler(
 		}
 		else
 		{
-			// todo tech: here I need to handle other invite channels when they are implemented (e.g. SSO) - for now I just want to make sure that the system is ready for that and doesn't allow accepting invites with unsupported channels
 			return TypedResult<AcceptInviteResult>.Fail(ResultError.NotSupported($"Invite by provided channel: '{inviteTarget.Type}' is not yet supported"));
 		}
 
+		// create account entity
 		var newAccount = Account.Create(
 			request.TenantId,
-			request.AutoGenAlias ?? (invite.InviteTarget.Value.Split('@')[0] + new Random(1).Next(999)),
-			new ContactInfo(Email.Create(inviteTarget.Value)), // todo : fix me
-			role,
+			invite.InviteTarget.Value.Split('@')[0] + new Random(1).Next(999),
+			new ContactInfo(Email.Create(inviteTarget.Value)),
+			invite.IntendedRole,
 			AccountState.PendingActivation,
-			tier
+			invite.IntendedTier
 		);
+
+		// link account entity to External Identity
+		var newExternalUser = ExternalIdentity.Create(
+			newAccount.Id,
+			newAccount.TenantId,
+			AuthProvider.Google,
+			request.GoogleSubjectId,
+			true);
 
 		invite.Accept(newAccount.Id, now);
 
 		try
 		{
 			await accountWriteRepository.AddAsync(newAccount, ct);
+			await externalIdentityWriteRepository.AddAsync(newExternalUser, ct);
 			await inviteWriteRepository.UpdateAsync(invite, ct);
-
-			// todo : here I already should have an externalId that is referenced to the already logged in account -> but not sure how to handle it yet
 
 			await unitOfWork.SaveChangesAsync(ct);
 		}
@@ -123,22 +125,6 @@ public sealed class AcceptInviteCommandHandler(
 
 		await unitOfWork.SaveChangesAsync(ct);
 
-		return TypedResult<AcceptInviteResult>.Ok(new AcceptInviteResult(invite.Id, newAccount.Id));
+		return TypedResult<AcceptInviteResult>.Ok(new AcceptInviteResult(invite.Id, newAccount.Id, newAccount.TenantId, newAccount.Role, newAccount.State));
 	}
-
-	private static Role MapRole(InviteTenantRole inviteRole) => inviteRole switch
-	{
-		InviteTenantRole.TenantUser => Role.TenantUser,
-		InviteTenantRole.TenantAdmin => Role.TenantAdmin,
-		_ => Role.None
-	};
-
-	private static AccountTier MapTier(InviteAccountTier inviteTier) => inviteTier switch
-	{
-		// here I need to throw an exception in case of fail as this is not a standard business rule violation
-		InviteAccountTier.Observer => AccountTier.Observer,
-		InviteAccountTier.Investor => AccountTier.Investor,
-		InviteAccountTier.Strategist => AccountTier.Strategist,
-		_ => AccountTier.None
-	};
 }

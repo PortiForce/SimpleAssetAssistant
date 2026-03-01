@@ -36,7 +36,7 @@ public sealed class TenantResolver : ITenantResolver
 
 			var tenant = await _db.Tenants
 				.AsNoTracking()
-				.Where(t => t.DomainPrefix == prefix && t.State == TenantState.Active || t.State == TenantState.Suspended)
+				.Where(t => t.DomainPrefix == prefix && (t.State == TenantState.Active || t.State == TenantState.Suspended))
 				.Select(t => new { t.Id, t.DomainPrefix, t.BrandName })
 				.SingleOrDefaultAsync(ct);
 

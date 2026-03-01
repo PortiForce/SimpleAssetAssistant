@@ -5,7 +5,7 @@ VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core.Identity", "Backend\Core\Portiforce.SAA.Core.Identity\Portiforce.SAA.Core.Identity.csproj", "{957B8B0F-EBFA-4CC5-B906-D86D5A675AEA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Core", "01 - Core", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Domain", "01 - Domain", "{A27A6353-8686-4E7A-949E-02F45FE35F4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Core.Assets", "Backend\Core\Portiforce.SAA.Core.Assets\Portiforce.SAA.Core.Assets.csproj", "{8C66EAE4-7C95-4C1D-BD01-53D01D7A6E3E}"
 EndProject

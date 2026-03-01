@@ -1,9 +1,10 @@
 ﻿@page "/tenant/admin/users/invite"
+
+@using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Invite
 @using Portiforce.SAA.Contracts.UiSetup
 @using Portiforce.SAA.Web.Client.Services.Interfaces
 
-@* 1. Protection at the Routing Level *@
 @attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
 @rendermode InteractiveWebAssembly
 
@@ -14,24 +15,64 @@
 
 <div class="container mt-4">
     <h3>Invite New User</h3>
-    <p class="text-muted">Send an invitation email to add a user to your tenant.</p>
+    <p class="text-muted">Send an invitation to add a user to your tenant.</p>
 
     <EditForm Model="@inviteModel" OnValidSubmit="HandleInvite">
         <DataAnnotationsValidator />
 
         <div class="card p-4 shadow-sm">
-            <div class="mb-3">
-                <label class="form-label">Email Address</label>
-                <InputText @bind-Value="inviteModel.Email" class="form-control" placeholder="colleague@example.com" />
-                <ValidationMessage For="@(() => inviteModel.Email)" />
+            <div class="row g-3">
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Invite channel</label>
+                    <InputSelect @bind-Value="inviteModel.Channel" class="form-select" @onchange="OnChannelChanged">
+                        <option value="@InviteChannel.Email">Email</option>
+                        <option value="@InviteChannel.Telegram">Telegram</option>
+                        <option value="@InviteChannel.AppleId">Apple ID</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => inviteModel.Channel)" />
+                </div>
+
+                <div class="col-12 col-md-8">
+                    <label class="form-label">@ValueLabel</label>
+                    <InputText @bind-Value="inviteModel.Value" class="form-control" placeholder="@ValuePlaceholder" />
+                    <div class="form-text">@ValueHelpText</div>
+                    <ValidationMessage For="@(() => inviteModel.Value)" />
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Intended role</label>
+                    <InputSelect @bind-Value="inviteModel.IntendedRole" class="form-select">
+                        <option value="@InviteTenantRole.TenantUser">Tenant user</option>
+                        <option value="@InviteTenantRole.TenantAdmin">Tenant admin</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => inviteModel.IntendedRole)" />
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Account tier</label>
+                    <InputSelect @bind-Value="inviteModel.IntendedTier" class="form-select">
+                        <option value="@InviteAccountTier.Observer">Observer</option>
+                        <option value="@InviteAccountTier.Investor">Investor</option>
+                        <option value="@InviteAccountTier.Strategist">Strategist</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => inviteModel.IntendedTier)" />
+                </div>
+
             </div>
 
-           <div class="d-flex justify-content-end gap-2">
+            <div class="d-flex justify-content-end gap-2 mt-4">
                 <a href="/tenant/admin/users" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-envelope"></i> Send Invite
+                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                    <i class="bi bi-envelope"></i>
+                    @(isSubmitting ? "Sending..." : "Send Invite")
                 </button>
             </div>
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
         </div>
     </EditForm>
 </div>
@@ -39,9 +80,58 @@
 @code {
     private CreateInviteRequest inviteModel = new();
 
+    private bool isSubmitting;
+    private string? error;
+
+    private string ValueLabel => inviteModel.Channel switch
+    {
+        InviteChannel.Email => "Email address",
+        InviteChannel.Telegram => "Telegram username",
+        InviteChannel.AppleId => "Apple ID",
+        _ => "Value"
+    };
+
+    private string ValuePlaceholder => inviteModel.Channel switch
+    {
+        InviteChannel.Email => "colleague@example.com",
+        InviteChannel.Telegram => "@nickname",
+        InviteChannel.AppleId => "name@icloud.com",
+        _ => ""
+    };
+
+    private string ValueHelpText => inviteModel.Channel switch
+    {
+        InviteChannel.Email => "We’ll send an email invitation link.",
+        InviteChannel.Telegram => "Enter Telegram username (with or without @).",
+        InviteChannel.AppleId => "Apple ID used to authenticate during acceptance (often an email).",
+        _ => ""
+    };
+
+    private void OnChannelChanged(ChangeEventArgs _)
+    {
+        // Optional: clear value when switching channels to reduce accidental mismatches
+        inviteModel.Value = string.Empty;
+        error = null;
+    }
+
     private async Task HandleInvite()
     {
-        await ApiClient.InviteUserAsync(inviteModel);
-        Nav.NavigateTo("/tenant/admin/users");
+        error = null;
+        isSubmitting = true;
+
+        try
+        {
+            await ApiClient.InviteUserAsync(inviteModel);
+            Nav.NavigateTo("/tenant/admin/users");
+        }
+        catch (Exception ex)
+        {
+            // Replace with your typed API error handling if you have it.
+            error = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 }

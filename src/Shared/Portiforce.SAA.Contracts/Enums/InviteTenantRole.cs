@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Core.Identity.Enums;
+﻿namespace Portiforce.SAA.Contracts.Enums;
 
 public enum InviteTenantRole : byte
 {

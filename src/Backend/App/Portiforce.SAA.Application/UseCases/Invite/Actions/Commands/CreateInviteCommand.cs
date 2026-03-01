@@ -20,8 +20,8 @@ namespace Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 public sealed record CreateInviteCommand(
 	TenantId TenantId,
 	InviteTarget InviteTarget,
-	InviteTenantRole IntendedRole,
-	InviteAccountTier IntendedTier,
+	Role IntendedRole,
+	AccountTier IntendedTier,
 	AccountId InvitedByAccountId,
 	DateTimeOffset CreatedAtUtc,
 	DateTimeOffset ExpiredAtUtc

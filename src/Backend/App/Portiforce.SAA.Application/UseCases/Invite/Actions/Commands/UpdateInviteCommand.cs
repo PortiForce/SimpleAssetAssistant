@@ -8,7 +8,7 @@ namespace Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 public sealed record UpdateInviteCommand(
 	TenantId TenantId,
 	Guid Id,
-	InviteAccountTier Tier,
-	InviteTenantRole Role,
+	AccountTier Tier,
+	Role Role,
 	InviteState State
 ) : ICommand<TypedResult<Guid>>;

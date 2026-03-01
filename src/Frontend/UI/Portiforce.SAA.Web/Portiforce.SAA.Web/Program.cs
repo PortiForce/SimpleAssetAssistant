@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Portiforce.SAA.Application;
 using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Contracts.Services;
 using Portiforce.SAA.Contracts.UiSetup;
+using Portiforce.SAA.Core.Identity;
+using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Web.Components;
+using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Middleware;
 using Portiforce.SAA.Web.Security;
 using Portiforce.SAA.Web.Services;
@@ -26,36 +30,68 @@ public class Program
 		builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
 		builder.Services.AddScoped<TenantContext>();
 		builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
-		builder.Services.AddScoped<Portiforce.SAA.Web.Client.Services.TenantApiClient>(sp =>
+		builder.Services.AddHttpClient<Portiforce.SAA.Web.Client.Services.TenantApiClient>((sp, http) =>
 		{
-			var httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-							  ?? throw new InvalidOperationException("No active HttpContext.");
+			var ctx = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+			          ?? throw new InvalidOperationException("No active HttpContext.");
 
-			var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
-			var http = new HttpClient { BaseAddress = baseUri };
-
-			return new Portiforce.SAA.Web.Client.Services.TenantApiClient(http);
+			http.BaseAddress = new Uri($"{ctx.Request.Scheme}://{ctx.Request.Host}");
 		});
 
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddMemoryCache();
 
-		builder.Services.AddEfInfrastructure(builder.Configuration);
-
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
 
-		builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+		// Scan and Register all Endpoints
+		builder.Services.AddEndpoints(typeof(Program).Assembly);
+
+		builder.Services.AddAuthentication(options =>
+			{
+				// This tells ASP.NET that your main way of tracking users is via Cookies
+				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+			})
 			.AddCookie(options =>
 			{
 				options.LoginPath = "/auth/login";
-				options.LogoutPath = "/auth/logout";
-				options.AccessDeniedPath = "/access-denied";
-				options.SlidingExpiration = true;
-				options.ExpireTimeSpan = TimeSpan.FromHours(8);
+				options.AccessDeniedPath = "/auth/access-denied";
 
-				// Optional hardening:
-				// options.Cookie.SameSite = SameSiteMode.Lax;
-				// options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+				options.Events.OnRedirectToLogin = ctx =>
+				{
+					// For APIs: return 401, for browser navigation: redirect
+					if (ctx.Request.Path.StartsWithSegments("/api"))
+					{
+						ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+						return Task.CompletedTask;
+					}
+					ctx.Response.Redirect(ctx.RedirectUri);
+					return Task.CompletedTask;
+				};
+
+				options.Events.OnRedirectToAccessDenied = ctx =>
+				{
+					if (ctx.Request.Path.StartsWithSegments("/api"))
+					{
+						ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+						return Task.CompletedTask;
+					}
+					ctx.Response.Redirect(ctx.RedirectUri);
+					return Task.CompletedTask;
+				};
+			}).AddGoogle(options =>
+			{
+				// ASP.NET Core automatically maps the scheme name to "Google" here
+
+				options.ClientId = builder.Configuration["GoogleClientSettings:ClientId"]
+				                   ?? throw new InvalidOperationException("Google ClientId is missing.");
+
+				options.ClientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"]
+				                       ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+
+				// By default, Google will redirect back to: https://app.dev.localhost:7100/signin-google
+				// ASP.NET Core automatically intercepts this route for you.
 			});
 
 		builder.Services.AddAuthorization(options =>
@@ -76,6 +112,11 @@ public class Program
 		builder.Services.AddRazorComponents()
 			.AddInteractiveServerComponents()
 			.AddInteractiveWebAssemblyComponents();
+
+		builder.Services.AddApplication();
+		builder.Services.AddCoreIdentity();
+		builder.Services.AddInfrastructure(builder.Configuration);
+		builder.Services.AddEfInfrastructure(builder.Configuration);
 
 		var app = builder.Build();
 
@@ -100,36 +141,8 @@ public class Program
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		// 
-		// Basic endpoints for now (avoid 404 while wiring auth)
-		//
-		app.MapGet("/access-denied", () => Results.Text("Access denied."));
-
-		// Placeholder until you wire Google/Passkeys
-		app.MapGet("/auth/login", () => Results.Text("Login not wired yet."));
-
-		app.MapPost("/auth/logout", async (HttpContext ctx) =>
-		{
-			await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-			return Results.Redirect("/");
-		});
-
-		//
-		// UI API (BFF endpoints)
-		// 
-		var uiApi = app.MapGroup("/ui-api");
-
-		uiApi.MapGet("/tenant", (ITenantContext tenant) =>
-		{
-			return Results.Ok(new
-			{
-				prefix = tenant.Prefix,
-				isLanding = tenant.IsLanding
-			});
-		});
-
-		// Example admin endpoint (add later)
-		// uiApi.MapPost("/admin/users/invite", ...).RequireAuthorization(Policies.InviteUsers)
+		// This line automatically discovers InviteEndpoints, AuthEndpoints, etc.
+		app.MapEndpoints();
 
 		//
 		// Blazor endpoints

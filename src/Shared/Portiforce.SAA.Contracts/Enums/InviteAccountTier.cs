@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Core.Identity.Enums;
+﻿namespace Portiforce.SAA.Contracts.Enums;
 
 public enum InviteAccountTier : byte
 {
@@ -17,5 +17,5 @@ public enum InviteAccountTier : byte
 	/// <summary>
 	/// Using projections, complex rebalancing.
 	/// </summary>
-	Strategist = 3,
+	Strategist = 3
 }

@@ -94,8 +94,6 @@ public class Program
 			app.MapScalarApiReference(options =>
 			{
 				options.Title = "SimpleAssetAssistant API";
-				// If Scalar supports specifying the OpenAPI route in your version, set it explicitly here.
-				// Otherwise, it will typically pick up /openapi/v1.json when MapOpenApi() is present.
 			});
 		}
 		else

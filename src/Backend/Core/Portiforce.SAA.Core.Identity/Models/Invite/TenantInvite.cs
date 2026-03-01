@@ -16,8 +16,8 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 
 	// Who invited + intended permission set
 	public AccountId InvitedByAccountId { get; private set; }
-	public InviteTenantRole IntendedRole { get; private set; }
-	public InviteAccountTier IntendedTier { get; private set; }
+	public Role IntendedRole { get; private set; }
+	public AccountTier IntendedTier { get; private set; }
 
 	public byte[] TokenHash { get; private set; } = default!;
 
@@ -42,8 +42,8 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 		TenantId tenantId,
 		InviteTarget inviteTarget,
 		AccountId invitedByAccountId,
-		InviteTenantRole intendedRole,
-		InviteAccountTier intendedTier,
+		Role intendedRole,
+		AccountTier intendedTier,
 		byte[] tokenHash,
 		DateTimeOffset now,
 		DateTimeOffset expiresAtUtc)

@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Portiforce.SAA.Api.Contracts.Auth.Requests;
 using Portiforce.SAA.Api.Interfaces;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Auth.Projections;
+using Portiforce.SAA.Application.UseCases.Auth.Result;
 using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Api.Controllers.V1.Auth;
@@ -32,8 +34,8 @@ public sealed class AuthController(
 			return BadRequest(problem);
 		}
 
-		LoginWithGoogleCommand command = new LoginWithGoogleCommand(request.IdToken, tenantId);
-		AuthResponse result = await mediator.Send(command, ct);
+		LoginWithGoogleExternalIdCommand command = new LoginWithGoogleExternalIdCommand(tenantId.Value, request.IdToken, null, null);
+		TypedResult<LoginWithGoogleResult> result = await mediator.Send(command, ct);
 
 		return Ok(result);
 	}
