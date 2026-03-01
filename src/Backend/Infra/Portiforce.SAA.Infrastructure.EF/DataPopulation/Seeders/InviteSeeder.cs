@@ -81,7 +81,7 @@ public class InviteSeeder(IOptions<PlatformUsers> platformUsersOptions)
 			rootTenant.Id,
 			inviteTarget,
 			sysAccount.Id,
-			Role.PlatformOwner,
+			Role.PlatformAdmin,
 			accountTier,
 			tokenHash,
 			DateTimeOffset.Now,
