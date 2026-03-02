@@ -13,7 +13,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 namespace Portiforce.SAA.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260218220317_InitialCreate")]
+    [Migration("20260301141239_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -1,4 +1,5 @@
 ﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Extensions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Interfaces;
 using Portiforce.SAA.Core.Models;
@@ -46,7 +47,8 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 		AccountTier intendedTier,
 		byte[] tokenHash,
 		DateTimeOffset now,
-		DateTimeOffset expiresAtUtc)
+		DateTimeOffset expiresAtUtc,
+		Guid inviteId = default)
 	{
 		if (tenantId == TenantId.Empty)
 		{
@@ -80,7 +82,8 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 			State = InviteState.Created,
 			TokenHash = tokenHash,
 			CreatedAtUtc = now,
-			ExpiresAtUtc = expiresAtUtc
+			ExpiresAtUtc = expiresAtUtc,
+			Id = inviteId == Guid.Empty ? GuidExtensions.New() : inviteId
 		};
 	}
 

@@ -1,29 +1,30 @@
 ﻿using Microsoft.Extensions.Options;
 
+using Portiforce.SAA.Application.Interfaces.Common.Security;
+using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Client;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Identity.Models.Profile;
-using Portiforce.SAA.Infrastructure.Auth;
 using Portiforce.SAA.Infrastructure.Configuration.Platform;
-using Portiforce.SAA.Infrastructure.Services.Security;
 
 namespace Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
 
-public class InviteSeeder(IOptions<PlatformUsers> platformUsersOptions)
+public class InviteSeeder(
+	IOptions<PlatformUsers> platformUsersOptions,
+	ITokenGenerator tokenGenerator,
+	IHashingService hashingService)
 {
 	private readonly PlatformUsers _config = platformUsersOptions.Value;
 
 	public List<TenantInvite> BuildPlatformInvites(
 		Tenant rootTenant,
-		Account sysAccount,
-		JwtTokenGenerator tokenGeneratorService,
-		TokenHashingService tokenHashingService)
+		Account sysAccount)
 	{
 		var platformUserInvites = new List<TenantInvite>();
 
-		var ownerToken = tokenGeneratorService.GenerateInviteToken();
-		var ownerTokenHash = tokenHashingService.HashInviteToken(ownerToken);
+		var ownerToken = tokenGenerator.GenerateInviteToken();
+		var ownerTokenHash = hashingService.HashInviteToken(ownerToken);
 
 		var platformOwnerInvite = BuildPlatformOwnerInvite(
 			rootTenant,
@@ -31,8 +32,8 @@ public class InviteSeeder(IOptions<PlatformUsers> platformUsersOptions)
 			sysAccount,
 			ownerTokenHash);
 
-		var adminToken = tokenGeneratorService.GenerateInviteToken();
-		var adminTokenHash = tokenHashingService.HashInviteToken(adminToken);
+		var adminToken = tokenGenerator.GenerateInviteToken();
+		var adminTokenHash = hashingService.HashInviteToken(adminToken);
 
 		var platformAdminInvite = BuildPlatformAdminInvite(
 			rootTenant,

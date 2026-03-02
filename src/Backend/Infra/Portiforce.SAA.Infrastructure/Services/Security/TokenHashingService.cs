@@ -33,7 +33,7 @@ public sealed class TokenHashingService : IHashingService
 			throw new ArgumentException("Token is required.", nameof(rawValue));
 		}
 
-		var hash = SHA256.HashData(Encoding.UTF8.GetBytes(rawValue));
+		byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(rawValue));
 
 		return hash;
 	}

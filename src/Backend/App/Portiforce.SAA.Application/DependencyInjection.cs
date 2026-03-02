@@ -42,6 +42,7 @@ public static class DependencyInjection
 		services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
 		services.AddScoped<IAssetLookupService, AssetLookupService>();
 		services.AddScoped<ITenantLimitsService, TenantLimitsService>();
+		services.AddScoped<ILoginValidationService, LoginValidationService>();
 
 		services.AddScoped<IAuthService, AuthService>();
 

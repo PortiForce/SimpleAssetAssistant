@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Portiforce.SAA.Application.Interfaces.Common.Security;
+using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
@@ -11,6 +13,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
 using Portiforce.SAA.Application.Interfaces.Persistence.PlatformAccount;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
+using Portiforce.SAA.Infrastructure.Auth;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders.Internal;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
@@ -23,6 +26,7 @@ using Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Platform;
 using Portiforce.SAA.Infrastructure.EF.Repositories.PlatformAccount;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Profile;
+using Portiforce.SAA.Infrastructure.Services.Security;
 
 namespace Portiforce.SAA.Infrastructure.EF;
 
@@ -49,11 +53,16 @@ public static class DependencyInjection
 #endif
 		});
 
+		// for seeded functionality
+		services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+		services.AddSingleton<IHashingService, TokenHashingService>();
+
 		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 		// data seeders:
 		services.AddScoped<DbUserSeeder>();
 		services.AddScoped<SystemAccountSeeder>();
+		services.AddScoped<InviteSeeder>();
 
 		// Repositories
 		services.AddScoped<ITenantReadRepository, TenantReadRepository>();
