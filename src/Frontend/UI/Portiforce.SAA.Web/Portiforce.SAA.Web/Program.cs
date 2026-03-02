@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Portiforce.SAA.Application;
+using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Contracts.Services;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
+using Portiforce.SAA.Infrastructure.Services.Time;
 using Portiforce.SAA.Web.Components;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Middleware;
@@ -90,7 +92,7 @@ public class Program
 				options.ClientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"]
 				                       ?? throw new InvalidOperationException("Google ClientSecret is missing.");
 
-				// By default, Google will redirect back to: https://app.dev.localhost:7100/signin-google
+				// By default, Google will redirect back to: https://{tenant.DomainPrefix}.portiforce.ai:7100/signin-google
 				// ASP.NET Core automatically intercepts this route for you.
 			});
 
@@ -117,6 +119,8 @@ public class Program
 		builder.Services.AddCoreIdentity();
 		builder.Services.AddInfrastructure(builder.Configuration);
 		builder.Services.AddEfInfrastructure(builder.Configuration);
+
+		builder.Services.AddSingleton<IClock, SystemClock>();
 
 		var app = builder.Build();
 

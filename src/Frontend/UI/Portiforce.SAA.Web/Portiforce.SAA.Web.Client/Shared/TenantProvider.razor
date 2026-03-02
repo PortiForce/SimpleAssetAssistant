@@ -15,8 +15,8 @@
         var uri = new Uri(Nav.Uri);
         var host = uri.Host;
 
-        // todo tech: baseDomain = dev.localhost (read from config later)
-        const string baseDomain = "dev.localhost";
+        // todo tech: baseDomain = portiforce.ai (todo: read from config later)
+        const string baseDomain = "portiforce.ai";
         var suffix = "." + baseDomain;
 
         if (string.Equals(host, baseDomain, StringComparison.OrdinalIgnoreCase) ||

@@ -21,6 +21,7 @@ public static class DependencyInjection
 		// infrastructure settings
 		services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 		services.Configure<GoogleClientSettings>(configuration.GetSection("GoogleClientSettings"));
+		services.Configure<TokenHashingOptions>(configuration.GetSection("TokenHashingOptions"));
 
 		// data operation settings
 		services.Configure<PlatformUsers>(configuration.GetSection("PlatformUsers"));

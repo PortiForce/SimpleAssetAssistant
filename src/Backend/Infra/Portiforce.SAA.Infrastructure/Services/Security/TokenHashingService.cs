@@ -6,12 +6,9 @@ using Portiforce.SAA.Infrastructure.Configuration;
 
 namespace Portiforce.SAA.Infrastructure.Services.Security;
 
-public sealed class TokenHashingService : IHashingService
+public sealed class TokenHashingService(IOptions<TokenHashingOptions> tokenHashingOptions) : IHashingService
 {
-	private readonly byte[] _key;
-
-	public TokenHashingService(IOptions<TokenHashingOptions> jwt)
-		=> _key = Encoding.UTF8.GetBytes(jwt.Value.Pepper);
+	private readonly byte[] _key = Encoding.UTF8.GetBytes(tokenHashingOptions.Value.Pepper);
 
 	public byte[] HashRefreshToken(string rawToken)
 	{
