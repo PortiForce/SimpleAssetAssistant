@@ -1,0 +1,11 @@
+﻿using Portiforce.SAA.Application.FlowResult;
+using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Core.Primitives.Ids;
+
+namespace Portiforce.SAA.Application.UseCases.Client.Tenant.Actions.Commands;
+
+public sealed record ManageTenantAssetRestrictionCommand(
+	TenantId TenantId,
+	AssetId AssetId,
+	bool  IsRestricted
+) : ICommand<Result>;

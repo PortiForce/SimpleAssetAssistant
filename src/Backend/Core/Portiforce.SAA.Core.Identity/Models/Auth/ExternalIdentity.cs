@@ -1,0 +1,88 @@
+﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Core.Models;
+using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Core.StaticResources;
+
+namespace Portiforce.SAA.Core.Identity.Models.Auth;
+
+public sealed class ExternalIdentity : Entity<ExternalIdentityId>
+{
+	private ExternalIdentity(
+		ExternalIdentityId id,
+		AccountId accountId,
+		TenantId tenantId,
+		AuthProvider provider,
+		string providerSubject,
+		bool isPrimary) : base(id)
+	{
+		if (id.IsEmpty)
+		{
+			throw new DomainValidationException("ExternalIdentity.Id must be defined.");
+		}
+
+		if (accountId.IsEmpty)
+		{
+			throw new DomainValidationException("AccountId must be defined.");
+		}
+
+		if (tenantId.IsEmpty)
+		{
+			throw new DomainValidationException("TenantId must be defined.");
+		}
+
+		string providerSubjectValue = NormalizeAndValidateProviderSubject(providerSubject);
+
+		AccountId = accountId;
+		TenantId = tenantId;
+		Provider = provider;
+		ProviderSubject = providerSubjectValue;
+		IsPrimary = isPrimary;
+	}
+
+	// Private Empty Constructor for EF Core
+	private ExternalIdentity()
+	{
+
+	}
+	public TenantId TenantId { get; init; }
+	public AccountId AccountId { get; init; }
+	public AuthProvider Provider { get; init; }
+	public string ProviderSubject { get; init; }
+
+	public bool IsPrimary { get; private set; }
+
+	public static ExternalIdentity Create(
+		AccountId accountId,
+		TenantId tenantId,
+		AuthProvider provider,
+		string providerSubject,
+		bool isPrimary = false,
+		ExternalIdentityId id = default)
+		=> new(
+			id.IsEmpty ? ExternalIdentityId.New() : id,
+			accountId,
+			tenantId,
+			provider,
+			providerSubject,
+			isPrimary);
+
+	public void MarkPrimary() => IsPrimary = true;
+	public void UnmarkPrimary() => IsPrimary = false;
+
+	private static string NormalizeAndValidateProviderSubject(string providerSubject)
+	{
+		if (string.IsNullOrWhiteSpace(providerSubject))
+		{
+			throw new DomainValidationException("ProviderSubject is required.");
+		}
+
+		// Google 'sub' is short, passkey subjects can vary
+		if (providerSubject.Length > EntityConstraints.CommonSettings.ProviderSubjectMaxLength)
+		{
+			throw new DomainValidationException($"ProviderSubject is too long (max {EntityConstraints.CommonSettings.ProviderSubjectMaxLength}).");
+		}
+
+		return providerSubject.Trim();
+	}
+}

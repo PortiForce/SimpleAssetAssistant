@@ -1,0 +1,100 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+using Portiforce.SAA.Application.Interfaces.Common.Security;
+using Portiforce.SAA.Application.Interfaces.Models.Auth;
+using Portiforce.SAA.Application.Interfaces.Persistence;
+using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
+using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
+using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
+using Portiforce.SAA.Application.Interfaces.Persistence.Client;
+using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
+using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
+using Portiforce.SAA.Application.Interfaces.Persistence.PlatformAccount;
+using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
+using Portiforce.SAA.Infrastructure.Auth;
+using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
+using Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders.Internal;
+using Portiforce.SAA.Infrastructure.EF.DbContexts;
+using Portiforce.SAA.Infrastructure.EF.Repositories;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Activity;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Asset;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Client;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Platform;
+using Portiforce.SAA.Infrastructure.EF.Repositories.PlatformAccount;
+using Portiforce.SAA.Infrastructure.EF.Repositories.Profile;
+using Portiforce.SAA.Infrastructure.Services.Security;
+
+namespace Portiforce.SAA.Infrastructure.EF;
+
+public static class DependencyInjection
+{
+	public static IServiceCollection AddEfInfrastructure(
+		this IServiceCollection services,
+		IConfiguration configuration)
+	{
+		services.AddDbContext<AssetAssistantDbContext>(opt =>
+		{
+			opt.UseSqlServer(
+				configuration.GetConnectionString("AssetAssistantSQLDb"),
+				sql =>
+				{
+					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
+					sql.EnableRetryOnFailure();
+				});
+			opt.EnableDetailedErrors();
+
+#if DEBUG
+			// only for local debugging
+			opt.EnableSensitiveDataLogging();
+#endif
+		});
+
+		// for seeded functionality
+		services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+		services.AddSingleton<IHashingService, TokenHashingService>();
+
+		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+
+		// data seeders:
+		services.AddScoped<DbUserSeeder>();
+		services.AddScoped<SystemAccountSeeder>();
+		services.AddScoped<InviteSeeder>();
+
+		// Repositories
+		services.AddScoped<ITenantReadRepository, TenantReadRepository>();
+		services.AddScoped<ITenantWriteRepository, TenantWriteRepository>();
+
+		services.AddScoped<IInviteReadRepository, InviteReadRepository>();
+		services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
+
+		services.AddScoped<IAccountReadRepository, AccountReadRepository>();
+		services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();
+
+		services.AddScoped<ICurrentUserReadRepository, CurrentUserReadRepository>();
+		services.AddScoped<ICurrentUserWriteRepository, CurrentUserWriteRepository>();
+
+		services.AddScoped<IPlatformReadRepository, PlatformReadRepository>();
+		services.AddScoped<IPlatformWriteRepository, PlatformWriteRepository>();
+
+		services.AddScoped<IPlatformAccountReadRepository, PlatformAccountReadRepository>();
+		services.AddScoped<IPlatformAccountWriteRepository, PlatformAccountWriteRepository>();
+
+		services.AddScoped<IAssetReadRepository, AssetReadRepository>();
+		services.AddScoped<IAssetWriteRepository, AssetWriteRepository>();
+
+		services.AddScoped<IActivityReadRepository, ActivityReadRepository>();
+		services.AddScoped<IActivityWriteRepository, ActivityWriteRepository>();
+
+		services.AddScoped<IExternalIdentityReadRepository, ExternalIdentityReadRepository>();
+		services.AddScoped<IExternalIdentityWriteRepository, ExternalIdentityWriteRepository>();
+
+		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
+		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
+
+		return services;
+	}
+}

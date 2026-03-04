@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>f8e12728-953f-4364-b7fd-d113de16218d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Backend\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\Backend\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
+    <ProjectReference Include="..\..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
+    <ProjectReference Include="..\Portiforce.SAA.Web.Client\Portiforce.SAA.Web.Client.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+  </ItemGroup>
+
+</Project>

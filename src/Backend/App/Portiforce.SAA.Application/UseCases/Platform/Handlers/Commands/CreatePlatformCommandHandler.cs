@@ -1,0 +1,53 @@
+﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.FlowResult;
+using Portiforce.SAA.Application.Interfaces.Persistence;
+using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
+using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.UseCases.Platform.Actions.Commands;
+using Portiforce.SAA.Core.Assets.Enums;
+using Portiforce.SAA.Core.Primitives.Ids;
+
+namespace Portiforce.SAA.Application.UseCases.Platform.Handlers.Commands;
+
+public sealed class CreatePlatformCommandHandler(
+	IPlatformReadRepository platformReadRepository,
+	IPlatformWriteRepository platformWriteRepository,
+	IUnitOfWork unitOfWork
+) : IRequestHandler<CreatePlatformCommand, TypedResult<PlatformId>>
+{
+	public async ValueTask<TypedResult<PlatformId>> Handle(CreatePlatformCommand request, CancellationToken ct)
+	{
+		// 1. Validate Business Rules (Uniqueness)
+		// Domain entities enforce their own invariants, but "Uniqueness" is a set-based validation,
+		// so it belongs in the Application Layer (Handler).
+		bool exists = await platformReadRepository.ExistsByNameAsync(request.Name, ct);
+		if (exists)
+		{
+			throw new ConflictException($"Platform with code '{request.Code}' already exists.");
+		}
+
+		// 2. Parse: not used here as my decision is to have valid state of command model as long as they reached handler
+
+		// 3. Construct missing values if needed
+
+		// 4. Orchestrate Domain Logic
+		// The Entity Factory handles internal consistency (e.g. name length).
+		Core.Assets.Models.Platform platform = Core.Assets.Models.Platform.Create(
+			name: request.Name,
+			code: request.Code,
+			kind: request.Kind,
+			state: PlatformState.Draft
+		);
+
+		// 5. Persistence
+		await platformWriteRepository.AddAsync(platform, ct);
+		var affectedRecords = await unitOfWork.SaveChangesAsync(ct);
+		if (affectedRecords == 0)
+		{
+			throw new ConflictException("No changes were persisted (possible concurrency issue or no-op update).");
+		}
+
+		// 6. Response
+		return TypedResult<PlatformId>.Ok(platform.Id);
+	}
+}

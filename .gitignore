@@ -88,3 +88,4 @@ CodeCoverage/
 
 *.txt
 src/_Infra/.env
+/src/Frontend/UI/Portiforce.SAA.Web/Portiforce.SAA.Web/Certs

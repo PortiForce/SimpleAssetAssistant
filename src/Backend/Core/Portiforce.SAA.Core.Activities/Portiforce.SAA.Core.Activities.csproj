@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portiforce.SAA.Core.Assets\Portiforce.SAA.Core.Assets.csproj" />
+    <ProjectReference Include="..\Portiforce.SAA.Core\Portiforce.SAA.Core.csproj" />
+  </ItemGroup>
+
+</Project>
