@@ -93,7 +93,7 @@ public sealed class AcceptInviteWithGoogleCommandHandler(
 		// create account entity
 		var newAccount = Account.Create(
 			request.TenantId,
-			invite.InviteTarget.Value.Split('@')[0] + new Random(1).Next(999),
+			invite.InviteTarget.Value.Split('@')[0].Replace(".", "_") + new Random(1).Next(999),
 			new ContactInfo(Email.Create(inviteTarget.Value)),
 			invite.IntendedRole,
 			AccountState.PendingActivation,
@@ -118,12 +118,16 @@ public sealed class AcceptInviteWithGoogleCommandHandler(
 
 			await unitOfWork.SaveChangesAsync(ct);
 		}
-		catch (UniqueConstraintViolationException)
+		catch (UniqueConstraintViolationException cex)
 		{
-			return TypedResult<AcceptInviteResult>.Fail(ResultError.Conflict("Invite already accepted or account with provided email already exists."));
+			return TypedResult<AcceptInviteResult>.Fail(
+				ResultError.Conflict("Invite already accepted or account with provided email already exists."));
 		}
-
-		await unitOfWork.SaveChangesAsync(ct);
+		catch (Exception ex)
+		{
+			return TypedResult<AcceptInviteResult>.Fail(
+				ResultError.Conflict("Server error while accepting an invite."));
+		}
 
 		return TypedResult<AcceptInviteResult>.Ok(new AcceptInviteResult(invite.Id, newAccount.Id, newAccount.TenantId, newAccount.Role, newAccount.State));
 	}

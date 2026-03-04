@@ -103,7 +103,6 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 	public async Task<TenantInvite?> GetByTenantAndTokenHashAsync(TenantId requestTenantId, byte[] tokenHash, CancellationToken ct)
 	{
 		var data = await db.Invites
-			.AsNoTracking()
 			.Where(x =>
 				x.TokenHash == tokenHash &&
 				x.TenantId == requestTenantId)
