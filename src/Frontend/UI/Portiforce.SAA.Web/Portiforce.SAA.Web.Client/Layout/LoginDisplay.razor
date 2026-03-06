@@ -1,0 +1,30 @@
+@using Portiforce.SAA.Contracts
+
+<AuthorizeView>
+    <Authorized>
+        <div class="user-info">
+            <span class="user-greeting">Hello, @GetUserName(context.User)!</span>
+            <a href="@AuthRoutes.Logout" class="btn-logout">
+                <span class="bi bi-box-arrow-right"></span>
+                Logout
+            </a>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="@AuthRoutes.Login" class="btn-login">
+            <span class="bi bi-person-circle"></span>
+            Login
+        </a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string GetUserName(System.Security.Claims.ClaimsPrincipal user)
+    {
+        return user.Identity?.Name
+            ?? user.FindFirst("name")?.Value
+            ?? user.FindFirst("preferred_username")?.Value
+            ?? user.FindFirst("email")?.Value?.Split('@')[0]
+            ?? "User";
+    }
+}

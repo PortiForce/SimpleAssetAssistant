@@ -38,25 +38,26 @@ public sealed class AuthEndpoints : IEndpoint
 		group.MapGet("/access-denied", () => Results.Text("Access denied."));
 
 		group.MapPost("/logout", LogoutAsync);
+			.WithName("LogoutPost");
 	}
 
 	private static async Task<IResult> LoginAsync(
-		[FromBody] LoginRequest request,
-		[FromServices] IMediator mediator,
-		[FromServices] ITenantContext tenantContext,
-		HttpContext context,
-		CancellationToken ct)
+			[FromBody] LoginRequest request,
+			[FromServices] IMediator mediator,
+			[FromServices] ITenantContext tenantContext,
+			HttpContext context,
+			CancellationToken ct)
 	{
-		// tech : consider for platform admin/owner flows
-		throw new NotImplementedException("not yet implemented");
-
 		Guid? tenantId = tenantContext.TenantId;
 		if (tenantId == null || tenantId == Guid.Empty)
 		{
-			return TypedResults.BadRequest("Tenant context is missing.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
-		throw new NotImplementedException("not yet implemented");
+		return TypedResults.Problem(
+			title: "Local login is disabled",
+			detail: "Use the Sign in page and choose “Continue with Google”.",
+			statusCode: StatusCodes.Status501NotImplemented);
 	}
 
 	private static IResult TriggerGoogleLogin(
@@ -75,7 +76,7 @@ public sealed class AuthEndpoints : IEndpoint
 		}
 		else
 		{
-			return TypedResults.BadRequest("Tenant context is required to login.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
 		if (!string.IsNullOrWhiteSpace(inviteToken))
@@ -92,9 +93,10 @@ public sealed class AuthEndpoints : IEndpoint
 		CancellationToken ct)
 	{
 		AuthenticateResult authenticateResult = await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
 		if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
 		{
-			return TypedResults.Redirect("/auth/access-denied?reason=google_failed");
+			return TypedResults.Redirect("/auth/access-denied?reason=google_auth_failed");
 		}
 
 		Guid? rawTenantId = null;
@@ -116,26 +118,24 @@ public sealed class AuthEndpoints : IEndpoint
 
 		if (rawTenantId == null || rawTenantId == Guid.Empty)
 		{
-			return TypedResults.BadRequest("Tenant context was lost during Google login.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
 		var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
 		var subjectId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-
-		// names are not guaranteed
 		var firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName) ?? string.Empty;
 		var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname) ?? string.Empty;
 
 		if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(subjectId))
 		{
-			return TypedResults.BadRequest("Incomplete Google profile.");
+			return TypedResults.Redirect("/auth/access-denied?reason=incomplete_profile");
 		}
 
-		AccountId accountId = AccountId.Empty;
-		Role role = Role.None;
-		AccountState state = AccountState.Unknown;
+		AccountId accountId;
+		Role role;
+		AccountState state;
 		TenantId tenantId = new TenantId(rawTenantId.Value);
-		
+
 		if (!string.IsNullOrWhiteSpace(inviteTokenStr))
 		{
 			var command = new AcceptInviteWithGoogleCommand(
@@ -150,8 +150,9 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/invite-accept-failed?error={result.Error.Code}");
+				return TypedResults.Redirect($"/auth/invite-accept-failed?error={result.Error?.Code ?? "unknown"}");
 			}
+
 			accountId = result.Value.AccountId;
 			role = result.Value.Role;
 			state = result.Value.State;
@@ -168,7 +169,7 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/access-denied?error={result.Error.Code}");
+				return TypedResults.Redirect($"/auth/access-denied?error={result.Error?.Code ?? "unknown"}");
 			}
 
 			accountId = result.Value.AccountId;
@@ -177,16 +178,16 @@ public sealed class AuthEndpoints : IEndpoint
 		}
 
 		var claims = new List<Claim>
-	{
-		new(ClaimTypes.NameIdentifier, accountId.ToString()),
-		new(ClaimTypes.Email, email),
-		new(ClaimTypes.Role, role.ToString()),
-		new(CustomClaimTypes.State, state.ToString()),
-		new(CustomClaimTypes.TenantId, tenantId.ToString()),
-#if  DEBUG
-		new("GoogleSub", subjectId)
+		{
+			new(ClaimTypes.NameIdentifier, accountId.ToString()),
+			new(ClaimTypes.Email, email),
+			new(ClaimTypes.Role, role.ToString()),
+			new(CustomClaimTypes.State, state.ToString()),
+			new(CustomClaimTypes.TenantId, tenantId.ToString())
+#if DEBUG
+			,new("GoogleSub", subjectId)
 #endif
-	};
+		};
 
 		var identity = new ClaimsIdentity(
 			claims,

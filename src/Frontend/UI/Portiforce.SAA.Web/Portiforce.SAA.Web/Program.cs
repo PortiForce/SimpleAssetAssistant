@@ -84,16 +84,32 @@ public class Program
 				};
 			}).AddGoogle(options =>
 			{
-				// ASP.NET Core automatically maps the scheme name to "Google" here
-
 				options.ClientId = builder.Configuration["GoogleClientSettings:ClientId"]
-				                   ?? throw new InvalidOperationException("Google ClientId is missing.");
+								   ?? throw new InvalidOperationException("Google ClientId is missing.");
 
 				options.ClientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"]
-				                       ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+									   ?? throw new InvalidOperationException("Google ClientSecret is missing.");
 
-				// By default, Google will redirect back to: https://{tenant.DomainPrefix}.portiforce.ai:7100/signin-google
-				// ASP.NET Core automatically intercepts this route for you.
+				// Explicitly set the callback path (where Google redirects)
+				options.CallbackPath = "/signin-google";
+
+				// Save tokens for later use
+				options.SaveTokens = true;
+
+				// Request additional scopes
+				options.Scope.Add("profile");
+				options.Scope.Add("email");
+
+				// Store correlation ID to preserve state through OAuth flow
+				options.UsePkce = true;
+
+				// Handle authentication failures
+				options.Events.OnRemoteFailure = context =>
+				{
+					context.Response.Redirect("/auth/access-denied?error=google_failed");
+					context.HandleResponse();
+					return Task.CompletedTask;
+				};
 			});
 
 		builder.Services.AddAuthorization(options =>
