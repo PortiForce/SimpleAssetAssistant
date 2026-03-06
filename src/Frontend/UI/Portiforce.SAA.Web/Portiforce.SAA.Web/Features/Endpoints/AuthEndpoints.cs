@@ -37,7 +37,7 @@ public sealed class AuthEndpoints : IEndpoint
 
 		group.MapGet("/access-denied", () => Results.Text("Access denied."));
 
-		group.MapPost("/logout", LogoutAsync);
+		group.MapPost("/logout", LogoutAsync)
 			.WithName("LogoutPost");
 	}
 
