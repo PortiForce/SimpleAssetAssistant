@@ -22,16 +22,52 @@ public sealed class InviteEndpoints : IEndpoint
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
 		// 1. Create a secure group for all Tenant Admin operations
-		var group = app.MapGroup("/api/v1/tenant/invites")
+		var group = app.MapGroup("/tenant/invites")
 			.WithTags("Tenant Invites")
 			.RequireAuthorization(UiPolicies.TenantAdmin);
 
-		// 2. Map the POST endpoint
-		group.MapPost("/", CreateInviteAsync)
+		// todo: load list of invites
+
+		// todo: load invite details
+
+		// build invite template
+		group.MapGet("/create", CreateInvite)
+			.WithName("GetCreateInviteTemplate")
+		  .Produces<CreateInviteRequest>(StatusCodes.Status200OK);
+
+		// 2.Send Invite
+		group.MapPost("/create", CreateInviteAsync)
 			 .WithName("CreateTenantInvite")
 			 .Produces<Guid>(StatusCodes.Status200OK)
 			 .ProducesProblem(StatusCodes.Status400BadRequest)
 			 .ProducesProblem(StatusCodes.Status409Conflict);
+	}
+
+	private static async Task<IResult> CreateInvite(
+		[FromServices] ICurrentUser currentUser,
+		HttpContext context,
+		CancellationToken ct)
+	{
+		if (!currentUser.IsAuthenticated)
+		{
+			return TypedResults.Unauthorized();
+		}
+
+		TenantId tenantId = currentUser.TenantId;
+		if (tenantId == TenantId.Empty)
+		{
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
+		}
+
+		var template = new CreateInviteRequest
+		{
+			IntendedRole = InviteTenantRole.TenantUser,
+			IntendedTier = InviteAccountTier.Investor,
+			Channel = InviteChannel.Email,
+			Value = ""
+		};
+
+		return TypedResults.Ok(template);
 	}
 
 	private static async Task<IResult> CreateInviteAsync(
@@ -49,7 +85,7 @@ public sealed class InviteEndpoints : IEndpoint
 		TenantId tenantId = currentUser.TenantId;
 		if (tenantId == TenantId.Empty)
 		{
-			return TypedResults.BadRequest("No active tenant context found.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
 		AccountId currentAccountId = currentUser.Id;

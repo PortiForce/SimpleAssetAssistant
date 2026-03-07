@@ -24,11 +24,9 @@ public sealed class AuthEndpoints : IEndpoint
 	{
 		var group = app.MapGroup("/auth").WithTags("Authentication");
 
-		// 1. Local Credentials Login
 		group.MapPost("/login", LoginAsync)
 			.WithName("LocalLogin");
 
-		// 2. Google OAuth Login Trigger
 		group.MapGet("/login/google", TriggerGoogleLogin)
 			.WithName("GoogleLogin");
 
