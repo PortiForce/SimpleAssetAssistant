@@ -1,8 +1,5 @@
-﻿using Azure;
-
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Models.Auth;
@@ -12,7 +9,6 @@ using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
-using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Invite;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
@@ -20,9 +16,6 @@ using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenants;
@@ -44,7 +37,8 @@ public sealed class InviteEndpoints : IEndpoint
 	{
 		var group = app.MapGroup("/tenant/invites")
 			.WithTags("Tenant Invites")
-			.RequireAuthorization(UiPolicies.TenantAdmin);
+			.RequireAuthorization(UiPolicies.TenantAdmin)
+			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
 
 		group.MapGet(string.Empty, ListInvitesAsync)
 			.WithName("ListTenantInvites")
@@ -58,12 +52,6 @@ public sealed class InviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden)
 			.ProducesProblem(StatusCodes.Status404NotFound);
-
-		group.MapGet("/template", GetCreateInviteTemplateAsync)
-			.WithName("GetCreateInviteTemplate")
-			.Produces<CreateInviteRequest>(StatusCodes.Status200OK)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden);
 
 		group.MapPost(string.Empty, CreateInviteAsync)
 			.WithName("CreateTenantInvite")
@@ -97,10 +85,9 @@ public sealed class InviteEndpoints : IEndpoint
 		[FromServices] ICurrentUser currentUser,
 		CancellationToken ct)
 	{
-		var guardResult = EnsureTenantAccess<InviteListResponse>(currentUser);
-		if (guardResult is not null)
+		if (currentUser.TenantId == TenantId.Empty)
 		{
-			return guardResult;
+			return TypedResults.Forbid();
 		}
 
 		InviteState? status = request.Status?.ToBusiness();
@@ -126,11 +113,6 @@ public sealed class InviteEndpoints : IEndpoint
 		[FromServices] ICurrentUser currentUser,
 		CancellationToken ct)
 	{
-		if (!currentUser.IsAuthenticated)
-		{
-			return TypedResults.Unauthorized();
-		}
-
 		if (currentUser.TenantId == TenantId.Empty)
 		{
 			return TypedResults.Forbid();
@@ -148,26 +130,6 @@ public sealed class InviteEndpoints : IEndpoint
 		return TypedResults.Ok(inviteDetailsResponse);
 	}
 
-	private static Results<Ok<CreateInviteRequest>, UnauthorizedHttpResult, ForbidHttpResult> GetCreateInviteTemplateAsync(
-		[FromServices] ICurrentUser currentUser)
-	{
-		var guardResult = EnsureTenantAccess<CreateInviteRequest>(currentUser);
-		if (guardResult is not null)
-		{
-			return guardResult;
-		}
-
-		CreateInviteRequest inviteTemplate = new CreateInviteRequest
-		{
-			Channel = InviteChannel.Email,
-			IntendedRole = InviteTenantRole.TenantUser,
-			IntendedTier = InviteAccountTier.Investor,
-			TargetValue = string.Empty
-		};
-
-		return TypedResults.Ok(inviteTemplate);
-	}
-
 	private static async Task<Results<Created<CreateInviteResponse>, ValidationProblem, ProblemHttpResult, UnauthorizedHttpResult, ForbidHttpResult>> CreateInviteAsync(
 		[FromBody] CreateInviteRequest request,
 		[FromServices] IMediator mediator,
@@ -176,20 +138,20 @@ public sealed class InviteEndpoints : IEndpoint
 		HttpContext httpContext,
 		CancellationToken ct)
 	{
-		if (!currentUser.IsAuthenticated)
-		{
-			return TypedResults.Unauthorized();
-		}
-
 		if (currentUser.TenantId == TenantId.Empty)
 		{
 			return TypedResults.Forbid();
 		}
 
-		Dictionary<string, string[]> errors = Validate(request);
-		if (errors.Count > 0)
+		Role role = request.IntendedRole.ToBusiness();
+		AccountTier tier = request.IntendedTier.ToBusiness();
+
+		if (role == Role.None || tier == AccountTier.None)
 		{
-			return TypedResults.ValidationProblem(errors);
+			return TypedResults.Problem(
+				title: "Invalid invite payload",
+				detail: "Unsupported role or tier.",
+				statusCode: StatusCodes.Status400BadRequest);
 		}
 
 		InviteTarget inviteTarget;
@@ -208,19 +170,6 @@ public sealed class InviteEndpoints : IEndpoint
 			return TypedResults.Problem(
 				title: "Invalid invite target",
 				detail: ex.Message,
-				statusCode: StatusCodes.Status400BadRequest);
-		}
-
-
-		Role role = request.IntendedRole.ToBusiness();
-
-		AccountTier tier = request.IntendedTier.ToBusiness();
-
-		if (role == Role.None || tier == AccountTier.None)
-		{
-			return TypedResults.Problem(
-				title: "Invalid invite payload",
-				detail: "Unsupported role or tier.",
 				statusCode: StatusCodes.Status400BadRequest);
 		}
 
@@ -246,18 +195,9 @@ public sealed class InviteEndpoints : IEndpoint
 				statusCode: MapToStatusCode(result));
 		}
 
-		string acceptInviteUrl = string.Empty;
-		string declineInviteUrl = string.Empty;
-		if (inviteTarget.Type == Core.Identity.Enums.InviteChannel.Email)
-		{
-			acceptInviteUrl = BuildAbsoluteUrl(httpContext, $"/auth/login/google?inviteToken={result.Value.Token}");
-			declineInviteUrl = BuildAbsoluteUrl(httpContext, $"/publicActions/declineInvite?inviteToken={result.Value.Token}");
-		}
-		
 		var response = new CreateInviteResponse(
 			InviteId: result.Value.InviteId,
-			AcceptInviteUrl: acceptInviteUrl,
-			DeclineInviteUrl: declineInviteUrl,
+			RawToken: result.Value.Token,
 			ExpiresAtUtc: result.Value.ExpiresAtUtc);
 
 		return TypedResults.Created($"/tenant/invites/{result.Value.InviteId}", response);
@@ -269,16 +209,6 @@ public sealed class InviteEndpoints : IEndpoint
 		[FromServices] ICurrentUser currentUser,
 		CancellationToken ct)
 	{
-		if (!currentUser.IsAuthenticated)
-		{
-			return TypedResults.Unauthorized();
-		}
-
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
-
 		// todo : implement me
 		//var resendInviteCommand = new ResendInviteCommand(currentUser.TenantId, inviteId);
 
@@ -292,7 +222,10 @@ public sealed class InviteEndpoints : IEndpoint
 		//		statusCode: MapToStatusCode(result));
 		//}
 
-		return TypedResults.NoContent();
+		return TypedResults.Problem(
+			title: "Not Implemented",
+			detail: "Resend invite endpoint is not implemented yet.",
+			statusCode: StatusCodes.Status501NotImplemented);
 	}
 
 	private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>> RevokeInviteAsync(
@@ -301,16 +234,6 @@ public sealed class InviteEndpoints : IEndpoint
 		[FromServices] ICurrentUser currentUser,
 		CancellationToken ct)
 	{
-		if (!currentUser.IsAuthenticated)
-		{
-			return TypedResults.Unauthorized();
-		}
-
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
-
 		// todo: implement me
 		//var revokeInviteCommand = new RevokeInviteCommand(currentUser.TenantId, inviteId);
 
@@ -324,45 +247,37 @@ public sealed class InviteEndpoints : IEndpoint
 		//		statusCode: MapToStatusCode(result));
 		//}
 
-		return TypedResults.NoContent();
-	}
-
-	private static Dictionary<string, string[]> Validate(CreateInviteRequest request)
-	{
-		var errors = new Dictionary<string, string[]>();
-
-		if (string.IsNullOrWhiteSpace(request.TargetValue))
-		{
-			errors["targetValue"] = ["Target value is required."];
-		}
-
-		return errors;
+		return TypedResults.Problem(
+			title: "Not Implemented",
+			detail: "Revoke invite endpoint is not implemented yet.",
+			statusCode: StatusCodes.Status501NotImplemented);
 	}
 
 	private static int MapToStatusCode<T>(TypedResult<T> result)
 	{
-		// todo : adjust to your real error model/codes
+		if (result.Error is null || string.IsNullOrEmpty(result.Error.Code))
+		{
+			return StatusCodes.Status400BadRequest;
+		}
+
+		var errorCode = result.Error.Code;
+
+		if (errorCode.Contains("NotFound", StringComparison.OrdinalIgnoreCase))
+		{
+			return StatusCodes.Status404NotFound;
+		}
+
+		if (errorCode.Contains("Conflict", StringComparison.OrdinalIgnoreCase))
+		{
+			return StatusCodes.Status409Conflict;
+		}
+
+		if (errorCode.Contains("Validation", StringComparison.OrdinalIgnoreCase))
+		{
+			return StatusCodes.Status400BadRequest;
+		}
+
+		// Default fallback
 		return StatusCodes.Status400BadRequest;
-	}
-
-	private static Results<Ok<T>, UnauthorizedHttpResult, ForbidHttpResult>? EnsureTenantAccess<T>(ICurrentUser currentUser)
-	{
-		if (!currentUser.IsAuthenticated)
-		{
-			return TypedResults.Unauthorized();
-		}
-
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
-
-		return null;
-	}
-
-	private static string BuildAbsoluteUrl(HttpContext httpContext, string relativePath)
-	{
-		// todo : move to invite link builder service
-		return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{relativePath}";
 	}
 }

@@ -4,5 +4,5 @@ namespace Portiforce.SAA.Web.Client.Services.Interfaces;
 
 public interface IAdminApiClient
 {
-	Task InviteUserAsync(CreateInviteRequest request);
+	Task<CreateInviteResponse> InviteUserAsync(CreateInviteRequest request, CancellationToken ct = default);
 }

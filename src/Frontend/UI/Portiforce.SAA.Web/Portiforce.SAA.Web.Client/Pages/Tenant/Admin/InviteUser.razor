@@ -1,4 +1,4 @@
-﻿@page "/tenant/admin/inviteUser"
+﻿@page "/tenant/admin/users/invite"
 
 @using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Invite
@@ -24,8 +24,8 @@
             <div class="row g-3">
 
                 <div class="col-12 col-md-4">
-                    <label class="form-label">Invite channel</label>
-                    <InputSelect @bind-Value="inviteModel.Channel" class="form-select" @onchange="OnChannelChanged">
+                    <label class="form-label fw-bold">Invite channel</label>
+                    <InputSelect @bind-Value="inviteModel.Channel" @bind-Value:after="OnChannelChanged" class="form-select">
                         <option value="@InviteChannel.Email">Email</option>
                         <option value="@InviteChannel.Telegram">Telegram</option>
                         <option value="@InviteChannel.AppleId">Apple ID</option>
@@ -34,14 +34,14 @@
                 </div>
 
                 <div class="col-12 col-md-8">
-                    <label class="form-label">@ValueLabel</label>
+                    <label class="form-label fw-bold">@ValueLabel</label>
                     <InputText @bind-Value="inviteModel.TargetValue" class="form-control" placeholder="@ValuePlaceholder" />
                     <div class="form-text">@ValueHelpText</div>
                     <ValidationMessage For="@(() => inviteModel.TargetValue)" />
                 </div>
 
                 <div class="col-12 col-md-6">
-                    <label class="form-label">Intended role</label>
+                    <label class="form-label fw-bold">Intended role</label>
                     <InputSelect @bind-Value="inviteModel.IntendedRole" class="form-select">
                         <option value="@InviteTenantRole.TenantUser">Tenant user</option>
                         <option value="@InviteTenantRole.TenantAdmin">Tenant admin</option>
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="col-12 col-md-6">
-                    <label class="form-label">Account tier</label>
+                    <label class="form-label fw-bold">Account tier</label>
                     <InputSelect @bind-Value="inviteModel.IntendedTier" class="form-select">
                         <option value="@InviteAccountTier.Observer">Observer</option>
                         <option value="@InviteAccountTier.Investor">Investor</option>
@@ -78,7 +78,13 @@
 </div>
 
 @code {
-    private CreateInviteRequest inviteModel = new();
+    private CreateInviteRequest inviteModel = new()
+    {
+        Channel = InviteChannel.Email,
+        IntendedRole = InviteTenantRole.TenantUser,
+        IntendedTier = InviteAccountTier.Investor,
+        TargetValue = string.Empty
+    };
 
     private bool isSubmitting;
     private string? error;
@@ -107,9 +113,8 @@
         _ => ""
     };
 
-    private void OnChannelChanged(ChangeEventArgs _)
+    private void OnChannelChanged()
     {
-        // Optional: clear value when switching channels to reduce accidental mismatches
         inviteModel.TargetValue = string.Empty;
         error = null;
     }
@@ -121,12 +126,16 @@
 
         try
         {
-            await ApiClient.InviteUserAsync(inviteModel);
+           CreateInviteResponse response = await ApiClient.InviteUserAsync(inviteModel);
+        
+            // Example: You could show a toast notification here with response.InviteId
             Nav.NavigateTo("/tenant/admin/users");
         }
         catch (Exception ex)
         {
-            // Replace with your typed API error handling if you have it.
+            // Because of our ApiClient update, 'ex.Message' will now hold 
+            // the exact business logic error (e.g., "Unsupported role or tier.") 
+            // returned by the Minimal API!
             error = ex.Message;
         }
         finally

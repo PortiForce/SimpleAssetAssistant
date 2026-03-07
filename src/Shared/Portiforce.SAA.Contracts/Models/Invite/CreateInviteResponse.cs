@@ -2,6 +2,5 @@
 
 public sealed record CreateInviteResponse(
 	Guid InviteId,
-	string AcceptInviteUrl,
-	string DeclineInviteUrl,
+	string RawToken,
 	DateTimeOffset ExpiresAtUtc);
