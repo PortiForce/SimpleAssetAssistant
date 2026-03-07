@@ -3,14 +3,14 @@ using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Contracts.Models.Invite;
 
-public sealed class CreateInviteRequest : IValidatableObject
+public sealed record CreateInviteRequest : IValidatableObject
 {
 	[Required]
 	public InviteChannel Channel { get; set; } = InviteChannel.Email;
 
 	[Required]
 	[StringLength(256, MinimumLength = 2)]
-	public string Value { get; set; } = string.Empty;
+	public string TargetValue { get; set; } = string.Empty;
 
 	[Required]
 	public InviteTenantRole IntendedRole { get; set; } = InviteTenantRole.TenantUser;
@@ -20,13 +20,13 @@ public sealed class CreateInviteRequest : IValidatableObject
 
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{
-		if (string.IsNullOrWhiteSpace(Value))
+		if (string.IsNullOrWhiteSpace(TargetValue))
 		{
-			yield return new ValidationResult("Value is required.", [nameof(Value)]);
+			yield return new ValidationResult("Value is required.", [nameof(TargetValue)]);
 			yield break;
 		}
 
-		var rawValue = Value.Trim();
+		var rawValue = TargetValue.Trim();
 
 		switch (Channel)
 		{
@@ -34,7 +34,7 @@ public sealed class CreateInviteRequest : IValidatableObject
 				// Let server be the source of truth, but catch obvious issues here.
 				if (!new EmailAddressAttribute().IsValid(rawValue))
 				{
-					yield return new ValidationResult("Please enter a valid email address.", [nameof(Value)]);
+					yield return new ValidationResult("Please enter a valid email address.", [nameof(TargetValue)]);
 				}
 				break;
 
@@ -43,14 +43,14 @@ public sealed class CreateInviteRequest : IValidatableObject
 				var nick = rawValue.StartsWith("@") ? rawValue[1..] : rawValue;
 				if (nick.Length is < 5 or > 32)
 				{
-					yield return new ValidationResult("Telegram username should be 5–32 characters.", [nameof(Value)]);
+					yield return new ValidationResult("Telegram username should be 5–32 characters.", [nameof(TargetValue)]);
 				}
 				// basic charset check (Telegram usernames are letters/digits/underscore)
 				if (nick.Any(c => !(char.IsLetterOrDigit(c) || c == '_')))
 				{
 					yield return new ValidationResult(
 						"Telegram username may contain letters, digits, and underscore only.",
-						[nameof(Value)]);
+						[nameof(TargetValue)]);
 				}
 				break;
 
@@ -61,7 +61,7 @@ public sealed class CreateInviteRequest : IValidatableObject
 				{
 					yield return new ValidationResult(
 						"Apple ID is typically an email address. Please enter a valid value.",
-						[nameof(Value)]);
+						[nameof(TargetValue)]);
 				}
 				break;
 

@@ -88,8 +88,7 @@ public sealed class CreateInviteCommandHandler(
 			return TypedResult<CreateInviteResult>.Fail(limitChecksResult.Error ?? ResultError.Validation("Tenant has no longer capability to create invites"));
 		}
 
-		//todo tech: move to settings
-		var expiresAt = now.AddHours(48);
+		var expiresAt = request.ExpiredAtUtc;
 
 		var rawInviteToken = tokenGenerator.GenerateInviteToken();
 		var tokenHash = hashingService.HashInviteToken(rawInviteToken);

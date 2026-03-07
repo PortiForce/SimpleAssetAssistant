@@ -35,9 +35,9 @@
 
                 <div class="col-12 col-md-8">
                     <label class="form-label">@ValueLabel</label>
-                    <InputText @bind-Value="inviteModel.Value" class="form-control" placeholder="@ValuePlaceholder" />
+                    <InputText @bind-Value="inviteModel.TargetValue" class="form-control" placeholder="@ValuePlaceholder" />
                     <div class="form-text">@ValueHelpText</div>
-                    <ValidationMessage For="@(() => inviteModel.Value)" />
+                    <ValidationMessage For="@(() => inviteModel.TargetValue)" />
                 </div>
 
                 <div class="col-12 col-md-6">
@@ -110,7 +110,7 @@
     private void OnChannelChanged(ChangeEventArgs _)
     {
         // Optional: clear value when switching channels to reduce accidental mismatches
-        inviteModel.Value = string.Empty;
+        inviteModel.TargetValue = string.Empty;
         error = null;
     }
 
