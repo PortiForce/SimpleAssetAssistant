@@ -21,9 +21,4 @@
     <ProjectReference Include="..\..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Platform\" />
-    <Folder Include="Pages\Tenant\User\" />
-  </ItemGroup>
-
 </Project>

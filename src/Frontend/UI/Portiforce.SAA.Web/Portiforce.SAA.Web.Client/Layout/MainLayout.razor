@@ -16,13 +16,7 @@
                 </a>
             </div>
         </div>
-
-        <input title="Navigation menu" id="sidebarToggle" class="navbar-toggler" @bind="collapseNavMenu" />
-
-        <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-            <NavMenu />
-        </div>
-
+        <NavMenu />
         <div class="sidebar-footer">
             <LoginDisplay />
         </div>
@@ -55,14 +49,3 @@
 </div>
 
 <ReconnectModal />
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

@@ -1,13 +1,18 @@
-@using Portiforce.SAA.Contracts
+@implements IDisposable
+
+@inject NavigationManager NavigationManager
 
 <AuthorizeView>
     <Authorized>
         <div class="user-info">
             <span class="user-greeting">Hello, @GetUserName(context.User)!</span>
-            <a href="@AuthRoutes.Logout" class="btn-logout">
-                <span class="bi bi-box-arrow-right"></span>
-                Logout
-            </a>
+            <form action="@AuthRoutes.Logout" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                <button type="submit" class="btn-logout">
+                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                </button>
+            </form>
         </div>
     </Authorized>
     <NotAuthorized>
@@ -19,9 +24,29 @@
 </AuthorizeView>
 
 @code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
     private string GetUserName(System.Security.Claims.ClaimsPrincipal user)
     {
-        return user.Identity?.Name
+        return user.Identity?.Name 
+            ?? user.FindFirst("firstName")?.Value
             ?? user.FindFirst("name")?.Value
             ?? user.FindFirst("preferred_username")?.Value
             ?? user.FindFirst("email")?.Value?.Split('@')[0]

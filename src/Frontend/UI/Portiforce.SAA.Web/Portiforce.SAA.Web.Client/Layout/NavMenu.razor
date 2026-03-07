@@ -1,72 +1,101 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+@using Microsoft.AspNetCore.Components.Authorization
 @using Portiforce.SAA.Contracts.UiSetup
 
-<nav class="flex-column">
-    <div class="nav-item px-3">
-        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-            <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
-        </NavLink>
-    </div>
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-    <AuthorizeView>
-        <Authorized>
-            <div class="nav-section">
-                <div class="nav-section-header px-3">
-                    <span class="bi bi-wallet2"></span> My Portfolio
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/portfolio">
-                        <span class="bi bi-graph-up" aria-hidden="true"></span> Dashboard
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/assets">
-                        <span class="bi bi-wallet2" aria-hidden="true"></span> My Assets
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/import/single">
-                        <span class="bi bi-cloud-upload" aria-hidden="true"></span> Import Data
-                    </NavLink>
-                </div>
-            </div>
-
-            <AuthorizeView Policy="@UiPolicies.TenantAdmin" Context="adminContext">
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <AuthorizeView>
+            <Authorized>
                 <div class="nav-section">
                     <div class="nav-section-header px-3">
-                        <span class="bi bi-gear"></span> Administration
+                        <span class="bi bi-wallet2"></span> My Portfolio
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/admin/users">
-                            <span class="bi bi-people-fill" aria-hidden="true"></span> Users
+                        <NavLink class="nav-link" href="tenant/user/portfolio">
+                            <span class="bi bi-graph-up" aria-hidden="true"></span> Dashboard
                         </NavLink>
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/admin/platforms">
-                            <span class="bi bi-shield-lock" aria-hidden="true"></span> Platforms
+                        <NavLink class="nav-link" href="tenant/user/assets">
+                            <span class="bi bi-wallet2" aria-hidden="true"></span> My Assets
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tenant/user/registerChange">
+                            <span class="bi bi-cloud-upload" aria-hidden="true"></span> Register Change
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tenant/user/importBatch">
+                            <span class="bi bi-cloud-upload" aria-hidden="true"></span> Import Batch
                         </NavLink>
                     </div>
                 </div>
-            </AuthorizeView>
 
-            <AuthorizeView Policy="@UiPolicies.PlatformOwner" Context="ownerContext">
-                <div class="nav-section">
-                    <div class="nav-section-header px-3">
-                        <span class="bi bi-hdd-rack"></span> System
-                    </div>
+                <AuthorizeView Policy="@UiPolicies.TenantAdmin" Context="adminContext">
+                    <div class="nav-section">
+                        <div class="nav-section-header px-3">
+                            <span class="bi bi-gear"></span> Administration
+                        </div>
 
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="platform/tenants">
-                            <span class="bi bi-hdd-network" aria-hidden="true"></span> All Tenants
-                        </NavLink>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="tenant/admin/users">
+                                <span class="bi bi-people-fill" aria-hidden="true"></span> Users
+                            </NavLink>
+                        </div>
+
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="tenant/admin/platforms">
+                                <span class="bi bi-shield-lock" aria-hidden="true"></span> Platforms
+                            </NavLink>
+                        </div>
                     </div>
-                </div>
-            </AuthorizeView>
-        </Authorized>
-    </AuthorizeView>
-</nav>
+                </AuthorizeView>
+
+                <AuthorizeView Policy="@UiPolicies.PlatformOwner" Context="ownerContext">
+                    <div class="nav-section">
+                        <div class="nav-section-header px-3">
+                            <span class="bi bi-hdd-rack"></span> System
+                        </div>
+
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="platform/tenants">
+                                <span class="bi bi-hdd-network" aria-hidden="true"></span> All Tenants
+                            </NavLink>
+                        </div>
+                    </div>
+                </AuthorizeView>
+            </Authorized>
+        </AuthorizeView>
+    </nav>
+</div>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

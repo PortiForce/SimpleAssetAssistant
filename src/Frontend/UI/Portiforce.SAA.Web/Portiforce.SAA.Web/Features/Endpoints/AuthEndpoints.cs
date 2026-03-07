@@ -205,9 +205,11 @@ public sealed class AuthEndpoints : IEndpoint
 		return TypedResults.Redirect("/");
 	}
 
-	private static async Task<IResult> LogoutAsync(HttpContext context)
+	private static async Task<IResult> LogoutAsync(
+		HttpContext context,
+		[FromForm] string returnUrl)
 	{
 		await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-		return TypedResults.Redirect("/");
+		return TypedResults.LocalRedirect($"~/{returnUrl}");
 	}
 }
