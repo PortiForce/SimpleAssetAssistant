@@ -1,4 +1,9 @@
-﻿@page "/tenant/account/dashboard"
+﻿@page "/me/dashboard"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.TenantUser)]
+
 <h3>Dashboard</h3>
 
 @code {

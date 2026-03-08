@@ -23,6 +23,7 @@
     <Folder Include="Components\Tenant\Account\Pages\" />
     <Folder Include="Components\Tenant\Admin\Pages\" />
     <Folder Include="Components\Tenant\User\Pages\" />
+    <Folder Include="Infrastructure\Interfaces\" />
   </ItemGroup>
 
 </Project>

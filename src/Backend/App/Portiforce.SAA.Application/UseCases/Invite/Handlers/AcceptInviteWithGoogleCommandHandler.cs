@@ -7,7 +7,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;

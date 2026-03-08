@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Application.Tech.Messaging;
+﻿namespace Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 
 public interface INotificationHandler<in TNotification>
 	where TNotification : INotification

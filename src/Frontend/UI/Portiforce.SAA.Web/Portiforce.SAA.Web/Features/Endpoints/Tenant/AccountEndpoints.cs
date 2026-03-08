@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-
+using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Web.Infrastructure;
 
@@ -9,7 +9,7 @@ public sealed class AccountEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup("/tenant/account")
+		var group = app.MapGroup(ApiRoutes.Account)
 			.WithTags("Tenant Account")
 			.RequireAuthorization(UiPolicies.TenantUser);
 
@@ -23,6 +23,12 @@ public sealed class AccountEndpoints : IEndpoint
 		// Portfolio Placeholder
 		group.MapGet("/portfolio", GetPortfolioAsync)
 			.WithName("GetTenantPortfolio")
+			.Produces(StatusCodes.Status200OK)
+			.ProducesProblem(StatusCodes.Status501NotImplemented);
+
+		// Assets Placeholder
+		group.MapGet("/assets", GetAssetsAsync)
+			.WithName("GetAssets")
 			.Produces(StatusCodes.Status200OK)
 			.ProducesProblem(StatusCodes.Status501NotImplemented);
 	}
@@ -41,6 +47,14 @@ public sealed class AccountEndpoints : IEndpoint
 		return TypedResults.Problem(
 			title: "Not Implemented",
 			detail: "Portfolio endpoint is not implemented yet.",
+			statusCode: StatusCodes.Status501NotImplemented);
+	}
+
+	private static async Task<Results<Ok, ProblemHttpResult>> GetAssetsAsync(CancellationToken ct)
+	{
+		return TypedResults.Problem(
+			title: "Not Implemented",
+			detail: "Assets endpoint is not implemented yet.",
 			statusCode: StatusCodes.Status501NotImplemented);
 	}
 }

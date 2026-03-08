@@ -1,4 +1,9 @@
-﻿@page "/tenant/admin/invites"
+﻿@page "/admin/invites"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+
 <h3>Invites</h3>
 
 @code {

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Contracts.Contexts;
@@ -9,6 +10,8 @@ using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.Services.Time;
+using Portiforce.SAA.Web.Client.Services;
+using Portiforce.SAA.Web.Client.Services.Interfaces;
 using Portiforce.SAA.Web.Components;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Middleware;
@@ -32,15 +35,26 @@ public class Program
 		builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
 		builder.Services.AddScoped<TenantContext>();
 		builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
-		builder.Services.AddHttpClient<Portiforce.SAA.Web.Client.Services.TenantApiClient>((sp, http) =>
-		{
-			var ctx = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			          ?? throw new InvalidOperationException("No active HttpContext.");
-
-			http.BaseAddress = new Uri($"{ctx.Request.Scheme}://{ctx.Request.Host}");
-		});
 
 		builder.Services.AddHttpContextAccessor();
+
+		// todo alex: check this setup here (should it be rewritten/optimized)?
+		builder.Services.AddHttpClient<TenantApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+			                          ?? throw new InvalidOperationException("TenantApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+
+		builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+			                          ?? throw new InvalidOperationException("AdminApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+		
 		builder.Services.AddMemoryCache();
 
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
@@ -119,7 +133,7 @@ public class Program
 			options.AddPolicy(UiPolicies.PlatformAdmin, p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantAdmin, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantUser, p => p.RequireRole(UiRoles.TenantUser, UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-
+			
 			// Granular (start small)
 			options.AddPolicy(UiPolicies.InviteUsers, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 		});
@@ -138,6 +152,11 @@ public class Program
 
 		builder.Services.AddSingleton<IClock, SystemClock>();
 
+		builder.Services.AddAntiforgery(options =>
+		{
+			options.HeaderName = "RequestVerificationToken";
+		});
+
 		var app = builder.Build();
 
 		if (app.Environment.IsDevelopment())
@@ -152,7 +171,9 @@ public class Program
 
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
-		app.UseAntiforgery();
+
+		// figure out endpoints before auth, so we can skip auth for static files, etc.
+		app.UseRouting();
 
 		// Tenant must run early (before auth decisions if you do tenant-bound checks)
 		app.UseMiddleware<TenantResolutionMiddleware>();
@@ -160,6 +181,9 @@ public class Program
 		// Auth must be before endpoints
 		app.UseAuthentication();
 		app.UseAuthorization();
+
+		// allow to the flow define`.DisableAntiforgery()` metadata on your endpoint!
+		app.UseAntiforgery();
 
 		// This line automatically discovers InviteEndpoints, AuthEndpoints, etc.
 		app.MapEndpoints();

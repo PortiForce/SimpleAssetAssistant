@@ -1,0 +1,13 @@
+﻿@page "/admin/invites/{InviteId:guid}"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+
+<h3>Invite details</h3>
+
+@code {
+    [Parameter]
+    public Guid InviteId { get; set; }
+
+}

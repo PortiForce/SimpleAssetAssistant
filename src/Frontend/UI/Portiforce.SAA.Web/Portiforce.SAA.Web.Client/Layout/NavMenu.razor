@@ -1,41 +1,45 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
-
-@using Microsoft.AspNetCore.Components.Authorization
 @using Portiforce.SAA.Contracts.UiSetup
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+<div class="nav-scrollable">
     <nav class="flex-column">
         <AuthorizeView>
             <Authorized>
                 <div class="nav-section">
                     <div class="nav-section-header px-3">
-                        <span class="bi bi-wallet2"></span> My Portfolio
+                        <span class="bi bi-wallet2"></span> My space
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/user/portfolio">
+                        <NavLink class="nav-link" href="/me/dashboard" Match="NavLinkMatch.Prefix">
                             <span class="bi bi-graph-up" aria-hidden="true"></span> Dashboard
+                        </NavLink>
+                    </div>
+                    
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/portfolio" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-graph-up" aria-hidden="true"></span> Portfolio
                         </NavLink>
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/user/assets">
+                        <NavLink class="nav-link" href="/me/assets" Match="NavLinkMatch.Prefix">
                             <span class="bi bi-wallet2" aria-hidden="true"></span> My Assets
                         </NavLink>
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/user/registerChange">
+                        <NavLink class="nav-link" href="/me/register-change" Match="NavLinkMatch.Prefix">
                             <span class="bi bi-cloud-upload" aria-hidden="true"></span> Register Change
                         </NavLink>
                     </div>
 
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/user/importBatch">
+                        <NavLink class="nav-link" href="/me/import-batch" Match="NavLinkMatch.Prefix">
                             <span class="bi bi-cloud-upload" aria-hidden="true"></span> Import Batch
                         </NavLink>
                     </div>
@@ -46,16 +50,28 @@
                         <div class="nav-section-header px-3">
                             <span class="bi bi-gear"></span> Administration
                         </div>
+                        
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/invites" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-people-fill" aria-hidden="true"></span> Invites
+                            </NavLink>
+                        </div>
 
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="tenant/admin/users">
+                            <NavLink class="nav-link" href="/admin/users" Match="NavLinkMatch.Prefix">
                                 <span class="bi bi-people-fill" aria-hidden="true"></span> Users
                             </NavLink>
                         </div>
 
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="tenant/admin/platforms">
+                            <NavLink class="nav-link" href="/admin/platforms" Match="NavLinkMatch.Prefix">
                                 <span class="bi bi-shield-lock" aria-hidden="true"></span> Platforms
+                            </NavLink>
+                        </div>
+                        
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/assets" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-shield-lock" aria-hidden="true"></span> Assets
                             </NavLink>
                         </div>
                     </div>
@@ -68,7 +84,7 @@
                         </div>
 
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="platform/tenants">
+                            <NavLink class="nav-link" href="/platform/tenants" Match="NavLinkMatch.Prefix">
                                 <span class="bi bi-hdd-network" aria-hidden="true"></span> All Tenants
                             </NavLink>
                         </div>

@@ -1,5 +1,10 @@
-﻿@page "/tenant/admin/assets"
-<h3>Assets</h3>
+﻿@page "/admin/assets"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+
+<h3>Asset management</h3>
 
 @code {
 

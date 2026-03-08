@@ -1,4 +1,9 @@
 ﻿@page "/platform/tenants"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.PlatformAdmin)]
+
 <h3>Tenants</h3>
 
 @code {

@@ -4,11 +4,12 @@ using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
+using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Models.Invite;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
@@ -16,26 +17,27 @@ using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
+
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 
-namespace Portiforce.SAA.Web.Features.Endpoints.Tenants;
+namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 
 public sealed class InviteEndpoints : IEndpoint
 {
 	/*
-		GET    /tenant/invites
-		GET    /tenant/invites/{inviteId:guid}
-		GET    /tenant/invites/template
-		POST   /tenant/invites
-		POST   /tenant/invites/{inviteId:guid}/resend
-		POST   /tenant/invites/{inviteId:guid}/revoke
+		GET    /bff/invites
+		GET    /bff/invites/{inviteId:guid}
+		GET    /bff/invites/template
+		POST   /bff/invites
+		POST   /bff/invites/{inviteId:guid}/resend
+		POST   /bff/invites/{inviteId:guid}/revoke
 	 */
 
 	private const int DefaultInviteLifetimeHours = 48;
 
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup("/tenant/invites")
+		var group = app.MapGroup(ApiRoutes.Invites)
 			.WithTags("Tenant Invites")
 			.RequireAuthorization(UiPolicies.TenantAdmin)
 			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
@@ -200,7 +202,7 @@ public sealed class InviteEndpoints : IEndpoint
 			RawToken: result.Value.Token,
 			ExpiresAtUtc: result.Value.ExpiresAtUtc);
 
-		return TypedResults.Created($"/tenant/invites/{result.Value.InviteId}", response);
+		return TypedResults.Created($"/bff/invites/{result.Value.InviteId}", response);
 	}
 
 	private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>> ResendInviteAsync(

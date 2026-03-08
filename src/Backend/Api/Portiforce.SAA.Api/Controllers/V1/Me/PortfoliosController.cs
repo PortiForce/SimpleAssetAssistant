@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Portiforce.SAA.Application.Tech.Messaging;
+
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 
 namespace Portiforce.SAA.Api.Controllers.V1.Me;
 

@@ -1,5 +1,10 @@
-﻿@page "/tenant/admin/platforms"
-<h3>Platforms</h3>
+﻿@page "/admin/platforms"
+
+@using Portiforce.SAA.Contracts.UiSetup
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+
+<h3>Platform management</h3>
 
 @code {
 

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Tech.Messaging;
+﻿using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Projections;
 using Portiforce.SAA.Core.Primitives.Ids;
 

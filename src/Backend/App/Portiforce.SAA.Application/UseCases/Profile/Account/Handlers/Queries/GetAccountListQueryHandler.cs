@@ -1,6 +1,6 @@
 ﻿using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 

@@ -2,7 +2,7 @@
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Platform.Actions.Commands;
 using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;

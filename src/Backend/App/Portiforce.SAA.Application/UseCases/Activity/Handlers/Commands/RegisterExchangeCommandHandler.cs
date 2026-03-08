@@ -2,7 +2,7 @@
 using Portiforce.SAA.Application.Interfaces.Guards;
 using Portiforce.SAA.Application.Interfaces.Services.Activity;
 using Portiforce.SAA.Application.Interfaces.Services.Asset;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Activity.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Factories;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Rules;

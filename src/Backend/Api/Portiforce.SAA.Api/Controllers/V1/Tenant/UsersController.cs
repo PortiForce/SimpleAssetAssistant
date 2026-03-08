@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Api.Contracts.Client.Tenant.Requests;
 using Portiforce.SAA.Api.Contracts.Profile.Account.Mappers;
 using Portiforce.SAA.Api.Contracts.Profile.Account.Requests;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;

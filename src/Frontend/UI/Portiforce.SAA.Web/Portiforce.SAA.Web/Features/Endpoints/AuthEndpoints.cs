@@ -1,15 +1,18 @@
 ﻿using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Application.FlowResult;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Auth.Result;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
+using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Core.Identity.Enums;
@@ -22,7 +25,7 @@ public sealed class AuthEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup("/auth").WithTags("Authentication");
+		var group = app.MapGroup(ApiRoutes.Auth).WithTags("Authentication");
 
 		group.MapPost("/login", LoginAsync)
 			.WithName("LocalLogin");
@@ -208,6 +211,6 @@ public sealed class AuthEndpoints : IEndpoint
 		[FromForm] string returnUrl)
 	{
 		await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-		return TypedResults.LocalRedirect($"~/{returnUrl}");
+		return TypedResults.LocalRedirect("/");
 	}
 }
