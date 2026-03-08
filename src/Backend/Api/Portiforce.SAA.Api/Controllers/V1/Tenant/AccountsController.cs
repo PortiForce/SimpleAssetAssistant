@@ -19,7 +19,7 @@ namespace Portiforce.SAA.Api.Controllers.V1.Tenant;
 [ApiController]
 [Route("api/v1/tenant/{controller}")]
 [Authorize]
-public sealed class UsersController(
+public sealed class AccountsController(
 	IMediator mediator) : ControllerBase
 {
 	[HttpPost]
@@ -57,7 +57,13 @@ public sealed class UsersController(
 		[FromQuery] PageRequest pageRequest,
 		CancellationToken ct)
 	{
-		var query = new GetAccountListQuery(currentUser.TenantId, pageRequest);
+		var query = new GetAccountListQuery(
+			currentUser.TenantId,
+			null,
+			null,
+			null,
+			null,
+			pageRequest);
 		PagedResult<AccountListItem> result = await mediator.Send(query, ct);
 
 		return Ok(result);
@@ -77,7 +83,7 @@ public sealed class UsersController(
 			new AccountId(userId),
 			currentUser.TenantId);
 
-		AccountDetails result = await mediator.Send(query, ct);
+		TypedResult<AccountDetails> result = await mediator.Send(query, ct);
 
 		return Ok(result);
 	}

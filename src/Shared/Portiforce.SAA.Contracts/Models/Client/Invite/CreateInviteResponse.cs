@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Contracts.Models.Invite;
+﻿namespace Portiforce.SAA.Contracts.Models.Client.Invite;
 
 public sealed record CreateInviteResponse(
 	Guid InviteId,

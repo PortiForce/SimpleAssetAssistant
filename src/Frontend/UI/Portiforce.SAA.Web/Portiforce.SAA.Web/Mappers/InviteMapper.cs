@@ -1,15 +1,14 @@
 ﻿using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Contracts.Enums;
-using Portiforce.SAA.Contracts.Models.Invite;
+using Portiforce.SAA.Contracts.Models.Client.Invite;
 using Portiforce.SAA.Core.Identity.Enums;
 
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Mappers;
 
-public static class InviteMappers
+public static class InviteMapper
 {
 	public static InviteAccountTier ToPresentation(this AccountTier domainTier) => domainTier switch
 	{

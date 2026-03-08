@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Models.Auth;
@@ -10,14 +11,14 @@ using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Contracts.Configuration;
-using Portiforce.SAA.Contracts.Models.Invite;
+using Portiforce.SAA.Contracts.Models.Client.Invite;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
-
+using GetInviteListQueryRequest = Portiforce.SAA.Contracts.Models.Client.Invite.GetInviteListQueryRequest;
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
@@ -100,8 +101,9 @@ public sealed class InviteEndpoints : IEndpoint
 			request.Search,
 			status,
 			channel,
-			request.Page,
-			request.PageSize);
+			new PageRequest(
+				request.Page,
+				request.PageSize));
 
 		PagedResult<InviteListItem> result = await mediator.Send(query, ct);
 

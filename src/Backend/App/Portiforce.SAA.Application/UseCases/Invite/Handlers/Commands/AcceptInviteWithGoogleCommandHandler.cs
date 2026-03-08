@@ -17,7 +17,7 @@ using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Identity.Models.Profile;
 using Portiforce.SAA.Core.Primitives;
 
-namespace Portiforce.SAA.Application.UseCases.Invite.Handlers;
+namespace Portiforce.SAA.Application.UseCases.Invite.Handlers.Commands;
 
 public sealed class AcceptInviteWithGoogleCommandHandler(
 	IHashingService hashing,

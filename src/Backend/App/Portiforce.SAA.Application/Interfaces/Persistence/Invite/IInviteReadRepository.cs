@@ -1,5 +1,6 @@
 ﻿using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -7,9 +8,12 @@ namespace Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 
 public interface IInviteReadRepository : IReadRepository<InviteDetails, Guid>
 {
-	Task<PagedResult<InviteListItem>> GetByTenantIdAsync(
-		TenantId tenantId,
-		PageRequest pageRequest,
+	Task<PagedResult<InviteListItem>> GetListAsync(
+		TenantId requestTenantId,
+		InviteChannel? requestChannel,
+		InviteState? requestState,
+		string? requestSearch,
+		PageRequest requestPageRequest,
 		CancellationToken ct);
 
 	Task<InviteDetails?> GetByInviteTargetAndTenantAsync(

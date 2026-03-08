@@ -6,6 +6,8 @@ using Portiforce.SAA.Application.Interfaces.Services.Activity;
 using Portiforce.SAA.Core.Activities.Models.Activities;
 using Portiforce.SAA.Core.Primitives.Ids;
 
+namespace Portiforce.SAA.Application.UseCases.Activity.Flow.Services;
+
 internal sealed class ActivityPersistenceService(
 	IActivityWriteRepository activityWriteRepository,
 	IUnitOfWork unitOfWork) : IActivityPersistenceService

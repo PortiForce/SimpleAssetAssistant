@@ -56,7 +56,10 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		return data;
 	}
 
-	public async Task<PagedResult<InviteListItem>> GetByTenantIdAsync(TenantId tenantId, PageRequest pageRequest, CancellationToken ct)
+	public async Task<PagedResult<InviteListItem>> GetByTenantIdAsync(
+		TenantId tenantId,
+		PageRequest pageRequest,
+		CancellationToken ct)
 	{
 		IQueryable<TenantInvite> query = db.Invites
 			.AsNoTracking()
@@ -67,6 +70,50 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		List<InviteListItem> items = await query
 			.OrderBy(x => x.Id)
 			.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
+			.Take(pageRequest.PageSize)
+			.Select(ListItemSelector)
+			.ToListAsync(ct);
+
+		return new PagedResult<InviteListItem>(
+			items,
+			totalCount,
+			pageRequest.PageNumber,
+			pageRequest.PageSize);
+	}
+
+	public async Task<PagedResult<InviteListItem>> GetListAsync(
+		TenantId tenantId,
+		InviteChannel? requestChannel,
+		InviteState? requestState,
+		string? requestSearch,
+		PageRequest pageRequest,
+		CancellationToken ct)
+	{
+		IQueryable<TenantInvite> query = db.Invites
+			.AsNoTracking()
+			.Where(x => x.TenantId == tenantId);
+
+		if (requestChannel is not null)
+		{
+			query = query.Where(x => x.InviteTarget.Type == requestChannel);
+		}
+
+		if (requestState is not null)
+		{
+			query = query.Where(x => x.State == requestState);
+		}
+
+		if (!string.IsNullOrWhiteSpace(requestSearch))
+		{
+			query = query.Where(x => x.InviteTarget.Value.Contains(requestSearch));
+		}
+
+		int skip = (pageRequest.PageNumber - 1) *pageRequest.PageSize;
+		int totalCount = await query.CountAsync(ct);
+
+		List<InviteListItem> items = await query
+			.OrderBy(x => x.Id)
+			.Skip(skip)
 			.Take(pageRequest.PageSize)
 			.Select(ListItemSelector)
 			.ToListAsync(ct);

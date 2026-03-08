@@ -1,9 +1,8 @@
 ﻿using Portiforce.SAA.Contracts.Enums;
 
-namespace Portiforce.SAA.Contracts.Models.Invite;
+namespace Portiforce.SAA.Contracts.Models.Client.User;
 
-public sealed record GetInviteListQueryRequest(
-	Guid TenantId,
+public sealed record GetAccountListQueryRequest(
 	string? Search,
 	InviteStatus? Status,
 	InviteChannel? Channel,

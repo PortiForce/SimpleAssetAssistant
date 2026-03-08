@@ -13,7 +13,7 @@ using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Application.UseCases.Invite.Handlers;
+namespace Portiforce.SAA.Application.UseCases.Invite.Handlers.Commands;
 
 public sealed class CreateInviteCommandHandler(
 	ITokenGenerator tokenGenerator,

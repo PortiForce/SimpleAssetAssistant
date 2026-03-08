@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using Portiforce.SAA.Contracts.Enums;
 
-namespace Portiforce.SAA.Contracts.Models.Invite;
+namespace Portiforce.SAA.Contracts.Models.Client.Invite;
 
 public sealed record CreateInviteRequest : IValidatableObject
 {
