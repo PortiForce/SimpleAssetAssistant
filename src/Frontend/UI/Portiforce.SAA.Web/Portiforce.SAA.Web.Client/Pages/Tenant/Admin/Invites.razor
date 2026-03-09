@@ -45,32 +45,35 @@
     else if (invitesData?.Items is { Count: > 0 })
     {
         <div class="table-responsive">
-            <QuickGrid Items="invitesData.Items.AsQueryable()" Class="table table-striped table-hover align-middle">
+            <QuickGrid TGridItem="InviteListItemResponse"
+                       Items="invitesData.Items.AsQueryable()"
+                       Class="table table-striped table-hover align-middle">
+
                 <PropertyColumn Property="x => x.InviteTargetValue" Title="Target" Sortable="true"/>
                 <PropertyColumn Property="x => x.InviteChannel" Title="Channel" Sortable="true"/>
                 <PropertyColumn Property="x => x.InviteRole" Title="Role" Sortable="true"/>
 
-                <TemplateColumn Title="Status">
-                    <span class="badge @(GetStatusBadge(context.Status))">
-                        @context.Status
+                <TemplateColumn Title="Status" Context="item">
+                    <span class="badge @(GetStatusBadge(item.Status))">
+                        @item.Status
                     </span>
                 </TemplateColumn>
 
-                <TemplateColumn Title="Actions">
-                    <a href="@UiRoutes.AdminRoutes.Invites.Details(context.Id)"
+                <TemplateColumn Title="Actions" Context="item">
+                    <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)"
                        class="btn btn-sm btn-outline-primary">
                         Details
                     </a>
-                    @if (context.CanResend)
+                    @if (item.CanResend)
                     {
-                        <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(context.Id)"
+                        <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)"
                            class="btn btn-sm btn-outline-primary">
                             Resend
                         </a>
                     }
-                    @if (context.CanRevoke)
+                    @if (item.CanRevoke)
                     {
-                        <a href="@UiRoutes.AdminRoutes.Invites.InviteRevoke(context.Id)"
+                        <a href="@UiRoutes.AdminRoutes.Invites.InviteRevoke(item.Id)"
                            class="btn btn-sm btn-outline-primary">
                             Revoke
                         </a>

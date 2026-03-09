@@ -14,4 +14,6 @@ public sealed record InviteListItemResponse(
 	DateTimeOffset ExpiresAtUtc,
 	Guid InvitedBy,
 	DateTimeOffset? AcceptedAtUtc,
-	Guid? RelatedAccountId);
+	Guid? RelatedAccountId,
+	bool CanResend,
+	bool CanRevoke);
