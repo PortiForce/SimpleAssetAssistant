@@ -8,7 +8,7 @@ using Portiforce.SAA.Application.UseCases.Activity.Flow.Factories;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Rules;
 using Portiforce.SAA.Application.UseCases.Asset.Projections;
 using Portiforce.SAA.Core.Activities.Enums;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.Activities.Models.Futures;
 using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Primitives.Ids;

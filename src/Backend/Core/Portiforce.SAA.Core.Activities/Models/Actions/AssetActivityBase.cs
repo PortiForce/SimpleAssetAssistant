@@ -4,7 +4,7 @@ using Portiforce.SAA.Core.Interfaces;
 using Portiforce.SAA.Core.Models;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
 public abstract record AssetActivityBase : Fact<ActivityId>, IAggregateRoot
 {

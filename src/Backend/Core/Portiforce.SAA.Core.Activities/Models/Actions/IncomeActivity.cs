@@ -3,65 +3,57 @@ using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Activities.Rules;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
-public sealed record ExchangeActivity : ExecutableActivity
+public sealed record IncomeActivity : ReasonedActivity
 {
 	// not public, init only via factory
-	private ExchangeActivity(
+	private IncomeActivity(
 		ActivityId id,
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
-		DateTimeOffset occurredAt,
-		AssetActivityReason reason,
+		AssetActivityKind kind,
+		DateTimeOffset occuredAt,
+		ExternalMetadata externalMetadata,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata, 
-		CompletionType completionType,
-		ExchangeType exchangeType)
+		AssetActivityReason reason)
 		: base(
 			id,
 			tenantId,
 			platformAccountId,
-			AssetActivityKind.Exchange,
-			occurredAt,
+			kind,
+			occuredAt,
 			externalMetadata,
 			legs,
-			reason,
-			completionType)
+			reason)
 	{
-		ExchangeType = exchangeType;
 	}
 
 	// Private Empty Constructor for EF Core
-	private ExchangeActivity(): base() { }
+	private IncomeActivity() : base() { }
 
-	public ExchangeType ExchangeType { get; init; }
-
-	public static ExchangeActivity Create(
+	public static IncomeActivity Create(
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
-		ExchangeType exchangeType,
 		IReadOnlyList<AssetMovementLeg> legs,
 		ExternalMetadata externalMetadata,
-		CompletionType completionType,
 		ActivityId? id)
 	{
-		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Exchange, reason);
+		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Income, reason);
 
 		LegGuards.EnforceCommonRules(legs);
-		LegGuards.EnsureTradeOrExchangeShape(legs);
+		LegGuards.EnsureOneSidedInflow(legs);
 
-		return new ExchangeActivity(
+		return new IncomeActivity(
 			id ?? ActivityId.New(),
 			tenantId,
 			platformAccountId,
+			AssetActivityKind.Income,
 			occurredAt,
-			reason,
-			legs,
 			externalMetadata,
-			completionType,
-			exchangeType);
+			legs,
+			reason);
 	}
 }

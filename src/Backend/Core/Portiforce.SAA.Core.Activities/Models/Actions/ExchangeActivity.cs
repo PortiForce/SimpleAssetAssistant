@@ -3,56 +3,65 @@ using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Activities.Rules;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
-public sealed record BurnActivity: ReasonedActivity
+public sealed record ExchangeActivity : ExecutableActivity
 {
 	// not public, init only via factory
-	private BurnActivity(
+	private ExchangeActivity(
 		ActivityId id,
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata)
+		ExternalMetadata externalMetadata, 
+		CompletionType completionType,
+		ExchangeType exchangeType)
 		: base(
 			id,
 			tenantId,
 			platformAccountId,
-			AssetActivityKind.Burn,
+			AssetActivityKind.Exchange,
 			occurredAt,
 			externalMetadata,
 			legs,
-			reason)
+			reason,
+			completionType)
 	{
-		
+		ExchangeType = exchangeType;
 	}
 
 	// Private Empty Constructor for EF Core
-	private BurnActivity() : base() { }
+	private ExchangeActivity(): base() { }
 
-	public static BurnActivity Create(
+	public ExchangeType ExchangeType { get; init; }
+
+	public static ExchangeActivity Create(
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
+		ExchangeType exchangeType,
 		IReadOnlyList<AssetMovementLeg> legs,
 		ExternalMetadata externalMetadata,
+		CompletionType completionType,
 		ActivityId? id)
 	{
-		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Burn, reason);
+		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Exchange, reason);
 
 		LegGuards.EnforceCommonRules(legs);
-		LegGuards.EnsureOneSidedOutflow(legs);
+		LegGuards.EnsureTradeOrExchangeShape(legs);
 
-		return new BurnActivity(
+		return new ExchangeActivity(
 			id ?? ActivityId.New(),
 			tenantId,
 			platformAccountId,
 			occurredAt,
 			reason,
 			legs,
-			externalMetadata);
+			externalMetadata,
+			completionType,
+			exchangeType);
 	}
 }

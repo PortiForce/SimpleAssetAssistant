@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Identity.Models.Auth;

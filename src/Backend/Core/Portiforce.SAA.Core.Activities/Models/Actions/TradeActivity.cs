@@ -5,7 +5,7 @@ using Portiforce.SAA.Core.Activities.Rules;
 using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
 public sealed record TradeActivity : ExecutableActivity
 {

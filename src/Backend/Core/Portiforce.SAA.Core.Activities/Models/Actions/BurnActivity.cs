@@ -3,36 +3,36 @@ using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Activities.Rules;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
-public sealed record IncomeActivity : ReasonedActivity
+public sealed record BurnActivity: ReasonedActivity
 {
 	// not public, init only via factory
-	private IncomeActivity(
+	private BurnActivity(
 		ActivityId id,
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
-		AssetActivityKind kind,
-		DateTimeOffset occuredAt,
-		ExternalMetadata externalMetadata,
+		DateTimeOffset occurredAt,
+		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
-		AssetActivityReason reason)
+		ExternalMetadata externalMetadata)
 		: base(
 			id,
 			tenantId,
 			platformAccountId,
-			kind,
-			occuredAt,
+			AssetActivityKind.Burn,
+			occurredAt,
 			externalMetadata,
 			legs,
 			reason)
 	{
+		
 	}
 
 	// Private Empty Constructor for EF Core
-	private IncomeActivity() : base() { }
+	private BurnActivity() : base() { }
 
-	public static IncomeActivity Create(
+	public static BurnActivity Create(
 		TenantId tenantId,
 		PlatformAccountId platformAccountId,
 		DateTimeOffset occurredAt,
@@ -41,19 +41,18 @@ public sealed record IncomeActivity : ReasonedActivity
 		ExternalMetadata externalMetadata,
 		ActivityId? id)
 	{
-		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Income, reason);
+		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Burn, reason);
 
 		LegGuards.EnforceCommonRules(legs);
-		LegGuards.EnsureOneSidedInflow(legs);
+		LegGuards.EnsureOneSidedOutflow(legs);
 
-		return new IncomeActivity(
+		return new BurnActivity(
 			id ?? ActivityId.New(),
 			tenantId,
 			platformAccountId,
-			AssetActivityKind.Income,
 			occurredAt,
-			externalMetadata,
+			reason,
 			legs,
-			reason);
+			externalMetadata);
 	}
 }

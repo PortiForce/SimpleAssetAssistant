@@ -2,7 +2,7 @@
 using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Primitives.Ids;
 
-namespace Portiforce.SAA.Core.Activities.Models.Activities;
+namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
 public abstract record ReasonedActivity : AssetActivityBase
 {
