@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
@@ -8,14 +7,12 @@ using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SAA.Contracts.Configuration;
-using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Client.Account;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
-using InviteChannel = Portiforce.SAA.Core.Identity.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 
@@ -23,7 +20,7 @@ public sealed class AccountEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup(ApiRoutes.Accounts)
+		var group = app.MapGroup(ApiRoutes.Accounts.Root)
 			.WithTags("Tenant Accounts")
 			.RequireAuthorization(UiPolicies.TenantAdmin);
 

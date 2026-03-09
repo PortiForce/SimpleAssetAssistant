@@ -33,7 +33,6 @@ public sealed record InviteTarget
 	public static InviteTarget AppleId(string sub)
 		=> new(sub, InviteChannel.AppleId);
 
-	// EF Core mapping helper if needed
 	public static InviteTarget Restore(string value, InviteChannel type)
 		=> new(value, type);
 

@@ -1,4 +1,5 @@
-﻿using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
+﻿using Portiforce.SAA.Application.Interfaces.Common.Time;
+using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
@@ -7,12 +8,15 @@ using Portiforce.SAA.Application.UseCases.Invite.Projections;
 namespace Portiforce.SAA.Application.UseCases.Invite.Handlers.Queries;
 
 public sealed class GetInviteListQueryHandler(
+	IClock clock,
 	IInviteReadRepository inviteReadRepository
 ) : IRequestHandler<GetInviteListQuery, PagedResult<InviteListItem>>
 {
-	public async ValueTask<PagedResult<InviteListItem>> Handle(GetInviteListQuery request, CancellationToken ct)
+	public async ValueTask<PagedResult<InviteListItem>> Handle(
+		GetInviteListQuery request,
+		CancellationToken ct)
 	{
-		PagedResult<InviteListItem> pagedInvites = await inviteReadRepository.GetListAsync(
+		PagedResult<InviteListItemRaw> pagedInvitesRaw = await inviteReadRepository.GetListAsync(
 			request.TenantId,
 			request.Channel,
 			request.State,
@@ -20,6 +24,18 @@ public sealed class GetInviteListQueryHandler(
 			request.PageRequest,
 			ct);
 
-		return pagedInvites;
+		DateTimeOffset now = clock.UtcNow;
+
+		List<InviteListItem> pagedInvites = pagedInvitesRaw.Items
+			.Select(x => InviteProjectionMapper.ToListItem(x, now))
+			.ToList();
+
+		var result = new PagedResult<InviteListItem>(
+			pagedInvites,
+			pagedInvitesRaw.TotalCount,
+			pagedInvitesRaw.PageNumber,
+			pagedInvitesRaw.PageSize);
+
+		return result;
 	}
 }

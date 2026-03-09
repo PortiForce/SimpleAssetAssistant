@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System.Globalization;
+using Microsoft.JSInterop;
 
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Web.Client.Configuration;
@@ -14,6 +16,8 @@ internal class Program
 	static async Task Main(string[] args)
 	{
 		var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+		builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 		builder.Services.AddScoped(sp => new HttpClient
 		{
@@ -40,7 +44,7 @@ internal class Program
 		builder.Services.AddScoped<BrowserCredentialsHandler>();
 		builder.Services.AddScoped<AntiforgeryTokenStore>();
 		builder.Services.AddScoped<AntiforgeryHandler>();
-
+			
 		builder.Services.AddHttpClient(WebClientConstants.NoAntiforgeryClientName, client =>
 			{
 				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
@@ -56,6 +60,15 @@ internal class Program
 
 		builder.Services.AddScoped<TenantApiClient>();
 
-		await builder.Build().RunAsync();
+		var host = builder.Build();
+
+		var js = host.Services.GetRequiredService<IJSRuntime>();
+		var cultureName = await js.InvokeAsync<string>("portiforce.getBrowserCulture");
+		var culture = CultureInfo.GetCultureInfo(cultureName);
+
+		CultureInfo.DefaultThreadCurrentCulture = culture;
+		CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+		await host.RunAsync();
 	}
 }

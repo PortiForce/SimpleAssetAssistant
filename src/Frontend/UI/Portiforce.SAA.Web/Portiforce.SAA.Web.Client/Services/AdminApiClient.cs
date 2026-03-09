@@ -15,13 +15,13 @@ public sealed class AdminApiClient(
 		GetInviteListQueryRequest request,
 		CancellationToken ct = default)
 	{
-		string url = BuildUrl(ApiRoutes.Invites, request.ToQueryParameters());
+		string url = BuildUrl(ApiRoutes.Invites.Root, request.ToQueryParameters());
 		return await GetAsync<InviteListResponse>(url, ct);
 	}
 
 	public async Task<InviteDetailsResponse> GetInviteDetailsAsync(Guid inviteId, CancellationToken ct = default)
 	{
-		string url = $"{ApiRoutes.Invites}/{inviteId}";
+		string url = $"{ApiRoutes.Invites.Details(inviteId)}";
 		return await GetAsync<InviteDetailsResponse>(url, ct);
 	}
 
@@ -30,20 +30,20 @@ public sealed class AdminApiClient(
 		CancellationToken ct = default)
 	{
 		return await PostJsonAsync<CreateInviteRequest, CreateInviteResponse>(
-			ApiRoutes.Invites,
+			ApiRoutes.Invites.Root,
 			request,
 			ct);
 	}
 
 	public async Task<AccountListResponse> GetUsersAsync(GetAccountListQueryRequest request, CancellationToken ct = default)
 	{
-		string url = BuildUrl(ApiRoutes.Invites, request.ToQueryParameters());
+		string url = BuildUrl(ApiRoutes.Accounts.Root, request.ToQueryParameters());
 		return await GetAsync<AccountListResponse>(url, ct);
 	}
 
 	public async Task<AccountDetailsResponse> GetUserDetailsAsync(Guid  accountId, CancellationToken ct = default)
 	{
-		string url = $"{ApiRoutes.Invites}/{accountId}";
+		string url = $"{ApiRoutes.Accounts.Details(accountId)}";
 		return await GetAsync<AccountDetailsResponse>(url, ct);
 	}
 }

@@ -104,7 +104,9 @@ public static class InviteMapper
 			model.ExpiresAtUtc,
 			model.InvitedBy.Value,
 			model.AcceptedAtUtc,
-			model.RelatedAccountId?.Value);
+			model.RelatedAccountId?.Value,
+			model.CanResend,
+			model.CanRevoke);
 	}
 
 	public static InviteDetailsResponse MapToInviteDetails(this InviteDetails model)
@@ -122,6 +124,8 @@ public static class InviteMapper
 			model.InvitedBy.Value,
 			model.SendTimesCount,
 			model.AcceptedAtUtc,
-			model.RelatedAccountId?.Value);
+			model.RelatedAccountId?.Value,
+			model.CanResend,
+			model.CanRevoke);
 	}
 }

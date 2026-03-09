@@ -13,8 +13,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
 internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInviteReadRepository
 {
 	// Reusable projection to avoiding code duplication
-	private static Expression<Func<TenantInvite, InviteListItem>> ListItemSelector =>
-		x => new InviteListItem(
+	private static Expression<Func<TenantInvite, InviteListItemRaw>> ListItemSelector =>
+		x => new InviteListItemRaw(
 			x.Id,
 			x.TenantId,
 			x.InviteTarget.Value,
@@ -29,8 +29,8 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			x.AcceptedAccountId
 		);
 
-	private static Expression<Func<TenantInvite, InviteDetails>> DetailsSelector =>
-		x => new InviteDetails(
+	private static Expression<Func<TenantInvite, InviteDetailsRaw>> DetailsSelector =>
+		x => new InviteDetailsRaw(
 			x.Id,
 			x.TenantId,
 			x.InviteTarget.Value,
@@ -45,7 +45,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			x.AcceptedAtUtc,
 			x.AcceptedAccountId);
 
-	public async Task<InviteDetails?> GetByIdAsync(Guid id, CancellationToken ct)
+	public async Task<InviteDetailsRaw?> GetByIdAsync(Guid id, CancellationToken ct)
 	{
 		var data = await db.Invites
 			.AsNoTracking()
@@ -56,7 +56,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		return data;
 	}
 
-	public async Task<PagedResult<InviteListItem>> GetByTenantIdAsync(
+	public async Task<PagedResult<InviteListItemRaw>> GetByTenantIdAsync(
 		TenantId tenantId,
 		PageRequest pageRequest,
 		CancellationToken ct)
@@ -67,21 +67,21 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 
 		int totalCount = await query.CountAsync(ct);
 
-		List<InviteListItem> items = await query
+		List<InviteListItemRaw> items = await query
 			.OrderBy(x => x.Id)
 			.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
 			.Take(pageRequest.PageSize)
 			.Select(ListItemSelector)
 			.ToListAsync(ct);
 
-		return new PagedResult<InviteListItem>(
+		return new PagedResult<InviteListItemRaw>(
 			items,
 			totalCount,
 			pageRequest.PageNumber,
 			pageRequest.PageSize);
 	}
 
-	public async Task<PagedResult<InviteListItem>> GetListAsync(
+	public async Task<PagedResult<InviteListItemRaw>> GetListAsync(
 		TenantId tenantId,
 		InviteChannel? requestChannel,
 		InviteState? requestState,
@@ -111,21 +111,21 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		int skip = (pageRequest.PageNumber - 1) *pageRequest.PageSize;
 		int totalCount = await query.CountAsync(ct);
 
-		List<InviteListItem> items = await query
+		List<InviteListItemRaw> items = await query
 			.OrderBy(x => x.Id)
 			.Skip(skip)
 			.Take(pageRequest.PageSize)
 			.Select(ListItemSelector)
 			.ToListAsync(ct);
 
-		return new PagedResult<InviteListItem>(
+		return new PagedResult<InviteListItemRaw>(
 			items,
 			totalCount,
 			pageRequest.PageNumber,
 			pageRequest.PageSize);
 	}
 
-	public async Task<InviteDetails?> GetByInviteTargetAndTenantAsync(InviteTarget inviteTarget, TenantId requestTenantId, CancellationToken ct)
+	public async Task<InviteDetailsRaw?> GetByInviteTargetAndTenantAsync(InviteTarget inviteTarget, TenantId requestTenantId, CancellationToken ct)
 	{
 		var data = await db.Invites
 			.AsNoTracking()
@@ -138,7 +138,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		return data;
 	}
 
-	public async Task<List<InviteListItem>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct)
+	public async Task<List<InviteListItemRaw>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct)
 	{
 		return await db.Invites
 			.AsNoTracking()

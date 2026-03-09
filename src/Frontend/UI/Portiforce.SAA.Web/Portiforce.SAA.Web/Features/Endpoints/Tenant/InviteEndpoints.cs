@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Models.Auth;
@@ -38,7 +37,7 @@ public sealed class InviteEndpoints : IEndpoint
 
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup(ApiRoutes.Invites)
+		var group = app.MapGroup(ApiRoutes.Invites.Root)
 			.WithTags("Tenant Invites")
 			.RequireAuthorization(UiPolicies.TenantAdmin)
 			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
@@ -56,7 +55,7 @@ public sealed class InviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status403Forbidden)
 			.ProducesProblem(StatusCodes.Status404NotFound);
 
-		group.MapPost(string.Empty, CreateInviteAsync)
+		group.MapPost("/new", CreateInviteAsync)
 			.WithName("CreateTenantInvite")
 			.Produces<CreateInviteResponse>(StatusCodes.Status201Created)
 			.ProducesValidationProblem()

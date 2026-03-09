@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
@@ -25,6 +27,8 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
+
+		builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 		if (builder.Environment.IsDevelopment())
 		{
@@ -175,11 +179,28 @@ public class Program
 
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
-
-		// figure out endpoints before auth, so we can skip auth for static files, etc.
 		app.UseRouting();
 
-		// Tenant must run early (before auth decisions if you do tenant-bound checks)
+		var supportedCultures = new[]
+		{
+			new CultureInfo("en-US"),
+			new CultureInfo("uk-UA")
+		};
+
+		var localizationOptions = new RequestLocalizationOptions
+		{
+			DefaultRequestCulture = new RequestCulture("en-US"),
+			SupportedCultures = supportedCultures,
+			SupportedUICultures = supportedCultures,
+			RequestCultureProviders =
+			[
+				new AcceptLanguageHeaderRequestCultureProvider()
+			]
+		};
+
+		app.UseRequestLocalization(localizationOptions);
+
+		// Tenant must run early
 		app.UseMiddleware<TenantResolutionMiddleware>();
 
 		// Auth must be before endpoints

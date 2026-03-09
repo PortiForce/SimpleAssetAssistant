@@ -15,5 +15,6 @@ public sealed record InviteDetailsResponse(
 	Guid InvitedBy,
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
-	Guid? RelatedAccountId
-);
+	Guid? RelatedAccountId,
+	bool CanResend,
+	bool CanRevoke);

@@ -1,5 +1,6 @@
 ﻿@page "/admin/invites/new"
 
+@using Portiforce.SAA.Contracts.Configuration
 @using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Contracts.UiSetup
@@ -16,6 +17,8 @@
 <div class="container mt-4">
     <h3>Invite New User</h3>
     <p class="text-muted">Send an invitation to add a user to your tenant.</p>
+    
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">Back to invites</a>
 
     <EditForm Model="@inviteModel" OnValidSubmit="HandleInvite">
         <DataAnnotationsValidator />

@@ -6,9 +6,9 @@ using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 
-public interface IInviteReadRepository : IReadRepository<InviteDetails, Guid>
+public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 {
-	Task<PagedResult<InviteListItem>> GetListAsync(
+	Task<PagedResult<InviteListItemRaw>> GetListAsync(
 		TenantId requestTenantId,
 		InviteChannel? requestChannel,
 		InviteState? requestState,
@@ -16,7 +16,7 @@ public interface IInviteReadRepository : IReadRepository<InviteDetails, Guid>
 		PageRequest requestPageRequest,
 		CancellationToken ct);
 
-	Task<InviteDetails?> GetByInviteTargetAndTenantAsync(
+	Task<InviteDetailsRaw?> GetByInviteTargetAndTenantAsync(
 		InviteTarget inviteTarget,
 		TenantId requestTenantId,
 		CancellationToken ct);
@@ -27,7 +27,7 @@ public interface IInviteReadRepository : IReadRepository<InviteDetails, Guid>
 	/// <param name="inviteTarget">invite target</param>
 	/// <param name="ct"></param>
 	/// <returns>list of invites that match provided email address</returns>
-	Task<List<InviteListItem>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct);
+	Task<List<InviteListItemRaw>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct);
 
 	Task<TenantInvite?> GetByTenantAndTokenHashAsync(
 		TenantId requestTenantId,
