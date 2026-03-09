@@ -84,6 +84,7 @@ public class Program
 						ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
 						return Task.CompletedTask;
 					}
+
 					ctx.Response.Redirect(ctx.RedirectUri);
 					return Task.CompletedTask;
 				};
@@ -95,6 +96,7 @@ public class Program
 						ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
 						return Task.CompletedTask;
 					}
+
 					ctx.Response.Redirect(ctx.RedirectUri);
 					return Task.CompletedTask;
 				};
