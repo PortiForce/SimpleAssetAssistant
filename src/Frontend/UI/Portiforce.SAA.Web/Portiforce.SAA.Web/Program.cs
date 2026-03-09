@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Contracts.Contexts;
@@ -9,6 +12,8 @@ using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.Services.Time;
+using Portiforce.SAA.Web.Client.Services;
+using Portiforce.SAA.Web.Client.Services.Interfaces;
 using Portiforce.SAA.Web.Components;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Middleware;
@@ -23,6 +28,8 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
+		builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 		if (builder.Environment.IsDevelopment())
 		{
 			builder.Configuration.AddUserSecrets<Program>(optional: true);
@@ -32,15 +39,26 @@ public class Program
 		builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
 		builder.Services.AddScoped<TenantContext>();
 		builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
-		builder.Services.AddHttpClient<Portiforce.SAA.Web.Client.Services.TenantApiClient>((sp, http) =>
-		{
-			var ctx = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			          ?? throw new InvalidOperationException("No active HttpContext.");
-
-			http.BaseAddress = new Uri($"{ctx.Request.Scheme}://{ctx.Request.Host}");
-		});
 
 		builder.Services.AddHttpContextAccessor();
+
+		// todo alex: check this setup here (should it be rewritten/optimized)?
+		builder.Services.AddHttpClient<TenantApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+			                          ?? throw new InvalidOperationException("TenantApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+
+		builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+			                          ?? throw new InvalidOperationException("AdminApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+		
 		builder.Services.AddMemoryCache();
 
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
@@ -50,10 +68,12 @@ public class Program
 
 		builder.Services.AddAuthentication(options =>
 			{
-				// This tells ASP.NET that your main way of tracking users is via Cookies
+				// main way of tracking users is via Cookies
 				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 				options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 			})
 			.AddCookie(options =>
 			{
@@ -62,38 +82,56 @@ public class Program
 
 				options.Events.OnRedirectToLogin = ctx =>
 				{
-					// For APIs: return 401, for browser navigation: redirect
-					if (ctx.Request.Path.StartsWithSegments("/api"))
+					// For APIs/ BFF: return 401, for browser navigation: redirect
+					if (ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/bff"))
 					{
 						ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
 						return Task.CompletedTask;
 					}
+
 					ctx.Response.Redirect(ctx.RedirectUri);
 					return Task.CompletedTask;
 				};
 
 				options.Events.OnRedirectToAccessDenied = ctx =>
 				{
-					if (ctx.Request.Path.StartsWithSegments("/api"))
+					if (ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/bff"))
 					{
 						ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
 						return Task.CompletedTask;
 					}
+
 					ctx.Response.Redirect(ctx.RedirectUri);
 					return Task.CompletedTask;
 				};
 			}).AddGoogle(options =>
 			{
-				// ASP.NET Core automatically maps the scheme name to "Google" here
-
 				options.ClientId = builder.Configuration["GoogleClientSettings:ClientId"]
-				                   ?? throw new InvalidOperationException("Google ClientId is missing.");
+								   ?? throw new InvalidOperationException("Google ClientId is missing.");
 
 				options.ClientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"]
-				                       ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+									   ?? throw new InvalidOperationException("Google ClientSecret is missing.");
 
-				// By default, Google will redirect back to: https://{tenant.DomainPrefix}.portiforce.ai:7100/signin-google
-				// ASP.NET Core automatically intercepts this route for you.
+				// Explicitly set the callback path (where Google redirects)
+				options.CallbackPath = "/signin-google";
+
+				// Save tokens for later use
+				options.SaveTokens = true;
+
+				// Request additional scopes
+				options.Scope.Add("profile");
+				options.Scope.Add("email");
+
+				// Store correlation ID to preserve state through OAuth flow
+				options.UsePkce = true;
+
+				// Handle authentication failures
+				options.Events.OnRemoteFailure = context =>
+				{
+					context.Response.Redirect("/auth/access-denied?error=google_failed");
+					context.HandleResponse();
+					return Task.CompletedTask;
+				};
 			});
 
 		builder.Services.AddAuthorization(options =>
@@ -103,7 +141,7 @@ public class Program
 			options.AddPolicy(UiPolicies.PlatformAdmin, p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantAdmin, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantUser, p => p.RequireRole(UiRoles.TenantUser, UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-
+			
 			// Granular (start small)
 			options.AddPolicy(UiPolicies.InviteUsers, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 		});
@@ -122,6 +160,11 @@ public class Program
 
 		builder.Services.AddSingleton<IClock, SystemClock>();
 
+		builder.Services.AddAntiforgery(options =>
+		{
+			options.HeaderName = "RequestVerificationToken";
+		});
+
 		var app = builder.Build();
 
 		if (app.Environment.IsDevelopment())
@@ -136,14 +179,36 @@ public class Program
 
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
-		app.UseAntiforgery();
+		app.UseRouting();
 
-		// Tenant must run early (before auth decisions if you do tenant-bound checks)
+		var supportedCultures = new[]
+		{
+			new CultureInfo("en-US"),
+			new CultureInfo("uk-UA")
+		};
+
+		var localizationOptions = new RequestLocalizationOptions
+		{
+			DefaultRequestCulture = new RequestCulture("en-US"),
+			SupportedCultures = supportedCultures,
+			SupportedUICultures = supportedCultures,
+			RequestCultureProviders =
+			[
+				new AcceptLanguageHeaderRequestCultureProvider()
+			]
+		};
+
+		app.UseRequestLocalization(localizationOptions);
+
+		// Tenant must run early
 		app.UseMiddleware<TenantResolutionMiddleware>();
 
 		// Auth must be before endpoints
 		app.UseAuthentication();
 		app.UseAuthorization();
+
+		// allow to the flow define`.DisableAntiforgery()` metadata on your endpoint!
+		app.UseAntiforgery();
 
 		// This line automatically discovers InviteEndpoints, AuthEndpoints, etc.
 		app.MapEndpoints();

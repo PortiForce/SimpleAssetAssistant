@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Api.Contracts.Auth.Requests;
 using Portiforce.SAA.Api.Interfaces;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Models.Auth;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Auth.Projections;
 using Portiforce.SAA.Application.UseCases.Auth.Result;

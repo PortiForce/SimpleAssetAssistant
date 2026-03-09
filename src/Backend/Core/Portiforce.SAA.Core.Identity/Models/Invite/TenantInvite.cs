@@ -1,4 +1,6 @@
-﻿using Portiforce.SAA.Core.Exceptions;
+﻿using System.Net.NetworkInformation;
+
+using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Extensions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Interfaces;
@@ -36,7 +38,7 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 	public DateTimeOffset? RevokedAtUtc { get; private set; }
 	public AccountId? RevokedByAccountId { get; private set; }
 
-	// EF
+	// Private Empty Constructor for EF Core
 	private TenantInvite() { }
 
 	public static TenantInvite Create(

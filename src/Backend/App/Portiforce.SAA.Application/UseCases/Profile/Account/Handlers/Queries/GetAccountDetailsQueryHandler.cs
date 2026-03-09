@@ -1,6 +1,7 @@
 ﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 
@@ -8,9 +9,9 @@ namespace Portiforce.SAA.Application.UseCases.Profile.Account.Handlers.Queries;
 
 internal sealed class GetAccountDetailsQueryHandler(
 	IAccountReadRepository accountReadRepository)
-	: IRequestHandler<GetAccountDetailsQuery, AccountDetails>
+	: IRequestHandler<GetAccountDetailsQuery, TypedResult<AccountDetails>>
 {
-	public async ValueTask<AccountDetails> Handle(
+	public async ValueTask<TypedResult<AccountDetails>> Handle(
 		GetAccountDetailsQuery request,
 		CancellationToken ct)
 	{
@@ -19,9 +20,11 @@ internal sealed class GetAccountDetailsQueryHandler(
 		// Ensure the user belongs to the requesting Tenant!
 		if (user is null || user.TenantId != request.TenantId)
 		{
-			throw new NotFoundException("User", request.Id);
+			return TypedResult<AccountDetails>.Fail(
+				ResultError.NotFound("Account",
+					request.Id.Value));
 		}
 
-		return user;
+		return TypedResult<AccountDetails>.Ok(user);
 	}
 }

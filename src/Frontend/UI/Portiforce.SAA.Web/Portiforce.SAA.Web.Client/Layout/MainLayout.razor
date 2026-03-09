@@ -1,111 +1,49 @@
 ﻿@inherits LayoutComponentBase
-@using Portiforce.SAA.Contracts
-@using Portiforce.SAA.Contracts.Models.Client
 @using Portiforce.SAA.Web.Client.Shared
 
-<div class="app-shell">
-    <aside class="sidebar @(isSidebarCollapsed ? "collapsed" : "")">
-        <div class="brand">
-            <div class="brand-title">PortiForce</div>
-            <div class="brand-subtitle">Simple Asset Assistant</div>
-        </div>
-
-        <NavMenu />
-
-        <div class="sidebar-footer">
-            <AuthorizeView>
-                <Authorized>
-                    <div class="user-box">
-                        <div class="user-name">@DisplayName</div>
-                        <div class="user-sub">Signed in</div>
-
-                        <a class="btn btn-outline-light btn-sm w-100 mt-2" href="@AuthRoutes.Logout">
-                            Log out
-                        </a>
+<div class="page">
+    <div class="sidebar">
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">
+                    <span class="brand-icon">🛡️</span>
+                    <div class="brand-text">
+                        <div class="brand-title">PortiForce</div>
+                        <div class="brand-subtitle">Simple Asset Assistant</div>
                     </div>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="user-box">
-                        <div class="user-name">Guest</div>
-                        <div class="user-sub">Not signed in</div>
-
-                        <a class="btn btn-primary btn-sm w-100 mt-2" href="@AuthRoutes.Login">
-                            Log in
-                        </a>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
-    </aside>
-
-    <main class="main">
-        <header class="topbar">
-            <button class="icon-btn" type="button" @onclick="ToggleSidebar" aria-label="Toggle menu">
-                ☰
-            </button>
-
-            <div class="topbar-title">
-                @PageTitle
+                </a>
             </div>
+        </div>
+        <NavMenu />
+        <div class="sidebar-footer">
+            <LoginDisplay />
+        </div>
+    </div>
 
-            <div class="topbar-right">
+    <main>
+        <div class="top-row px-4">
+            <div class="top-row-left">
+                <label for="sidebarToggle" class="navbar-toggler">
+                    <span class="navbar-toggler-icon"></span>
+                </label>
+            </div>
+            <div class="top-row-right">
                 <AuthorizeView>
                     <Authorized>
-                        <span class="muted">Hi, @ShortName</span>
+                        <a href="tenant/user/portfolio" class="btn btn-link">
+                            <span class="bi bi-house-door"></span>
+                        </a>
                     </Authorized>
                 </AuthorizeView>
             </div>
-        </header>
+        </div>
 
-        <section class="content">
+        <article class="content px-4">
             <TenantProvider>
                 @Body
             </TenantProvider>
-        </section>
+        </article>
     </main>
 </div>
 
 <ReconnectModal />
-
-@code {
-    private bool isSidebarCollapsed;
-
-    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
-    [CascadingParameter] private TenantInfo? Tenant { get; set; }
-
-    private string DisplayName { get; set; } = "User";
-    private string ShortName { get; set; } = "User";
-    private string PageTitle => "Dashboard";
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (AuthenticationStateTask is null)
-        {
-            return;
-        }
-
-        var auth = await AuthenticationStateTask;
-        var user = auth.User;
-
-        if (user.Identity?.IsAuthenticated == true)
-        {
-            // You can adjust claim selection depending on your auth setup.
-            var name =
-                user.Identity.Name
-                ?? user.FindFirst("name")?.Value
-                ?? user.FindFirst("preferred_username")?.Value
-                ?? user.FindFirst("email")?.Value
-                ?? "User";
-
-            DisplayName = name;
-            ShortName = name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? name;
-        }
-        else
-        {
-            DisplayName = "Guest";
-            ShortName = "Guest";
-        }
-    }
-
-    private void ToggleSidebar() => isSidebarCollapsed = !isSidebarCollapsed;
-}

@@ -17,5 +17,23 @@ public sealed record InviteDetails(
 	AccountId InvitedBy,
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
+	AccountId? RelatedAccountId,
+	bool CanResend,
+	bool CanRevoke
+);
+
+public sealed record InviteDetailsRaw(
+	Guid Id,
+	TenantId TenantId,
+	string InviteTargetValue,
+	InviteChannel InviteChannel,
+	AccountTier InviteTier,
+	Role InviteRole,
+	InviteState State,
+	DateTimeOffset CreatedAtUtc,
+	DateTimeOffset ExpiresAtUtc,
+	AccountId InvitedBy,
+	int SendTimesCount,
+	DateTimeOffset? AcceptedAtUtc,
 	AccountId? RelatedAccountId
 ) : IDetailsProjection;

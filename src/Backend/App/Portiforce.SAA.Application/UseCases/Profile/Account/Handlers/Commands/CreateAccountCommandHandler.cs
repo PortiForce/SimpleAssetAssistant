@@ -3,7 +3,7 @@ using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SAA.Application.UseCases.Profile.Result;

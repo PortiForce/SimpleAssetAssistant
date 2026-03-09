@@ -1,19 +1,23 @@
 ﻿using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Application.FlowResult;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Auth.Result;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
+using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Web.Configuration;
 using Portiforce.SAA.Web.Infrastructure;
 
 namespace Portiforce.SAA.Web.Features.Endpoints;
@@ -22,13 +26,11 @@ public sealed class AuthEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup("/auth").WithTags("Authentication");
+		var group = app.MapGroup(ApiRoutes.Auth).WithTags("Authentication");
 
-		// 1. Local Credentials Login
 		group.MapPost("/login", LoginAsync)
 			.WithName("LocalLogin");
 
-		// 2. Google OAuth Login Trigger
 		group.MapGet("/login/google", TriggerGoogleLogin)
 			.WithName("GoogleLogin");
 
@@ -37,64 +39,66 @@ public sealed class AuthEndpoints : IEndpoint
 
 		group.MapGet("/access-denied", () => Results.Text("Access denied."));
 
-		group.MapPost("/logout", LogoutAsync);
+		group.MapPost("/logout", LogoutAsync)
+			.WithName("LogoutPost");
 	}
 
 	private static async Task<IResult> LoginAsync(
-		[FromBody] LoginRequest request,
-		[FromServices] IMediator mediator,
-		[FromServices] ITenantContext tenantContext,
-		HttpContext context,
-		CancellationToken ct)
+			[FromBody] LoginRequest request,
+			[FromServices] IMediator mediator,
+			[FromServices] ITenantContext tenantContext,
+			HttpContext context,
+			CancellationToken ct)
 	{
-		// tech : consider for platform admin/owner flows
-		throw new NotImplementedException("not yet implemented");
-
 		Guid? tenantId = tenantContext.TenantId;
 		if (tenantId == null || tenantId == Guid.Empty)
 		{
-			return TypedResults.BadRequest("Tenant context is missing.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
-		throw new NotImplementedException("not yet implemented");
+		return TypedResults.Problem(
+			title: "Local login is disabled",
+			detail: "Use the Sign in page and choose “Continue with Google”.",
+			statusCode: StatusCodes.Status501NotImplemented);
 	}
 
 	private static IResult TriggerGoogleLogin(
 		[FromServices] ITenantContext tenantContext,
-		HttpContext context,
 		[FromQuery] string? inviteToken)
 	{
+		if (!tenantContext.TenantId.HasValue || tenantContext.TenantId.Value == Guid.Empty)
+		{
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
+		}
+
 		var properties = new AuthenticationProperties
 		{
 			RedirectUri = "/auth/google-callback"
 		};
 
-		if (tenantContext.TenantId.HasValue && tenantContext.TenantId.Value != Guid.Empty)
-		{
-			properties.Items["TenantId"] = tenantContext.TenantId.Value.ToString();
-		}
-		else
-		{
-			return TypedResults.BadRequest("Tenant context is required to login.");
-		}
+		properties.Items[WebConstants.TenantIdName] = tenantContext.TenantId.Value.ToString();
 
 		if (!string.IsNullOrWhiteSpace(inviteToken))
 		{
-			properties.Items["InviteToken"] = inviteToken;
+			properties.Items[WebConstants.InviteTokenName] = inviteToken;
 		}
 
-		return TypedResults.Challenge(properties, ["Google"]);
+		return TypedResults.Challenge(
+			properties,
+			new[] { GoogleDefaults.AuthenticationScheme });
 	}
 
 	private static async Task<IResult> HandleGoogleCallbackAsync(
-		HttpContext context,
-		[FromServices] IMediator mediator,
-		CancellationToken ct)
+	HttpContext context,
+	[FromServices] IMediator mediator,
+	CancellationToken ct)
 	{
-		AuthenticateResult authenticateResult = await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-		if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
+		AuthenticateResult authenticateResult =
+			await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+		if (!authenticateResult.Succeeded || authenticateResult.Principal is null)
 		{
-			return TypedResults.Redirect("/auth/access-denied?reason=google_failed");
+			return TypedResults.Redirect("/auth/access-denied?reason=google_auth_failed");
 		}
 
 		Guid? rawTenantId = null;
@@ -102,40 +106,39 @@ public sealed class AuthEndpoints : IEndpoint
 
 		if (authenticateResult.Properties?.Items is { } items)
 		{
-			if (items.TryGetValue("TenantId", out var tenantIdStr) &&
-				Guid.TryParse(tenantIdStr, out var parsed))
+			if (items.TryGetValue(WebConstants.TenantIdName, out string? tenantIdStr) &&
+				Guid.TryParse(tenantIdStr, out Guid parsedTenantId))
 			{
-				rawTenantId = parsed;
+				rawTenantId = parsedTenantId;
 			}
 
-			if (items.TryGetValue("InviteToken", out var token))
+			if (items.TryGetValue(WebConstants.InviteTokenName, out string? token))
 			{
 				inviteTokenStr = token;
 			}
 		}
 
-		if (rawTenantId == null || rawTenantId == Guid.Empty)
+		if (rawTenantId is null || rawTenantId == Guid.Empty)
 		{
-			return TypedResults.BadRequest("Tenant context was lost during Google login.");
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
-		var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
-		var subjectId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+		string? email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
+		string? subjectId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+		string firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName) ?? string.Empty;
+		string lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname) ?? string.Empty;
 
-		// names are not guaranteed
-		var firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName) ?? string.Empty;
-		var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname) ?? string.Empty;
-
-		if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(subjectId))
+		if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(subjectId))
 		{
-			return TypedResults.BadRequest("Incomplete Google profile.");
+			return TypedResults.Redirect("/auth/access-denied?reason=incomplete_profile");
 		}
 
-		AccountId accountId = AccountId.Empty;
-		Role role = Role.None;
-		AccountState state = AccountState.Unknown;
-		TenantId tenantId = new TenantId(rawTenantId.Value);
-		
+		TenantId tenantId = new(rawTenantId.Value);
+
+		AccountId accountId;
+		Role role;
+		AccountState state;
+
 		if (!string.IsNullOrWhiteSpace(inviteTokenStr))
 		{
 			var command = new AcceptInviteWithGoogleCommand(
@@ -150,8 +153,10 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/invite-accept-failed?error={result.Error.Code}");
+				string error = Uri.EscapeDataString(result.Error?.Code ?? "unknown");
+				return TypedResults.Redirect($"/auth/invite-accept-failed?error={error}");
 			}
+
 			accountId = result.Value.AccountId;
 			role = result.Value.Role;
 			state = result.Value.State;
@@ -168,7 +173,8 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/access-denied?error={result.Error.Code}");
+				string error = Uri.EscapeDataString(result.Error?.Code ?? "unknown");
+				return TypedResults.Redirect($"/auth/access-denied?error={error}");
 			}
 
 			accountId = result.Value.AccountId;
@@ -179,14 +185,15 @@ public sealed class AuthEndpoints : IEndpoint
 		var claims = new List<Claim>
 	{
 		new(ClaimTypes.NameIdentifier, accountId.ToString()),
+		new(ClaimTypes.Name, $"{firstName} {lastName}".Trim()),
 		new(ClaimTypes.Email, email),
 		new(ClaimTypes.Role, role.ToString()),
 		new(CustomClaimTypes.State, state.ToString()),
-		new(CustomClaimTypes.TenantId, tenantId.ToString()),
-#if  DEBUG
-		new("GoogleSub", subjectId)
+		new(CustomClaimTypes.TenantId, tenantId.ToString())
+#if DEBUG
+        ,new("GoogleSub", subjectId)
 #endif
-	};
+    };
 
 		var identity = new ClaimsIdentity(
 			claims,
@@ -197,16 +204,18 @@ public sealed class AuthEndpoints : IEndpoint
 			new ClaimsPrincipal(identity),
 			new AuthenticationProperties
 			{
-				IsPersistent = true,
-				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8) // todo tech: from the settings
+				IsPersistent = false,
+				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
 			});
 
 		return TypedResults.Redirect("/");
 	}
 
-	private static async Task<IResult> LogoutAsync(HttpContext context)
+	private static async Task<IResult> LogoutAsync(
+		HttpContext context,
+		[FromForm] string returnUrl)
 	{
 		await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-		return TypedResults.Redirect("/");
+		return TypedResults.LocalRedirect("/");
 	}
 }

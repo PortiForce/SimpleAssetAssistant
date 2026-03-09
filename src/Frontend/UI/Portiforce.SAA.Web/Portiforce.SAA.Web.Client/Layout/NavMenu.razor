@@ -1,104 +1,137 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@implements IDisposable
+
+@using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.UiSetup
 
-<div class="nav-scrollable" @onclick="ToggleNavMenu">
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<NavMenu> L
+
+<input type="checkbox" title="@L["Nav_ToggleTitle"]" class="navbar-toggler" />
+
+<div class="nav-scrollable">
     <nav class="flex-column">
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
         <AuthorizeView>
             <Authorized>
-                <div class="nav-divider">My Portfolio</div>
+                <div class="nav-section">
+                    <div class="nav-section-header px-3">
+                        <span class="bi bi-wallet2"></span> @L["Nav_Section_MySpace"]
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/portfolio">
-                        <span class="bi bi-graph-up"></span> Dashboard
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/assets">
-                        <span class="bi bi-wallet2"></span> My Assets
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tenant/user/import/single">
-                        <span class="bi bi-cloud-upload"></span> Import Data
-                    </NavLink>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/dashboard" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-graph-up" aria-hidden="true"></span> @L["Nav_Dashboard"]
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/portfolio" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-graph-up" aria-hidden="true"></span> @L["Nav_Portfolio"]
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/assets" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-wallet2" aria-hidden="true"></span> @L["Nav_MyAssets"]
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/register-change" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-cloud-upload" aria-hidden="true"></span> @L["Nav_RegisterChange"]
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/me/import-batch" Match="NavLinkMatch.Prefix">
+                            <span class="bi bi-cloud-upload" aria-hidden="true"></span> @L["Nav_ImportBatch"]
+                        </NavLink>
+                    </div>
                 </div>
 
                 <AuthorizeView Policy="@UiPolicies.TenantAdmin" Context="adminContext">
-                    <div class="nav-divider">Administration</div>
+                    <div class="nav-section">
+                        <div class="nav-section-header px-3">
+                            <span class="bi bi-gear"></span> @L["Nav_Section_Administration"]
+                        </div>
 
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/admin/users">
-                            <span class="bi bi-people-fill"></span> Users
-                        </NavLink>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/invites" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-people-fill" aria-hidden="true"></span> @L["Nav_Invites"]
+                            </NavLink>
+                        </div>
+
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/users" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-people-fill" aria-hidden="true"></span> @L["Nav_Users"]
+                            </NavLink>
+                        </div>
+
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/platforms" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-shield-lock" aria-hidden="true"></span> @L["Nav_Platforms"]
+                            </NavLink>
+                        </div>
+
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/assets" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-shield-lock" aria-hidden="true"></span> @L["Nav_Assets"]
+                            </NavLink>
+                        </div>
                     </div>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="tenant/admin/platforms">
-                            <span class="bi bi-shield-lock"></span> Platforms
-                        </NavLink>
+                </AuthorizeView>
+
+                <AuthorizeView Policy="@UiPolicies.PlatformAdmin" Context="ownerContext">
+                    <div class="nav-section">
+                        <div class="nav-section-header px-3">
+                            <span class="bi bi-hdd-rack"></span> @L["Nav_Section_Settings"]
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/piforce/assets" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-hdd-network" aria-hidden="true"></span> @L["Nav_Assets"]
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/piforce/platforms" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-hdd-network" aria-hidden="true"></span> @L["Nav_Platforms"]
+                            </NavLink>
+                        </div>
                     </div>
                 </AuthorizeView>
 
                 <AuthorizeView Policy="@UiPolicies.PlatformOwner" Context="ownerContext">
-                    <div class="nav-divider">System</div>
-
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="platform/tenants">
-                            <span class="bi bi-hdd-network"></span> All Tenants
-                        </NavLink>
+                    <div class="nav-section">
+                        <div class="nav-section-header px-3">
+                            <span class="bi bi-hdd-rack"></span> @L["Nav_Section_System"]
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/piforce/tenants" Match="NavLinkMatch.Prefix">
+                                <span class="bi bi-hdd-network" aria-hidden="true"></span> @L["Nav_Tenants"]
+                            </NavLink>
+                        </div>
                     </div>
                 </AuthorizeView>
-
             </Authorized>
         </AuthorizeView>
     </nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
 }
-
-<style>
-    .nav {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .nav-section {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .nav-caption {
-        font-size: 12px;
-        opacity: .75;
-        margin-top: 6px;
-    }
-
-    .nav-link {
-        color: rgba(255,255,255,.9);
-        text-decoration: none;
-        padding: 8px 10px;
-        border-radius: 10px;
-    }
-
-        .nav-link.active {
-            background: rgba(255,255,255,.12);
-        }
-
-    .nav-divider {
-        height: 1px;
-        background: rgba(255,255,255,.12);
-        margin: 8px 0;
-    }
-</style>

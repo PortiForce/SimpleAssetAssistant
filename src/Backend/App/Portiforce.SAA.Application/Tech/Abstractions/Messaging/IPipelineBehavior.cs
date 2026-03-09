@@ -1,0 +1,12 @@
+﻿using Portiforce.SAA.Application.Tech.Messaging;
+
+namespace Portiforce.SAA.Application.Tech.Abstractions.Messaging;
+
+public interface IPipelineBehavior<TRequest, TResponse>
+	where TRequest : IRequest<TResponse>
+{
+	ValueTask<TResponse> Handle(
+		TRequest request,
+		CancellationToken ct,
+		RequestHandlerDelegate<TResponse> next);
+}

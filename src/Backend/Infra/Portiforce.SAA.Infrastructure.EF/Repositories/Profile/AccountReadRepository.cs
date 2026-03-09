@@ -77,6 +77,54 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 			pageRequest.PageSize);
 	}
 
+	public async Task<PagedResult<AccountListItem>> GetListAsync(
+		TenantId tenantId,
+		string? requestSearch,
+		Role? requestRole,
+		AccountState? requestState,
+		AccountTier? requestTier,
+		PageRequest pageRequest,
+		CancellationToken ct)
+	{
+		IQueryable<Account> query = db.Accounts
+			.AsNoTracking()
+			.Where(x => x.TenantId == tenantId);
+
+		if (!string.IsNullOrWhiteSpace(requestSearch))
+		{
+			query = query.Where(x => x.Alias.Contains(requestSearch));
+		}
+		if (requestRole is not null)
+		{
+			query = query.Where(x => x.Role == requestRole);
+		}
+		if (requestState is not null)
+		{
+			query = query.Where(x => x.State == requestState);
+		}
+
+		if (requestTier is not null)
+		{
+			query = query.Where(x => x.Tier == requestTier);
+		}
+
+		int skip = (pageRequest.PageNumber - 1) * pageRequest.PageSize;
+		int totalCount = await query.CountAsync(ct);
+
+		List<AccountListItem> items = await query
+			.OrderBy(x => x.Alias)
+			.Skip(skip)
+			.Take(pageRequest.PageSize)
+			.Select(ListItemSelector)
+			.ToListAsync(ct);
+
+		return new PagedResult<AccountListItem>(
+			items,
+			totalCount,
+			pageRequest.PageNumber,
+			pageRequest.PageSize);
+	}
+
 	public async Task<AccountDetails?> GetByEmailAndTenantAsync(
 		Email email,
 		TenantId requestTenantId,

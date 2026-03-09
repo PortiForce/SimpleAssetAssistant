@@ -1,5 +1,5 @@
 ﻿using Portiforce.SAA.Application.Interfaces.Services.Auth;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Auth.Projections;
 

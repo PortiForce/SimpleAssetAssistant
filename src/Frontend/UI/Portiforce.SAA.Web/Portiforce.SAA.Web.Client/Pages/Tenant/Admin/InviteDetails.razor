@@ -1,0 +1,129 @@
+﻿@page "/admin/invites/{InviteId:guid}"
+
+@using Portiforce.SAA.Contracts.Configuration
+@using Portiforce.SAA.Contracts.Enums
+@using Portiforce.SAA.Contracts.Models.Client.Invite
+@using Portiforce.SAA.Contracts.UiSetup
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@inject IAdminApiClient ApiClient
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="mb-0">Invite details</h3>
+        <div class="text-muted small">Id: @InviteId</div>
+    </div>
+
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">Back to invites</a>
+</div>
+
+@if (isLoading)
+{
+    <div class="text-muted">Loading invite details...</div>
+}
+else if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (invite is null)
+{
+    <div class="alert alert-warning">Invite not found.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="h5 mb-1">@invite.InviteTargetValue</div>
+                    <div class="text-muted">
+                        @invite.InviteChannel • @invite.InviteRole • @invite.InviteTier
+                    </div>
+                </div>
+
+                <span class="badge @GetStatusBadge(invite.State)">
+                    @invite.State
+                </span>
+            </div>
+
+            <hr />
+
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Created</dt>
+                <dd class="col-sm-9">@invite.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+
+                <dt class="col-sm-3">Expires</dt>
+                <dd class="col-sm-9">@invite.ExpiresAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+
+                <dt class="col-sm-3">Invited by</dt>
+                <dd class="col-sm-9">@invite.InvitedBy</dd>
+
+                <dt class="col-sm-3">Send count</dt>
+                <dd class="col-sm-9">@invite.SendTimesCount</dd>
+
+                <dt class="col-sm-3">Accepted</dt>
+                <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "—")</dd>
+
+                <dt class="col-sm-3">Related account</dt>
+                <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? "—")</dd>
+            </dl>
+        </div>
+        <div class="card-actions">
+            @if (invite.CanResend)
+            {
+                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">Resend</a>
+            }
+            @if (invite.CanRevoke)
+            {
+                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">Revoke</a>
+            }
+        </div>
+    </div>
+    
+}
+
+@code {
+    [Parameter]
+    public Guid InviteId { get; set; }
+
+    private InviteDetailsResponse? invite;
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+
+            invite = await ApiClient.GetInviteDetailsAsync(InviteId);
+        }
+        catch (Exception ex)
+        {
+            invite = null;
+            error = "Could not load invite details: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string GetStatusBadge(InviteStatus status) => status switch
+    {
+        InviteStatus.Pending => "bg-warning text-dark",
+        InviteStatus.Accepted => "bg-success",
+        InviteStatus.Revoked => "bg-secondary",
+        InviteStatus.Expired => "bg-dark",
+        _ => "bg-secondary"
+    };
+}

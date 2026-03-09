@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using Portiforce.SAA.Application.Entitlements.Resolvers;
 using Portiforce.SAA.Application.Interfaces.Guards;
 using Portiforce.SAA.Application.Interfaces.Resolvers;
@@ -7,6 +9,7 @@ using Portiforce.SAA.Application.Interfaces.Services.Activity;
 using Portiforce.SAA.Application.Interfaces.Services.Asset;
 using Portiforce.SAA.Application.Interfaces.Services.Auth;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Guards;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Services;

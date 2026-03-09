@@ -22,13 +22,9 @@ public sealed class TenantResolutionMiddleware
 		var host = context.Request.Host.Host;
 
 		// 1) Landing host (no tenant)
-		if (string.Equals(host, _options.BaseDomain, StringComparison.OrdinalIgnoreCase) ||
-			string.Equals(host, $"www.{_options.BaseDomain}", StringComparison.OrdinalIgnoreCase))
+		if (IsBaseDomain(host))
 		{
 			tenantContext.IsLanding = true;
-			tenantContext.Prefix = null;
-			tenantContext.TenantId = null;
-
 			await _next(context);
 			return;
 		}
@@ -47,9 +43,6 @@ public sealed class TenantResolutionMiddleware
 				return;
 			}
 
-			tenantContext.IsLanding = false;
-			tenantContext.Prefix = prefix;
-
 			TenantResolution? resolved = await tenantResolver.ResolveByPrefixAsync(prefix, context.RequestAborted);
 			if (resolved is null)
 			{
@@ -58,6 +51,8 @@ public sealed class TenantResolutionMiddleware
 				return;
 			}
 
+			tenantContext.IsLanding = false;
+			tenantContext.Prefix = prefix;
 			tenantContext.TenantId = resolved.TenantId;
 			tenantContext.PublicName = resolved.Name;
 
@@ -69,4 +64,8 @@ public sealed class TenantResolutionMiddleware
 		context.Response.StatusCode = StatusCodes.Status404NotFound;
 		await context.Response.WriteAsync("Unknown tenant host.");
 	}
+
+	private bool IsBaseDomain(string host) =>
+		string.Equals(host, _options.BaseDomain, StringComparison.OrdinalIgnoreCase) ||
+		string.Equals(host, $"www.{_options.BaseDomain}", StringComparison.OrdinalIgnoreCase);
 }

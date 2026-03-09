@@ -1,5 +1,5 @@
 ﻿using Portiforce.SAA.Application.Models.Common.DataAccess;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.PlatformAccount.Projections;
 using Portiforce.SAA.Core.Primitives.Ids;
 

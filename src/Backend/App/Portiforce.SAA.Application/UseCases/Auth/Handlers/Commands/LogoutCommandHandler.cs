@@ -1,6 +1,6 @@
 ﻿using Portiforce.SAA.Application.Interfaces.Services.Auth;
 using Portiforce.SAA.Application.Models.Auth;
-using Portiforce.SAA.Application.Tech.Messaging;
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Auth.Actions.Commands;
 
 namespace Portiforce.SAA.Application.UseCases.Auth.Handlers.Commands;

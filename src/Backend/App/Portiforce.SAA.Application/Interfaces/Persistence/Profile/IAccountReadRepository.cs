@@ -1,6 +1,7 @@
 ﻿using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
+using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -11,6 +12,15 @@ public interface IAccountReadRepository : IReadRepository<AccountDetails, Accoun
 	Task<PagedResult<AccountListItem>> GetByTenantIdAsync(
 		TenantId tenantId,
 		PageRequest pageRequest,
+		CancellationToken ct);
+
+	Task<PagedResult<AccountListItem>> GetListAsync(
+		TenantId requestTenantId,
+		string? requestSearch,
+		Role? requestRole,
+		AccountState? requestState,
+		AccountTier? requestTier,
+		PageRequest requestPageRequest,
 		CancellationToken ct);
 
 	Task<AccountDetails?> GetByEmailAndTenantAsync(

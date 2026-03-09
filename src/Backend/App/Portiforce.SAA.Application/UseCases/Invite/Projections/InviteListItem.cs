@@ -16,4 +16,20 @@ public sealed record InviteListItem(
 	DateTimeOffset ExpiresAtUtc,
 	AccountId InvitedBy,
 	DateTimeOffset? AcceptedAtUtc,
+	AccountId? RelatedAccountId,
+	bool CanResend,
+	bool CanRevoke);
+
+public sealed record InviteListItemRaw(
+	Guid Id,
+	TenantId TenantId,
+	string InviteTargetValue,
+	InviteChannel InviteChannel,
+	AccountTier InviteTier,
+	Role InviteRole,
+	InviteState State,
+	DateTimeOffset CreatedAtUtc,
+	DateTimeOffset ExpiresAtUtc,
+	AccountId InvitedBy,
+	DateTimeOffset? AcceptedAtUtc,
 	AccountId? RelatedAccountId) : IListItemProjection;

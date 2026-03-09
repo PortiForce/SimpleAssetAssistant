@@ -1,4 +1,4 @@
-﻿@using Portiforce.SAA.Web.Client
+﻿    @using Portiforce.SAA.Web.Client
 @using Portiforce.SAA.Web.Client.Layout
 
 <!DOCTYPE html>
@@ -7,8 +7,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com;
+        style-src 'self' 'unsafe-inline' https://accounts.google.com;
+        img-src 'self' data: https:;
+        font-src 'self' data:;
+        connect-src 'self' https://accounts.google.com;
+        frame-src 'self' https://accounts.google.com;
+        frame-ancestors 'self';
+    " />
     <base href="/" />
     <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Portiforce.SAA.Web.styles.css"]" />
     <ImportMap />
@@ -16,9 +27,18 @@
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveAuto" />
-    <ReconnectModal />
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
+<Routes @rendermode="InteractiveAuto" />
+<ReconnectModal />
+<script src="@Assets["_framework/blazor.web.js"]"></script>
+<script src="@Assets["js/culture.js"]"></script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private IComponentRenderMode? PageRenderMode =>
+        HttpContext.AcceptsInteractiveRouting() ? InteractiveAuto : null;
+}

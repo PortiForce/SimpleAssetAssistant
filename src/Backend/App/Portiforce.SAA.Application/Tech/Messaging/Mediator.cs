@@ -1,5 +1,8 @@
 ﻿using System.Collections.Concurrent;
+
 using Microsoft.Extensions.DependencyInjection;
+
+using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 
 namespace Portiforce.SAA.Application.Tech.Messaging;
 
