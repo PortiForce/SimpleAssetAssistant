@@ -1,13 +1,9 @@
-﻿using System.Net.Http.Json;
-
-using Portiforce.SAA.Contracts.Configuration;
+﻿using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Models.Client.Account;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
-using Portiforce.SAA.Web.Client.Models;
 using Portiforce.SAA.Web.Client.Services.ApiClients;
 using Portiforce.SAA.Web.Client.Services.Interfaces;
 
-using GetInviteDetailsRequest = Portiforce.SAA.Contracts.Models.Client.Invite.GetInviteDetailsRequest;
 using GetInviteListQueryRequest = Portiforce.SAA.Contracts.Models.Client.Invite.GetInviteListQueryRequest;
 
 namespace Portiforce.SAA.Web.Client.Services;

@@ -17,6 +17,7 @@ using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Web.Configuration;
 using Portiforce.SAA.Web.Infrastructure;
 
 namespace Portiforce.SAA.Web.Features.Endpoints;
@@ -63,39 +64,39 @@ public sealed class AuthEndpoints : IEndpoint
 
 	private static IResult TriggerGoogleLogin(
 		[FromServices] ITenantContext tenantContext,
-		HttpContext context,
 		[FromQuery] string? inviteToken)
 	{
+		if (!tenantContext.TenantId.HasValue || tenantContext.TenantId.Value == Guid.Empty)
+		{
+			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
+		}
+
 		var properties = new AuthenticationProperties
 		{
 			RedirectUri = "/auth/google-callback"
 		};
 
-		if (tenantContext.TenantId.HasValue && tenantContext.TenantId.Value != Guid.Empty)
-		{
-			properties.Items["TenantId"] = tenantContext.TenantId.Value.ToString();
-		}
-		else
-		{
-			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
-		}
+		properties.Items[WebConstants.TenantIdName] = tenantContext.TenantId.Value.ToString();
 
 		if (!string.IsNullOrWhiteSpace(inviteToken))
 		{
-			properties.Items["InviteToken"] = inviteToken;
+			properties.Items[WebConstants.InviteTokenName] = inviteToken;
 		}
 
-		return TypedResults.Challenge(properties, ["Google"]);
+		return TypedResults.Challenge(
+			properties,
+			new[] { GoogleDefaults.AuthenticationScheme });
 	}
 
 	private static async Task<IResult> HandleGoogleCallbackAsync(
-		HttpContext context,
-		[FromServices] IMediator mediator,
-		CancellationToken ct)
+	HttpContext context,
+	[FromServices] IMediator mediator,
+	CancellationToken ct)
 	{
-		AuthenticateResult authenticateResult = await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+		AuthenticateResult authenticateResult =
+			await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
-		if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
+		if (!authenticateResult.Succeeded || authenticateResult.Principal is null)
 		{
 			return TypedResults.Redirect("/auth/access-denied?reason=google_auth_failed");
 		}
@@ -105,37 +106,38 @@ public sealed class AuthEndpoints : IEndpoint
 
 		if (authenticateResult.Properties?.Items is { } items)
 		{
-			if (items.TryGetValue("TenantId", out var tenantIdStr) &&
-				Guid.TryParse(tenantIdStr, out var parsed))
+			if (items.TryGetValue(WebConstants.TenantIdName, out string? tenantIdStr) &&
+				Guid.TryParse(tenantIdStr, out Guid parsedTenantId))
 			{
-				rawTenantId = parsed;
+				rawTenantId = parsedTenantId;
 			}
 
-			if (items.TryGetValue("InviteToken", out var token))
+			if (items.TryGetValue(WebConstants.InviteTokenName, out string? token))
 			{
 				inviteTokenStr = token;
 			}
 		}
 
-		if (rawTenantId == null || rawTenantId == Guid.Empty)
+		if (rawTenantId is null || rawTenantId == Guid.Empty)
 		{
 			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
-		var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
-		var subjectId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-		var firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName) ?? string.Empty;
-		var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname) ?? string.Empty;
+		string? email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
+		string? subjectId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+		string firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName) ?? string.Empty;
+		string lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname) ?? string.Empty;
 
-		if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(subjectId))
+		if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(subjectId))
 		{
 			return TypedResults.Redirect("/auth/access-denied?reason=incomplete_profile");
 		}
 
+		TenantId tenantId = new(rawTenantId.Value);
+
 		AccountId accountId;
 		Role role;
 		AccountState state;
-		TenantId tenantId = new TenantId(rawTenantId.Value);
 
 		if (!string.IsNullOrWhiteSpace(inviteTokenStr))
 		{
@@ -151,7 +153,8 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/invite-accept-failed?error={result.Error?.Code ?? "unknown"}");
+				string error = Uri.EscapeDataString(result.Error?.Code ?? "unknown");
+				return TypedResults.Redirect($"/auth/invite-accept-failed?error={error}");
 			}
 
 			accountId = result.Value.AccountId;
@@ -170,7 +173,8 @@ public sealed class AuthEndpoints : IEndpoint
 
 			if (!result.IsSuccess)
 			{
-				return TypedResults.Redirect($"/auth/access-denied?error={result.Error?.Code ?? "unknown"}");
+				string error = Uri.EscapeDataString(result.Error?.Code ?? "unknown");
+				return TypedResults.Redirect($"/auth/access-denied?error={error}");
 			}
 
 			accountId = result.Value.AccountId;
@@ -179,16 +183,17 @@ public sealed class AuthEndpoints : IEndpoint
 		}
 
 		var claims = new List<Claim>
-		{
-			new(ClaimTypes.NameIdentifier, accountId.ToString()),
-			new(ClaimTypes.Email, email),
-			new(ClaimTypes.Role, role.ToString()),
-			new(CustomClaimTypes.State, state.ToString()),
-			new(CustomClaimTypes.TenantId, tenantId.ToString())
+	{
+		new(ClaimTypes.NameIdentifier, accountId.ToString()),
+		new(ClaimTypes.Name, $"{firstName} {lastName}".Trim()),
+		new(ClaimTypes.Email, email),
+		new(ClaimTypes.Role, role.ToString()),
+		new(CustomClaimTypes.State, state.ToString()),
+		new(CustomClaimTypes.TenantId, tenantId.ToString())
 #if DEBUG
-			,new("GoogleSub", subjectId)
+        ,new("GoogleSub", subjectId)
 #endif
-		};
+    };
 
 		var identity = new ClaimsIdentity(
 			claims,
@@ -199,8 +204,8 @@ public sealed class AuthEndpoints : IEndpoint
 			new ClaimsPrincipal(identity),
 			new AuthenticationProperties
 			{
-				IsPersistent = true,
-				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8) // todo tech: from the settings
+				IsPersistent = false,
+				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
 			});
 
 		return TypedResults.Redirect("/");

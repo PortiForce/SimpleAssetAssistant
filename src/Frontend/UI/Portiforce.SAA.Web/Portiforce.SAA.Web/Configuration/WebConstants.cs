@@ -2,5 +2,6 @@
 
 public static class WebConstants
 {
-	public const string InviteTokenNane = "inviteToken";
+	public const string InviteTokenName = "inviteToken";
+	public const string TenantIdName = "TenantId";
 }

@@ -64,10 +64,12 @@ public class Program
 
 		builder.Services.AddAuthentication(options =>
 			{
-				// This tells ASP.NET that your main way of tracking users is via Cookies
+				// main way of tracking users is via Cookies
 				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 				options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 			})
 			.AddCookie(options =>
 			{
@@ -76,8 +78,8 @@ public class Program
 
 				options.Events.OnRedirectToLogin = ctx =>
 				{
-					// For APIs: return 401, for browser navigation: redirect
-					if (ctx.Request.Path.StartsWithSegments("/api"))
+					// For APIs/ BFF: return 401, for browser navigation: redirect
+					if (ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/bff"))
 					{
 						ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
 						return Task.CompletedTask;
@@ -88,7 +90,7 @@ public class Program
 
 				options.Events.OnRedirectToAccessDenied = ctx =>
 				{
-					if (ctx.Request.Path.StartsWithSegments("/api"))
+					if (ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/bff"))
 					{
 						ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
 						return Task.CompletedTask;
