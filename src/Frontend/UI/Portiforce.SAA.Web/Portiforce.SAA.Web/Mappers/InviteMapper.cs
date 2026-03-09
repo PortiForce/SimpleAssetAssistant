@@ -18,12 +18,12 @@ public static class InviteMapper
 		_ => InviteAccountTier.None
 	};
 
-	public static AccountTier ToBusiness(this InviteAccountTier presentationTier) => presentationTier switch
+	public static AccountTier? ToBusiness(this InviteAccountTier presentationTier) => presentationTier switch
 	{
 		InviteAccountTier.Observer => AccountTier.Observer,
 		InviteAccountTier.Investor => AccountTier.Investor,
 		InviteAccountTier.Strategist => AccountTier.Strategist,
-		_ => throw new ArgumentOutOfRangeException(nameof(presentationTier), $"Unsupported tier: {presentationTier}")
+		_ => null
 	};
 
 	public static InviteTenantRole ToPresentation(this Role domainRole) => domainRole switch
@@ -33,11 +33,11 @@ public static class InviteMapper
 		_ => InviteTenantRole.None
 	};
 
-	public static Role ToBusiness(this InviteTenantRole presentationRole) => presentationRole switch
+	public static Role? ToBusiness(this InviteTenantRole presentationRole) => presentationRole switch
 	{
 		InviteTenantRole.TenantUser => Role.TenantUser,
 		InviteTenantRole.TenantAdmin => Role.TenantAdmin,
-		_ => throw new ArgumentOutOfRangeException(nameof(presentationRole), $"Unsupported role: {presentationRole}")
+		_ => null
 	};
 
 	public static InviteChannel ToPresentation(this Core.Identity.Enums.InviteChannel domainChannel) => domainChannel switch
@@ -48,12 +48,12 @@ public static class InviteMapper
 		_ => InviteChannel.None
 	};
 
-	public static Core.Identity.Enums.InviteChannel ToBusiness(this InviteChannel presentationChannel) => presentationChannel switch
+	public static Core.Identity.Enums.InviteChannel? ToBusiness(this InviteChannel presentationChannel) => presentationChannel switch
 	{
 		InviteChannel.Email => Core.Identity.Enums.InviteChannel.Email,
 		InviteChannel.Telegram => Core.Identity.Enums.InviteChannel.Telegram,
 		InviteChannel.AppleId => Core.Identity.Enums.InviteChannel.AppleId,
-		_ => throw new ArgumentOutOfRangeException(nameof(presentationChannel), $"Unsupported channel: {presentationChannel}")
+		_ => null
 	};
 
 	public static InviteStatus ToPresentation(this InviteState domainState) => domainState switch
@@ -97,7 +97,7 @@ public static class InviteMapper
 			model.TenantId.Value,
 			model.InviteTargetValue,
 			model.InviteChannel.ToPresentation(),
-			model.InviteTier.ToPresentation(),
+			InviteMapper.ToPresentation(model.InviteTier),
 			model.InviteRole.ToPresentation(),
 			model.State.ToPresentation(),
 			model.CreatedAtUtc,
@@ -114,7 +114,7 @@ public static class InviteMapper
 			model.TenantId.Value,
 			model.InviteTargetValue,
 			model.InviteChannel.ToPresentation(),
-			model.InviteTier.ToPresentation(),
+			InviteMapper.ToPresentation(model.InviteTier),
 			model.InviteRole.ToPresentation(),
 			model.State.ToPresentation(),
 			model.CreatedAtUtc,

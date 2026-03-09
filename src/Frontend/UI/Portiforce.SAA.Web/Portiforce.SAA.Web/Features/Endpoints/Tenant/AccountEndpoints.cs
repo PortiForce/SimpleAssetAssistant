@@ -8,12 +8,14 @@ using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Profile.Account.Projections;
 using Portiforce.SAA.Contracts.Configuration;
-using Portiforce.SAA.Contracts.Models.Client.User;
+using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Models.Client.Account;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
+using InviteChannel = Portiforce.SAA.Core.Identity.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 
@@ -50,8 +52,8 @@ public sealed class AccountEndpoints : IEndpoint
 			return TypedResults.Forbid();
 		}
 
-		InviteState? status = request.Status?.ToBusiness();
-		InviteChannel? channel = request.Channel?.ToBusiness();
+		AccountState? state = request.State?.ToBusiness();
+		AccountTier? tier = request.Tier?.ToBusiness();
 
 		var query = new GetAccountListQuery(
 			currentUser.TenantId,

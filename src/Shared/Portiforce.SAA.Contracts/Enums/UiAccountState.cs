@@ -1,5 +1,5 @@
 ﻿namespace Portiforce.SAA.Contracts.Enums;
-public enum UiAccountStatus : byte
+public enum UiAccountState : byte
 {
 	None = 0,
 

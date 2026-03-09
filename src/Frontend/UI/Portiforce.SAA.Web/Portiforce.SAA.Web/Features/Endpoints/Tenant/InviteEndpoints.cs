@@ -147,10 +147,10 @@ public sealed class InviteEndpoints : IEndpoint
 			return TypedResults.Forbid();
 		}
 
-		Role role = request.IntendedRole.ToBusiness();
-		AccountTier tier = request.IntendedTier.ToBusiness();
+		Role? role = request.IntendedRole.ToBusiness();
+		AccountTier? tier = request.IntendedTier.ToBusiness();
 
-		if (role == Role.None || tier == AccountTier.None)
+		if (role is null || tier is null)
 		{
 			return TypedResults.Problem(
 				title: "Invalid invite payload",
@@ -183,8 +183,8 @@ public sealed class InviteEndpoints : IEndpoint
 		var command = new CreateInviteCommand(
 			TenantId: currentUser.TenantId,
 			InviteTarget: inviteTarget,
-			IntendedRole: role,
-			IntendedTier: tier,
+			IntendedRole: role.Value,
+			IntendedTier: tier.Value,
 			InvitedByAccountId: currentUser.Id,
 			CreatedAtUtc: now,
 			ExpiredAtUtc: expiresAtUtc);
