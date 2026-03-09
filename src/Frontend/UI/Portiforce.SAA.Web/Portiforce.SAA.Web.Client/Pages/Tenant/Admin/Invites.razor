@@ -16,19 +16,19 @@
     <h3>Invites</h3>
 </div>
 
-<div class="container data-area">
+<div class="container card-body">
     <div class="actions-area-top">
         <a href="@UiRoutes.AdminRoutes.Invites.New" class="btn btn-primary">Invite User</a>
     </div>
 
-    <div class="row g-2 mb-3 data-manipulation-area">
+    <div class="row g-2 mb-3 mt-2 data-manipulation-area">
         <div class="col-md-4">
             <input class="form-control"
                    placeholder="Search..."
                    @bind="search"
                    @bind:event="oninput" />
         </div>
-        <div class="col-auto">
+        <div class="col-auto ">
             <button class="btn btn-outline-primary" @onclick="ReloadAsync" disabled="@isLoading">
                 Search
             </button>
