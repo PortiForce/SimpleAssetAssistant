@@ -11,6 +11,7 @@
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 @inject IAdminApiClient ApiClient
+@inject IJSRuntime JSRuntime
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Invites</h3>
@@ -44,11 +45,11 @@
     }
     else if (invitesData?.Items is { Count: > 0 })
     {
-        <div class="table-responsive">
+        <div class="card-body">
             <QuickGrid TGridItem="InviteListItemResponse"
                        Items="invitesData.Items.AsQueryable()"
-                       Class="table table-striped table-hover align-middle">
-
+                       Class="table table-striped table-hover align-middle"
+                       Pagination="paginationState">
                 <PropertyColumn Property="x => x.InviteTargetValue" Title="Target" Sortable="true"/>
                 <PropertyColumn Property="x => x.InviteChannel" Title="Channel" Sortable="true"/>
                 <PropertyColumn Property="x => x.InviteRole" Title="Role" Sortable="true"/>
@@ -73,36 +74,17 @@
                     }
                     @if (item.CanRevoke)
                     {
-                        <a href="@UiRoutes.AdminRoutes.Invites.InviteRevoke(item.Id)"
-                           class="btn btn-sm btn-outline-primary">
+                        <button class="btn btn-sm btn-outline-danger"
+                                @onclick="() => RevokeInviteAsync(item.Id)"
+                                disabled="@isLoading">
                             Revoke
-                        </a>
+                        </button>
                     }
                 </TemplateColumn>
             </QuickGrid>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted">
-                    Total: @invitesData.TotalCount
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-outline-secondary"
-                            @onclick="PreviousPageAsync"
-                            disabled="@(pageNumber <= 1 || isLoading)">
-                        Previous
-                    </button>
-
-                    <button class="btn btn-outline-secondary" disabled>
-                        Page @pageNumber
-                    </button>
-
-                    <button class="btn btn-outline-secondary"
-                            @onclick="NextPageAsync"
-                            disabled="@(!CanGoNext || isLoading)">
-                        Next
-                    </button>
-                </div>
-            </div>
+        </div>
+        <div class="card-footer">
+            <Paginator State="paginationState" />
         </div>
     }
     else
@@ -115,6 +97,9 @@
 </div>
 
 @code {
+
+    PaginationState paginationState = new PaginationState() { ItemsPerPage = 20 };
+
     private InviteListResponse? invitesData;
     private bool isLoading = true;
     private string? error;
@@ -180,6 +165,30 @@
         {
             invitesData = null;
             error = "Could not load invites: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task RevokeInviteAsync(Guid inviteId)
+    {
+        var confirm = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to revoke this invite?");
+        if (!confirm)
+        {
+            return;
+        }
+        try
+        {
+            isLoading = true;
+            error = null;
+            await ApiClient.RevokeInviteAsync(inviteId);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            error = "Could not revoke invite: " + ex.Message;
         }
         finally
         {

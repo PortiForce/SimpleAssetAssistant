@@ -30,9 +30,24 @@ public sealed class AdminApiClient(
 		CancellationToken ct = default)
 	{
 		return await PostJsonAsync<CreateInviteRequest, CreateInviteResponse>(
-			ApiRoutes.Invites.Root,
+			ApiRoutes.Invites.New,
 			request,
 			ct);
+	}
+
+	public async Task<bool> RevokeInviteAsync(Guid inviteId, CancellationToken ct = default)
+	{
+		string url = $"{ApiRoutes.Invites.InviteRevoke(inviteId)}";
+		try
+		{
+			await PostAsync(url, ct);
+		}
+		catch (Exception ex)
+		{
+			// Log the exception if needed
+			return false;
+		}
+		return true;
 	}
 
 	public async Task<AccountListResponse> GetUsersAsync(GetAccountListQueryRequest request, CancellationToken ct = default)
