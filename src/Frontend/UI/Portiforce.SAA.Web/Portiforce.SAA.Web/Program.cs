@@ -165,6 +165,10 @@ public class Program
 			options.HeaderName = "RequestVerificationToken";
 		});
 
+		builder.Services.AddProblemDetails();
+
+		builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 		var app = builder.Build();
 
 		if (app.Environment.IsDevelopment())

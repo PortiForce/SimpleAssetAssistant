@@ -1,0 +1,7 @@
+﻿::deep .invites-grid-wrapper tr:has(> td:not(:empty)) > td {
+    display: table-cell;
+}
+
+::deep .invites-grid-wrapper td:empty {
+    display: none;
+}
