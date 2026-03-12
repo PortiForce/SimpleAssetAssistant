@@ -27,6 +27,11 @@ public sealed record GetInviteListQueryRequest(
 			yield return new KeyValuePair<string, string>("channel", Channel.ToString()!);
 		}
 
+		if (HasAccount is not null)
+		{
+			yield return new KeyValuePair<string, string>("hasAccount", HasAccount.Value.ToString());
+		}
+
 		yield return new KeyValuePair<string, string>("page", Page.ToString());
 		yield return new KeyValuePair<string, string>("pageSize", PageSize.ToString());
 	}

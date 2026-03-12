@@ -13,6 +13,7 @@ public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 		InviteChannel? requestChannel,
 		InviteState? requestState,
 		string? requestSearch,
+		bool? hasAccount,
 		PageRequest requestPageRequest,
 		CancellationToken ct);
 

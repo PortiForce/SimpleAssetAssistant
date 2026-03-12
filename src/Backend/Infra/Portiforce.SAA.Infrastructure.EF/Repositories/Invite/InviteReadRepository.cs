@@ -86,6 +86,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		InviteChannel? requestChannel,
 		InviteState? requestState,
 		string? requestSearch,
+		bool? hasAccount,
 		PageRequest pageRequest,
 		CancellationToken ct)
 	{
@@ -106,6 +107,13 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		if (!string.IsNullOrWhiteSpace(requestSearch))
 		{
 			query = query.Where(x => x.InviteTarget.Value.Contains(requestSearch));
+		}
+
+		if (hasAccount.HasValue)
+		{
+			query = hasAccount.Value 
+				? query.Where(x => x.AcceptedAccountId != AccountId.Empty) 
+				: query.Where(x => x.AcceptedAccountId == null || x.AcceptedAccountId == AccountId.Empty);
 		}
 
 		int skip = (pageRequest.PageNumber - 1) *pageRequest.PageSize;

@@ -11,4 +11,5 @@ public sealed record GetInviteListQuery(
 	string? Search,
 	InviteState? State,
 	InviteChannel? Channel,
+	bool? HasAccount,
 	PageRequest PageRequest) : IQuery<PagedResult<InviteListItem>>;

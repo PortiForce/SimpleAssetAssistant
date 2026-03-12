@@ -21,6 +21,7 @@ public sealed class GetInviteListQueryHandler(
 			request.Channel,
 			request.State,
 			request.Search,
+			request.HasAccount,
 			request.PageRequest,
 			ct);
 

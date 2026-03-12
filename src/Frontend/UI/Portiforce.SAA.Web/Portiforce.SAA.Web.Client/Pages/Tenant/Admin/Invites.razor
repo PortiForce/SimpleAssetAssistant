@@ -100,9 +100,6 @@
                        Pagination="paginationState">
             
                 <PropertyColumn Property="x => x.InviteTargetValue" Title="Target" />
-                <PropertyColumn Property="x => x.InviteChannel" Title="Channel" />
-                <PropertyColumn Property="x => x.InviteRole" Title="Role" />
-
                 <TemplateColumn Title="Status" Context="item">
                     <span class="badge @(GetStatusBadge(item.Status))">
                         @item.Status
@@ -112,7 +109,8 @@
                         <i class="bi bi-person-check-fill text-success ms-2" title="Has valid account"></i>
                     }
                 </TemplateColumn>
-
+                <PropertyColumn Property="x => x.InviteChannel" Title="Channel" />
+                <PropertyColumn Property="x => x.InviteRole" Title="Role" />
                 <TemplateColumn Title="Actions" Context="item">
                     <div class="d-flex gap-2 flex-wrap">
                         <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)" class="btn btn-sm btn-outline-primary">
@@ -203,7 +201,7 @@
                     appliedChannel,
                     pageNumber,
                     pageSize,
-                    appliedHasAccount ? true : null // Only send true if checked
+                    appliedHasAccount ? true : null
                 );
 
                 InviteListResponse response = await ApiClient.GetInvitesAsync(apiRequest, request.CancellationToken);

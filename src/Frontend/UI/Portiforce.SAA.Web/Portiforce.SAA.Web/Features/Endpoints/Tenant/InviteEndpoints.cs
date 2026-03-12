@@ -100,6 +100,7 @@ public sealed class InviteEndpoints : IEndpoint
 			request.Search,
 			status,
 			channel,
+			request.HasAccount,
 			new PageRequest(
 				request.Page,
 				request.PageSize));
