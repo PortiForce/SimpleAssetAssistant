@@ -24,8 +24,9 @@
         </a>
     </div>
 
-    <div class="row g-2 mb-3 data-manipulation-area">
-        <div class="col-md-4">
+    @* --- FILTER AREA --- *@
+    <div class="row g-2 mb-3 data-manipulation-area align-items-center">
+        <div class="col-md-3">
             <input class="form-control"
                    placeholder="Search targets..."
                    @bind="searchText"
@@ -33,110 +34,148 @@
                    @onkeydown="HandleSearchKeyDownAsync" />
         </div>
 
-        <div class="col-auto">
-            <button class="btn btn-outline-primary"
-                    @onclick="ApplySearchAsync"
-                    disabled="@isBusy">
-                Search
-            </button>
+        <div class="col-md-2">
+            <select class="form-select" @bind="searchChannel">
+                <option value="">All Channels</option>
+                <option value="@InviteChannel.Email">Email</option>
+                <option value="@InviteChannel.Telegram">Telegram</option>
+                <option value="@InviteChannel.AppleId">Apple ID</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select class="form-select" @bind="searchStatus">
+                <option value="">All Statuses</option>
+                <option value="@InviteStatus.Pending">Pending</option>
+                <option value="@InviteStatus.Accepted">Accepted</option>
+                <option value="@InviteStatus.Revoked">Revoked</option>
+                <option value="@InviteStatus.Expired">Expired</option>
+            </select>
         </div>
 
         <div class="col-auto">
-            <button class="btn btn-outline-secondary"
-                    @onclick="ClearSearchAsync"
-                    disabled="@(isBusy || (string.IsNullOrEmpty(searchText) && string.IsNullOrEmpty(appliedSearchText)))">
-                Clear
-            </button>
-        </div>
-    </div>
-
-    @if (!string.IsNullOrWhiteSpace(error))
-    {
-        <div class="alert alert-danger">@error</div>
-    }
-
-    <div class="invites-grid-wrapper position-relative">
-        
-        @if (isBusy)
-        {
-            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.7); z-index: 10;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <div class="form-check mt-2 mt-md-0 ms-1">
+                <input class="form-check-input" type="checkbox" id="hasAccountCheck" @bind="searchHasAccount">
+                    <label class="form-check-label" for="hasAccountCheck">
+                        Has Valid Account
+                    </label>
                 </div>
             </div>
+
+            <div class="col-auto ms-auto">
+                <button class="btn btn-outline-primary me-2"
+                        @onclick="ApplySearchAsync"
+                        disabled="@isBusy">
+                    Search
+                </button>
+                <button class="btn btn-outline-secondary"
+                        @onclick="ClearSearchAsync"
+                        disabled="@isBusy">
+                    Clear
+                </button>
+            </div>
+        </div>
+        @* --- END FILTER AREA --- *@
+
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-danger">@error</div>
         }
 
-        @* REMOVED the ItemKey lambda to stop the infinite loop! *@
-        <QuickGrid TGridItem="InviteListItemResponse"
-                   @ref="grid"
-                   ItemsProvider="invitesProvider"
-                   Class="table table-striped table-hover align-middle"
-                   Pagination="paginationState">
-            
-            <PropertyColumn Property="x => x.InviteTargetValue" Title="Target" />
-            <PropertyColumn Property="x => x.InviteChannel" Title="Channel" />
-            <PropertyColumn Property="x => x.InviteRole" Title="Role" />
-
-            <TemplateColumn Title="Status" Context="item">
-                <span class="badge @(GetStatusBadge(item.Status))">
-                    @item.Status
-                </span>
-            </TemplateColumn>
-
-            <TemplateColumn Title="Actions" Context="item">
-                <div class="d-flex gap-2 flex-wrap">
-                    <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)" class="btn btn-sm btn-outline-primary">
-                        Details
-                    </a>
-
-                    @if (item.CanResend)
-                    {
-                        <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)" class="btn btn-sm btn-outline-primary">
-                            Resend
-                        </a>
-                    }
-
-                    @if (item.CanRevoke)
-                    {
-                        <button class="btn btn-sm btn-outline-danger"
-                                @onclick="() => RevokeInviteAsync(item.Id)"
-                                disabled="@isBusy">
-                            Revoke
-                        </button>
-                    }
-                </div>
-            </TemplateColumn>
-        </QuickGrid>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
-        <div class="text-muted small">
-            @if (totalCount > 0)
+        <div class="invites-grid-wrapper position-relative">
+        
+            @if (isBusy)
             {
-                <span>
-                    Showing page @(paginationState.CurrentPageIndex + 1) of @TotalPages (@totalCount total)
-                </span>
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.7); z-index: 10;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             }
+
+            <QuickGrid TGridItem="InviteListItemResponse"
+                       @ref="grid"
+                       ItemsProvider="invitesProvider"
+                       Class="table table-striped table-hover align-middle"
+                       Pagination="paginationState">
+            
+                <PropertyColumn Property="x => x.InviteTargetValue" Title="Target" />
+                <PropertyColumn Property="x => x.InviteChannel" Title="Channel" />
+                <PropertyColumn Property="x => x.InviteRole" Title="Role" />
+
+                <TemplateColumn Title="Status" Context="item">
+                    <span class="badge @(GetStatusBadge(item.Status))">
+                        @item.Status
+                    </span>
+                    @if (item.RelatedAccountId.HasValue)
+                    {
+                        <i class="bi bi-person-check-fill text-success ms-2" title="Has valid account"></i>
+                    }
+                </TemplateColumn>
+
+                <TemplateColumn Title="Actions" Context="item">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)" class="btn btn-sm btn-outline-primary">
+                            Details
+                        </a>
+
+                        @if (item.CanResend)
+                        {
+                            <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)" class="btn btn-sm btn-outline-primary">
+                                Resend
+                            </a>
+                        }
+
+                        @if (item.CanRevoke)
+                        {
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => RevokeInviteAsync(item.Id)"
+                                    disabled="@isBusy">
+                                Revoke
+                            </button>
+                        }
+                    </div>
+                </TemplateColumn>
+            </QuickGrid>
         </div>
 
-        <Paginator State="paginationState" />
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+            <div class="text-muted small">
+                @if (totalCount > 0)
+                {
+                    <span>
+                        Showing page @(paginationState.CurrentPageIndex + 1) of @TotalPages (@totalCount total)
+                    </span>
+                }
+            </div>
+
+            <Paginator State="paginationState" />
+        </div>
+
+        @if (!isBusy && totalCount == 0 && string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-info mt-3">No invites found matching your criteria.</div>
+        }
     </div>
 
-    @if (!isBusy && totalCount == 0 && string.IsNullOrWhiteSpace(error))
-    {
-        <div class="alert alert-info mt-3">No invites found matching your criteria.</div>
-    }
-</div>
-
 @code {
-    private const int DefaultPageSize = 10;
+    private const int DefaultPageSize = 20;
 
     private readonly PaginationState paginationState = new() { ItemsPerPage = DefaultPageSize };
     private QuickGrid<InviteListItemResponse>? grid;
     private GridItemsProvider<InviteListItemResponse> invitesProvider = default!;
 
+    // UI Input Bindings
     private string searchText = string.Empty;
+    private InviteChannel? searchChannel;
+    private InviteStatus? searchStatus;
+    private bool searchHasAccount;
+
+    // Applied Filters (Used by the Grid Provider)
     private string appliedSearchText = string.Empty;
+    private InviteChannel? appliedChannel;
+    private InviteStatus? appliedStatus;
+    private bool appliedHasAccount;
 
     private bool isBusy;
     private string? error;
@@ -157,8 +196,15 @@
                 int pageSize = request.Count ?? paginationState.ItemsPerPage;
                 int pageNumber = (request.StartIndex / pageSize) + 1;
 
+                // Pass all applied filters to the API
                 var apiRequest = new GetInviteListQueryRequest(
-                    appliedSearchText, null, null, pageNumber, pageSize);
+                    appliedSearchText,
+                    appliedStatus,
+                    appliedChannel,
+                    pageNumber,
+                    pageSize,
+                    appliedHasAccount ? true : null // Only send true if checked
+                );
 
                 InviteListResponse response = await ApiClient.GetInvitesAsync(apiRequest, request.CancellationToken);
                 totalCount = response.TotalCount;
@@ -185,7 +231,11 @@
 
     private async Task ApplySearchAsync()
     {
+        // Copy the UI inputs to the applied state
         appliedSearchText = searchText.Trim();
+        appliedChannel = searchChannel;
+        appliedStatus = searchStatus;
+        appliedHasAccount = searchHasAccount;
         
         if (paginationState.CurrentPageIndex != 0)
         {
@@ -199,8 +249,16 @@
 
     private async Task ClearSearchAsync()
     {
+        // Reset both UI inputs and applied state
         searchText = string.Empty;
+        searchChannel = null;
+        searchStatus = null;
+        searchHasAccount = false;
+
         appliedSearchText = string.Empty;
+        appliedChannel = null;
+        appliedStatus = null;
+        appliedHasAccount = false;
 
         if (paginationState.CurrentPageIndex != 0)
         {

@@ -7,7 +7,8 @@ public sealed record GetInviteListQueryRequest(
 	InviteStatus? Status,
 	InviteChannel? Channel,
 	int Page = 1,
-	int PageSize = 20)
+	int PageSize = 20,
+	bool? HasAccount = null)
 {
 	public IEnumerable<KeyValuePair<string, string>> ToQueryParameters()
 	{
