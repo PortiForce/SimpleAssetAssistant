@@ -83,9 +83,9 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 
 	public async Task<PagedResult<InviteListItemRaw>> GetListAsync(
 		TenantId tenantId,
-		InviteChannel? requestChannel,
-		InviteState? requestState,
-		string? requestSearch,
+		HashSet<InviteChannel>? channels,
+		HashSet<InviteState>? states,
+		string? search,
 		bool? hasAccount,
 		PageRequest pageRequest,
 		CancellationToken ct)
@@ -94,19 +94,19 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			.AsNoTracking()
 			.Where(x => x.TenantId == tenantId);
 
-		if (requestChannel is not null)
+		if (channels is not null)
 		{
-			query = query.Where(x => x.InviteTarget.Type == requestChannel);
+			query = query.Where(x => channels.Contains(x.InviteTarget.Type));
 		}
 
-		if (requestState is not null)
+		if (states is not null)
 		{
-			query = query.Where(x => x.State == requestState);
+			query = query.Where(x => states.Contains(x.State));
 		}
 
-		if (!string.IsNullOrWhiteSpace(requestSearch))
+		if (!string.IsNullOrWhiteSpace(search))
 		{
-			query = query.Where(x => x.InviteTarget.Value.Contains(requestSearch));
+			query = query.Where(x => x.InviteTarget.Value.Contains(search));
 		}
 
 		if (hasAccount.HasValue)

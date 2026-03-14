@@ -1,0 +1,109 @@
+﻿@typeparam TItem
+
+<div class="dropdown w-100">
+    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center bg-white"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        <span class="text-truncate">@DisplayButtonText</span>
+    </button>
+    
+    @* @onclick:stopPropagation prevents the dropdown from closing when you click a checkbox inside it! *@
+    <ul class="dropdown-menu shadow p-2 w-100" @onclick:stopPropagation="true">
+        @if (Items is not null)
+        {
+            @foreach (var item in Items)
+            {
+                // Generate a unique ID for the input/label connection
+                var domId = $"chk_{GetHashCode()}_{item?.GetHashCode()}";
+
+                <li>
+                    <div class="form-check m-1">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="@domId"
+                               checked="@IsChecked(item)"
+                               @onchange="(e) => OnCheckboxChanged(item, e.Value)" />
+                        
+                        <label class="form-check-label w-100 cursor-pointer" for="@domId">
+                            @GetItemText(item)
+                        </label>
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+</div>
+
+@code {
+    // 1. Declare the generic type at the top of the file: @typeparam TItem
+
+    // 2. Strongly typed parameters mapping to your Invites.razor usage
+    [Parameter, EditorRequired]
+    public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    [Parameter]
+    public HashSet<TItem> SelectedValues { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<HashSet<TItem>> SelectedValuesChanged { get; set; }
+
+    [Parameter]
+    public string ButtonText { get; set; } = "Select...";
+
+    [Parameter]
+    public Func<TItem, string>? ItemTextSelector { get; set; }
+
+    // Helper to check if an item is currently selected
+    private bool IsChecked(TItem item) => SelectedValues.Contains(item);
+
+    // Determines the text to show inside the dropdown list
+    private string GetItemText(TItem item)
+    {
+        if (ItemTextSelector is not null)
+        {
+            return ItemTextSelector(item);
+        }
+        return item?.ToString() ?? string.Empty;
+    }
+
+    // Dynamic button text to show how many items are selected
+    private string DisplayButtonText
+    {
+        get
+        {
+            if (SelectedValues.Count == 0)
+            {
+                return ButtonText;
+            }
+
+            if (SelectedValues.Count == Items.Count())
+            {
+                return $"{ButtonText} (All)";
+            }
+                
+            return $"{SelectedValues.Count} selected";
+        }
+    }
+
+    // Triggered when a user clicks a checkbox
+    private async Task OnCheckboxChanged(TItem item, object? checkedValue)
+    {
+        bool isChecked = (bool)(checkedValue ?? false);
+        
+        // Create a new HashSet based on the old one to trigger Blazor's state detection
+        var newSet = new HashSet<TItem>(SelectedValues ?? []);
+
+        if (isChecked)
+        {
+            newSet.Add(item);
+        }
+        else
+        {
+            newSet.Remove(item);
+        }
+
+        // Send the updated set back to the parent component (Invites.razor)
+        await SelectedValuesChanged.InvokeAsync(newSet);
+    }
+}

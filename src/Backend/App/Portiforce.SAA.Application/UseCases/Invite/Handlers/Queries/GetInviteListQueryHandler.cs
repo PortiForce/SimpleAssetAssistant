@@ -18,8 +18,8 @@ public sealed class GetInviteListQueryHandler(
 	{
 		PagedResult<InviteListItemRaw> pagedInvitesRaw = await inviteReadRepository.GetListAsync(
 			request.TenantId,
-			request.Channel,
-			request.State,
+			request.Channels,
+			request.States,
 			request.Search,
 			request.HasAccount,
 			request.PageRequest,

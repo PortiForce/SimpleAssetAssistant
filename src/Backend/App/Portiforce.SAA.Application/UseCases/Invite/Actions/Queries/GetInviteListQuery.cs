@@ -9,7 +9,7 @@ namespace Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 public sealed record GetInviteListQuery(
 	TenantId TenantId,
 	string? Search,
-	InviteState? State,
-	InviteChannel? Channel,
+	HashSet<InviteState>? States,
+	HashSet<InviteChannel>? Channels,
 	bool? HasAccount,
 	PageRequest PageRequest) : IQuery<PagedResult<InviteListItem>>;

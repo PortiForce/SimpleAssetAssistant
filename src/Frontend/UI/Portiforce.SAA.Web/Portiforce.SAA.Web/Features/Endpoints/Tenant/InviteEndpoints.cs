@@ -92,14 +92,14 @@ public sealed class InviteEndpoints : IEndpoint
 			return TypedResults.Forbid();
 		}
 
-		InviteState? status = request.Status?.ToBusiness();
-		Core.Identity.Enums.InviteChannel? channel = request.Channel?.ToBusiness();
+		HashSet<InviteState> statuses = request.Statuses?.ToBusinessSet();
+		HashSet<Core.Identity.Enums.InviteChannel> channels = request.Channels?.ToBusinessSet();
 
 		var query = new GetInviteListQuery(
 			currentUser.TenantId,
 			request.Search,
-			status,
-			channel,
+			statuses,
+			channels,
 			request.HasAccount,
 			new PageRequest(
 				request.Page,
