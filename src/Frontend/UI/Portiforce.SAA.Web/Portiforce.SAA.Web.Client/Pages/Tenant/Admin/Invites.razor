@@ -8,6 +8,7 @@
 @using Portiforce.SAA.Contracts.UiSetup
 @using Portiforce.SAA.Web.Client.Configuration
 @using Portiforce.SAA.Web.Client.Extensions
+@using Portiforce.SAA.Web.Client.Resources
 @using Portiforce.SAA.Web.Client.Services.Interfaces
 @using Portiforce.SAA.Web.Client.Shared
 
@@ -17,6 +18,7 @@
 @inject IAdminApiClient ApiClient
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<Invites> L
+@inject IStringLocalizer<SharedActionResources> SharedActionL
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@L["Title"]</h3>
@@ -69,10 +71,10 @@
 
         <div class="col-md-auto ms-auto d-flex gap-2 justify-content-end">
             <button type="submit" class="btn btn-outline-primary" disabled="@isBusy">
-                @L["SearchButton"]
+                @SharedActionL["ButtonSearch"]
             </button>
             <button type="button" class="btn btn-outline-secondary" @onclick="ClearSearchAsync" disabled="@isBusy">
-                @L["ClearButton"]
+                @SharedActionL["ButtonClear"]
             </button>
         </div>
     </form>

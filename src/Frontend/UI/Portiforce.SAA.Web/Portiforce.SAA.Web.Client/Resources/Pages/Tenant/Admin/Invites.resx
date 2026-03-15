@@ -153,12 +153,6 @@
   <data name="AccountFilterOnlyWithoutAccount" xml:space="preserve">
     <value>Only without account</value>
   </data>
-  <data name="SearchButton" xml:space="preserve">
-    <value>Search</value>
-  </data>
-  <data name="ClearButton" xml:space="preserve">
-    <value>Clear</value>
-  </data>
   <data name="GridTarget" xml:space="preserve">
     <value>Target</value>
   </data>
