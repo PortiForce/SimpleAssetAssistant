@@ -26,14 +26,15 @@
     </div>
 
     <form @onsubmit="ApplySearchAsync" class="row g-2 mb-3 data-manipulation-area align-items-end">
+    
         <div class="col-md-3">
             <label class="form-label">Search targets</label>
             <input class="form-control"
                    placeholder="Search targets..."
-                   @bind="searchText" /> @* Removed @bind:event and @onkeydown *@
+                   @bind="searchText" />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label">Channels</label>
             <DropdownCheckboxList TItem="InviteChannel"
                                   Items="channelOptions"
@@ -43,7 +44,7 @@
                                   ItemTextSelector="GetChannelDisplayName" />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label">Statuses</label>
             <DropdownCheckboxList TItem="InviteStatus"
                                   Items="statusOptions"
@@ -52,10 +53,9 @@
                                   ButtonText="All Statuses"
                                   ItemTextSelector="GetStatusDisplayName" />
         </div>
-
+        
         <div class="col-md-2">
             <label class="form-label">Account filter</label>
-            @* Bound to the new C# property *@
             <select class="form-select" @bind="SearchHasAccountString">
                 <option value="">Any option</option>
                 <option value="true">Only with account</option>
@@ -63,8 +63,7 @@
             </select>
         </div>
 
-        <div class="col-md-1 d-flex gap-2 justify-content-md-end">
-            @* type="submit" triggers the form's @onsubmit *@
+        <div class="col-md-auto ms-auto d-flex gap-2 justify-content-end">
             <button type="submit" class="btn btn-outline-primary" disabled="@isBusy">
                 Search
             </button>
