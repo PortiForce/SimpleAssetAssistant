@@ -35,4 +35,19 @@
     <Folder Include="Pages\Tenant\User\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\Pages\Tenant\Admin\Invites.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Invites.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Pages\Tenant\Admin\Invites.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Invites.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
