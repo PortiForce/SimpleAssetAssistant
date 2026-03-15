@@ -115,6 +115,24 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resend.
+        /// </summary>
+        internal static string ButtonResend {
+            get {
+                return ResourceManager.GetString("ButtonResend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revoke.
+        /// </summary>
+        internal static string ButtonRevoke {
+            get {
+                return ResourceManager.GetString("ButtonRevoke", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apple ID.
         /// </summary>
         internal static string ChannelAppleId {
@@ -151,15 +169,6 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clear.
-        /// </summary>
-        internal static string ClearButton {
-            get {
-                return ResourceManager.GetString("ClearButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to revoke this invite?.
         /// </summary>
         internal static string ConfirmRevokeInvite {
@@ -183,24 +192,6 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         internal static string CouldNotRevokeInvite {
             get {
                 return ResourceManager.GetString("CouldNotRevokeInvite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Details.
-        /// </summary>
-        internal static string Details {
-            get {
-                return ResourceManager.GetString("Details", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Actions.
-        /// </summary>
-        internal static string GridActions {
-            get {
-                return ResourceManager.GetString("GridActions", resourceCulture);
             }
         }
         
@@ -259,33 +250,6 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resend.
-        /// </summary>
-        internal static string Resend {
-            get {
-                return ResourceManager.GetString("Resend", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Revoke.
-        /// </summary>
-        internal static string Revoke {
-            get {
-                return ResourceManager.GetString("Revoke", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search.
-        /// </summary>
-        internal static string SearchButton {
-            get {
-                return ResourceManager.GetString("SearchButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Search targets.
         /// </summary>
         internal static string SearchTargetsLabel {
@@ -304,20 +268,20 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Showing page {0} of {1} ({2} total).
-        /// </summary>
-        internal static string ShowingPageOfTotal {
-            get {
-                return ResourceManager.GetString("ShowingPageOfTotal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Accepted.
         /// </summary>
         internal static string StatusAccepted {
             get {
                 return ResourceManager.GetString("StatusAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Declined.
+        /// </summary>
+        internal static string StatusDeclined {
+            get {
+                return ResourceManager.GetString("StatusDeclined", resourceCulture);
             }
         }
         
@@ -340,6 +304,15 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed.
+        /// </summary>
+        internal static string StatusFailed {
+            get {
+                return ResourceManager.GetString("StatusFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pending.
         /// </summary>
         internal static string StatusPending {
@@ -358,7 +331,7 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invites.
+        ///   Looks up a localized string similar to Manage Invites.
         /// </summary>
         internal static string Title {
             get {

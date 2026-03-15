@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Title" xml:space="preserve">
-    <value>Запрошення</value>
+    <value>Керування запрошеннями</value>
   </data>
   <data name="InviteUser" xml:space="preserve">
     <value>Запросити користувача</value>
@@ -165,20 +165,11 @@
   <data name="GridRole" xml:space="preserve">
     <value>Роль</value>
   </data>
-  <data name="GridActions" xml:space="preserve">
-    <value>Дії</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>Деталі</value>
-  </data>
-  <data name="Resend" xml:space="preserve">
+  <data name="ButtonResend" xml:space="preserve">
     <value>Надіслати повторно</value>
   </data>
-  <data name="Revoke" xml:space="preserve">
+  <data name="ButtonRevoke" xml:space="preserve">
     <value>Відкликати</value>
-  </data>
-  <data name="ShowingPageOfTotal" xml:space="preserve">
-    <value>Сторінка {0} з {1} (всього {2})</value>
   </data>
   <data name="NoInvitesFound" xml:space="preserve">
     <value>За вашим запитом не знайдено жодного запрошення.</value>

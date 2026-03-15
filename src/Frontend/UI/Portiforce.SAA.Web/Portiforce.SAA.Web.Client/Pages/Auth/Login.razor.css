@@ -1,0 +1,166 @@
+﻿/* Google-inspired light & clean layout */
+:root {
+    --bg: #f0f4f9; /* Standard Google Auth background */
+    --surface: #ffffff;
+    --border: #dadce0;
+    --text-main: #202124;
+    --text-muted: #5f6368;
+    --primary: #1a73e8;
+    --primary-hover: #f6fafe;
+    --disabled-bg: #f1f3f4;
+    --disabled-text: #9aa0a6;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg);
+}
+
+.page, .landing {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.panel, .landing-card {
+    width: 100%;
+    max-width: 448px; /* Classic Google login card width */
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 48px 40px 36px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.brand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.brand-mark {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-main);
+    margin: 0 0 8px 0;
+}
+
+.subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-main);
+    margin: 0 0 32px 0;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 40px;
+    border-radius: 4px; /* Slightly rounded corners */
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: #3c4043; /* Standard dark gray text for SSO buttons */
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.25px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+    .btn:hover:not(:disabled) {
+        background-color: #f8f9fa;
+        box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    }
+
+.btn-icon-svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.btn-disabled {
+    background-color: var(--surface);
+    color: var(--disabled-text);
+    border-color: var(--border);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.fineprint {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Landing Specific Styles */
+.info {
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.info-title {
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.info-text {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.actions {
+    text-align: left;
+}
+
+.btn-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+code {
+    background: #e8eaed;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: var(--text-main);
+}

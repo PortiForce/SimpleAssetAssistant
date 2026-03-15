@@ -17,8 +17,10 @@
 
 @inject IAdminApiClient ApiClient
 @inject IJSRuntime JSRuntime
+
 @inject IStringLocalizer<Invites> L
 @inject IStringLocalizer<SharedActionResources> SharedActionL
+@inject IStringLocalizer<SharedGridResources> SharedGridL
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@L["Title"]</h3>
@@ -91,7 +93,7 @@
             <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                  style="background: rgba(255,255,255,0.7); z-index: 10;">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">@SharedGridL["StatusLoading"]</span>
                 </div>
             </div>
         }
@@ -113,16 +115,16 @@
             <PropertyColumn Property="x => x.InviteChannel" Title="@L["GridChannel"]" />
             <PropertyColumn Property="x => x.InviteRole" Title="@L["GridRole"]" />
 
-            <TemplateColumn Title="@L["GridActions"]" Context="item">
+            <TemplateColumn Title="@SharedGridL["HeaderGridActions"]" Context="item">
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)" class="btn btn-sm btn-outline-primary">
-                        @L["Details"]
+                        @SharedActionL["ButtonDetails"]
                     </a>
 
                     @if (item.CanResend)
                     {
                         <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)" class="btn btn-sm btn-outline-primary">
-                            @L["Resend"]
+                            @L["ButtonResend"]
                         </a>
                     }
 
@@ -131,7 +133,7 @@
                         <button class="btn btn-sm btn-outline-danger"
                                 @onclick="() => RevokeInviteAsync(item.Id)"
                                 disabled="@isBusy">
-                            @L["Revoke"]
+                            @L["ButtonRevoke"]
                         </button>
                     }
                 </div>
@@ -144,7 +146,7 @@
             @if (totalCount > 0)
             {
                 <span>
-                    @L["ShowingPageOfTotal", (paginationState.CurrentPageIndex + 1), TotalPages, totalCount]
+                    @SharedGridL["PagingShowingPageOfTotal", (paginationState.CurrentPageIndex + 1), TotalPages, totalCount]
                 </span>
             }
         </div>
@@ -162,6 +164,7 @@
     private const int DefaultPageSize = 10;
 
     private readonly PaginationState paginationState = new() { ItemsPerPage = DefaultPageSize };
+
     private QuickGrid<InviteListItemResponse>? grid;
     private GridItemsProvider<InviteListItemResponse> invitesProvider = default!;
 

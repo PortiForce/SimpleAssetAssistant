@@ -117,19 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ButtonAdd" xml:space="preserve">
-    <value>Add</value>
+  <data name="HeaderGridActions" xml:space="preserve">
+    <value>Дії</value>
   </data>
-  <data name="ButtonClear" xml:space="preserve">
-    <value>Clear</value>
+  <data name="PagingShowingPageOfTotal" xml:space="preserve">
+    <value>Сторінка {0} з {1} (всього {2})</value>
   </data>
-  <data name="ButtonDetails" xml:space="preserve">
-    <value>Details</value>
-  </data>
-  <data name="ButtonRemove" xml:space="preserve">
-    <value>Remove</value>
-  </data>
-  <data name="ButtonSearch" xml:space="preserve">
-    <value>Search</value>
+  <data name="StatusLoading" xml:space="preserve">
+    <value>Завантаження, будь ласка, зачекайте...</value>
   </data>
 </root>
