@@ -1,21 +1,26 @@
 ﻿@typeparam TItem
 
-<div class="dropdown w-100">
+@* Added an onfocusout event to automatically close the dropdown if the user clicks away *@
+<div class="dropdown w-100" @onclick:stopPropagation="true" @onfocusout="CloseDropdown">
+    
+    @* 1. Removed data-bs-toggle and added @onclick="ToggleDropdown" *@
     <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center bg-white"
             type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
+            @onclick="ToggleDropdown"
+            aria-expanded="@isOpen.ToString().ToLower()">
         <span class="text-truncate">@DisplayButtonText</span>
     </button>
     
-    @* @onclick:stopPropagation prevents the dropdown from closing when you click a checkbox inside it! *@
-    <ul class="dropdown-menu shadow p-2 w-100" @onclick:stopPropagation="true">
-        @if (Items is not null)
+    @* 2. Dynamically add the "show" class and standard block styling based on C# state *@
+    <ul class="dropdown-menu shadow p-2 w-100 @(isOpen ? "show" : "")"
+        style="@(isOpen ? "display: block;" : "display: none;") max-height: 300px; overflow-y: auto;">
+        
+        @if (Items is not null && Items.Any())
         {
             @foreach (var item in Items)
             {
-                // Generate a unique ID for the input/label connection
-                var domId = $"chk_{GetHashCode()}_{item?.GetHashCode()}";
+                // 3. Safer DOM ID generation for Enums (HashCodes can change per application run)
+                var domId = $"chk_{GetHashCode()}_{item?.ToString()}";
 
                 <li>
                     <div class="form-check m-1">
@@ -32,13 +37,20 @@
                 </li>
             }
         }
+        else
+        {
+            <li><span class="dropdown-item-text text-muted">No options available</span></li>
+        }
     </ul>
 </div>
 
-@code {
-    // 1. Declare the generic type at the top of the file: @typeparam TItem
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
 
-    // 2. Strongly typed parameters mapping to your Invites.razor usage
+@code {
     [Parameter, EditorRequired]
     public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
 
@@ -54,10 +66,25 @@
     [Parameter]
     public Func<TItem, string>? ItemTextSelector { get; set; }
 
-    // Helper to check if an item is currently selected
-    private bool IsChecked(TItem item) => SelectedValues.Contains(item);
+    // --- NEW: Internal UI State ---
+    private bool isOpen = false;
 
-    // Determines the text to show inside the dropdown list
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+
+    private async Task CloseDropdown()
+    {
+        // Adding a tiny delay allows checkbox clicks to register before the menu collapses
+        await Task.Delay(100);
+        isOpen = false;
+        StateHasChanged();
+    }
+    // ------------------------------
+
+    private bool IsChecked(TItem item) => SelectedValues is not null && SelectedValues.Contains(item);
+
     private string GetItemText(TItem item)
     {
         if (ItemTextSelector is not null)
@@ -67,12 +94,11 @@
         return item?.ToString() ?? string.Empty;
     }
 
-    // Dynamic button text to show how many items are selected
     private string DisplayButtonText
     {
         get
         {
-            if (SelectedValues.Count == 0)
+            if (SelectedValues is null || SelectedValues.Count == 0)
             {
                 return ButtonText;
             }
@@ -86,12 +112,10 @@
         }
     }
 
-    // Triggered when a user clicks a checkbox
     private async Task OnCheckboxChanged(TItem item, object? checkedValue)
     {
         bool isChecked = (bool)(checkedValue ?? false);
         
-        // Create a new HashSet based on the old one to trigger Blazor's state detection
         var newSet = new HashSet<TItem>(SelectedValues ?? []);
 
         if (isChecked)
@@ -103,7 +127,6 @@
             newSet.Remove(item);
         }
 
-        // Send the updated set back to the parent component (Invites.razor)
         await SelectedValuesChanged.InvokeAsync(newSet);
     }
 }

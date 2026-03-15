@@ -15,6 +15,7 @@ public sealed class AdminApiClient(
 		GetInviteListQueryRequest request,
 		CancellationToken ct = default)
 	{
+
 		string url = BuildUrl(ApiRoutes.Invites.Root, request.ToQueryParameters());
 		return await GetAsync<InviteListResponse>(url, ct);
 	}

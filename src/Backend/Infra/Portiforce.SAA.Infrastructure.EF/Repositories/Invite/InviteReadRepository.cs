@@ -94,12 +94,12 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			.AsNoTracking()
 			.Where(x => x.TenantId == tenantId);
 
-		if (channels is not null)
+		if (channels is { Count: > 0 })
 		{
 			query = query.Where(x => channels.Contains(x.InviteTarget.Type));
 		}
 
-		if (states is not null)
+		if (states is { Count: > 0 })
 		{
 			query = query.Where(x => states.Contains(x.State));
 		}

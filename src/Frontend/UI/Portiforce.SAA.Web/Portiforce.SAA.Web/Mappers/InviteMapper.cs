@@ -20,7 +20,7 @@ public static class InviteMapper
 		_ => InviteAccountTier.None
 	};
 
-	public static HashSet<AccountTier> ToBusinessSet(this HashSet<InviteAccountTier> presentationTiers)
+	public static HashSet<AccountTier> ToBusinessSet(this InviteAccountTier[] presentationTiers)
 	{
 		var set = new HashSet<AccountTier>();
 		foreach (var inviteAccountTier in presentationTiers)
@@ -49,7 +49,7 @@ public static class InviteMapper
 		_ => InviteTenantRole.None
 	};
 
-	public static HashSet<Role> ToBusinessSet(this HashSet<InviteTenantRole> presentationRoles)
+	public static HashSet<Role> ToBusinessSet(this InviteTenantRole[] presentationRoles)
 	{
 		var set = new HashSet<Role>();
 		foreach (var inviteTenantRole in presentationRoles)
@@ -79,7 +79,7 @@ public static class InviteMapper
 		_ => InviteChannel.None
 	};
 
-	public static HashSet<Core.Identity.Enums.InviteChannel> ToBusinessSet(this HashSet<InviteChannel> presentationChannels)
+	public static HashSet<Core.Identity.Enums.InviteChannel> ToBusinessSet(this InviteChannel[] presentationChannels)
 	{
 		var set = new HashSet<Core.Identity.Enums.InviteChannel>();
 		foreach (var presentationChannel in presentationChannels)
@@ -113,7 +113,7 @@ public static class InviteMapper
 		_ => InviteStatus.Unknown
 	};
 
-	public static HashSet<InviteState> ToBusinessSet(this HashSet<InviteStatus> presentationStates)
+	public static HashSet<InviteState> ToBusinessSet(this InviteStatus[] presentationStates)
 	{
 		var set = new HashSet<InviteState>();
 		foreach (var presentationState in presentationStates)

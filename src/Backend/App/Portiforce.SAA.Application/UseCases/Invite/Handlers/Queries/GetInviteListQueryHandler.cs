@@ -16,11 +16,13 @@ public sealed class GetInviteListQueryHandler(
 		GetInviteListQuery request,
 		CancellationToken ct)
 	{
+		var normalizedSearch = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
+
 		PagedResult<InviteListItemRaw> pagedInvitesRaw = await inviteReadRepository.GetListAsync(
 			request.TenantId,
 			request.Channels,
 			request.States,
-			request.Search,
+			normalizedSearch,
 			request.HasAccount,
 			request.PageRequest,
 			ct);

@@ -25,14 +25,12 @@
         </a>
     </div>
 
-    <div class="row g-2 mb-3 data-manipulation-area align-items-end">
+    <form @onsubmit="ApplySearchAsync" class="row g-2 mb-3 data-manipulation-area align-items-end">
         <div class="col-md-3">
             <label class="form-label">Search targets</label>
             <input class="form-control"
                    placeholder="Search targets..."
-                   @bind="searchText"
-                   @bind:event="oninput"
-                   @onkeydown="HandleSearchKeyDownAsync" />
+                   @bind="searchText" /> @* Removed @bind:event and @onkeydown *@
         </div>
 
         <div class="col-md-3">
@@ -57,26 +55,24 @@
 
         <div class="col-md-2">
             <label class="form-label">Account filter</label>
-            <select class="form-select" @bind="searchHasAccount">
-                <option value="">With and without account</option>
+            @* Bound to the new C# property *@
+            <select class="form-select" @bind="SearchHasAccountString">
+                <option value="">Any option</option>
                 <option value="true">Only with account</option>
                 <option value="false">Only without account</option>
             </select>
         </div>
 
         <div class="col-md-1 d-flex gap-2 justify-content-md-end">
-            <button class="btn btn-outline-primary"
-                    @onclick="ApplySearchAsync"
-                    disabled="@isBusy">
+            @* type="submit" triggers the form's @onsubmit *@
+            <button type="submit" class="btn btn-outline-primary" disabled="@isBusy">
                 Search
             </button>
-            <button class="btn btn-outline-secondary"
-                    @onclick="ClearSearchAsync"
-                    disabled="@isBusy">
+            <button type="button" class="btn btn-outline-secondary" @onclick="ClearSearchAsync" disabled="@isBusy">
                 Clear
             </button>
         </div>
-    </div>
+    </form>
 
     @if (!string.IsNullOrWhiteSpace(error))
     {
@@ -247,6 +243,12 @@
         };
     }
 
+    private string SearchHasAccountString
+    {
+        get => searchHasAccount switch { true => "true", false => "false", _ => "" };
+        set => searchHasAccount = value switch { "true" => true, "false" => false, _ => null };
+    }
+
     private Task OnSelectedChannelsChanged(HashSet<InviteChannel> values)
     {
         selectedChannels = values;
@@ -266,14 +268,7 @@
         appliedStatuses = [.. selectedStatuses];
         appliedHasAccount = searchHasAccount;
 
-        if (paginationState.CurrentPageIndex != 0)
-        {
-            await paginationState.SetCurrentPageIndexAsync(0);
-        }
-        else if (grid is not null)
-        {
-            await grid.RefreshDataAsync();
-        }
+        await RefreshGridAsync();
     }
 
     private async Task ClearSearchAsync()
@@ -288,6 +283,11 @@
         appliedStatuses.Clear();
         appliedHasAccount = null;
 
+        await RefreshGridAsync();
+    }
+
+    private async Task RefreshGridAsync()
+    {
         if (paginationState.CurrentPageIndex != 0)
         {
             await paginationState.SetCurrentPageIndexAsync(0);
@@ -295,14 +295,6 @@
         else if (grid is not null)
         {
             await grid.RefreshDataAsync();
-        }
-    }
-
-    private async Task HandleSearchKeyDownAsync(KeyboardEventArgs args)
-    {
-        if (args.Key == "Enter")
-        {
-            await ApplySearchAsync();
         }
     }
 
