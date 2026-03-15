@@ -1,9 +1,7 @@
 ﻿@typeparam TItem
 
-@* Added an onfocusout event to automatically close the dropdown if the user clicks away *@
 <div class="dropdown w-100" @onclick:stopPropagation="true" @onfocusout="CloseDropdown">
     
-    @* 1. Removed data-bs-toggle and added @onclick="ToggleDropdown" *@
     <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center bg-white"
             type="button"
             @onclick="ToggleDropdown"
@@ -11,7 +9,6 @@
         <span class="text-truncate">@DisplayButtonText</span>
     </button>
     
-    @* 2. Dynamically add the "show" class and standard block styling based on C# state *@
     <ul class="dropdown-menu shadow p-2 w-100 @(isOpen ? "show" : "")"
         style="@(isOpen ? "display: block;" : "display: none;") max-height: 300px; overflow-y: auto;">
         
@@ -19,8 +16,7 @@
         {
             @foreach (var item in Items)
             {
-                // 3. Safer DOM ID generation for Enums (HashCodes can change per application run)
-                var domId = $"chk_{GetHashCode()}_{item?.ToString()}";
+               var domId = $"chk_{GetHashCode()}_{item?.ToString()}";
 
                 <li>
                     <div class="form-check m-1">
@@ -66,7 +62,6 @@
     [Parameter]
     public Func<TItem, string>? ItemTextSelector { get; set; }
 
-    // --- NEW: Internal UI State ---
     private bool isOpen = false;
 
     private void ToggleDropdown()
@@ -76,12 +71,10 @@
 
     private async Task CloseDropdown()
     {
-        // Adding a tiny delay allows checkbox clicks to register before the menu collapses
-        await Task.Delay(100);
+        await Task.Delay(150);
         isOpen = false;
         StateHasChanged();
     }
-    // ------------------------------
 
     private bool IsChecked(TItem item) => SelectedValues is not null && SelectedValues.Contains(item);
 
