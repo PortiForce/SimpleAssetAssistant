@@ -21,7 +21,7 @@ public sealed record GetInviteListQueryRequest(
 		{
 			foreach (var status in Statuses)
 			{
-				yield return new KeyValuePair<string, string>("status", status.ToString());
+				yield return new KeyValuePair<string, string>("statuses", status.ToString());
 			}
 		}
 
@@ -29,7 +29,7 @@ public sealed record GetInviteListQueryRequest(
 		{
 			foreach (var channel in Channels)
 			{
-				yield return new KeyValuePair<string, string>("channel", channel.ToString());
+				yield return new KeyValuePair<string, string>("channels", channel.ToString());
 			}
 		}
 

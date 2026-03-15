@@ -135,6 +135,7 @@ public static class InviteMapper
 		InviteStatus.Revoked => InviteState.RevokedByTenant,
 		InviteStatus.Declined => InviteState.DeclinedByUser,
 		InviteStatus.Failed => InviteState.AcceptAttemptFailed,
+		InviteStatus.Expired => InviteState.Expired,
 		_ => null
 	};
 

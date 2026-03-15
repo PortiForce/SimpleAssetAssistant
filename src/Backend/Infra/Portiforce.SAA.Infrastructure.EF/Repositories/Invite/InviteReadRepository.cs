@@ -112,7 +112,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 		if (hasAccount.HasValue)
 		{
 			query = hasAccount.Value 
-				? query.Where(x => x.AcceptedAccountId != AccountId.Empty) 
+				? query.Where(x => x.AcceptedAccountId != AccountId.Empty && x.AcceptedAccountId != null) 
 				: query.Where(x => x.AcceptedAccountId == null || x.AcceptedAccountId == AccountId.Empty);
 		}
 
