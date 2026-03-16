@@ -62,13 +62,38 @@ internal class Program
 
 		var host = builder.Build();
 
-		var js = host.Services.GetRequiredService<IJSRuntime>();
-		var cultureName = await js.InvokeAsync<string>("portiforce.getBrowserCulture");
-		var culture = CultureInfo.GetCultureInfo(cultureName);
+		IJSRuntime js = host.Services.GetRequiredService<IJSRuntime>();
+		var browserCulture = await js.InvokeAsync<string>("portiforce.getBrowserCulture");
+
+		string cultureMame = NormalizeCulture(browserCulture);
+		var culture = new CultureInfo(cultureMame);
 
 		CultureInfo.DefaultThreadCurrentCulture = culture;
 		CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 		await host.RunAsync();
+	}
+
+	static string NormalizeCulture(string? browserCulture)
+	{
+		if (string.IsNullOrWhiteSpace(browserCulture))
+		{
+			return "en-US";
+		}
+
+		browserCulture = browserCulture.Trim();
+
+		if (browserCulture.StartsWith("uk", StringComparison.OrdinalIgnoreCase))
+		{
+			return "uk-UA";
+		}
+
+		if (browserCulture.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+		{
+			return "en-US";
+		}
+
+		// fallback to en-US if unsupported culture is detected
+		return "en-US";
 	}
 }

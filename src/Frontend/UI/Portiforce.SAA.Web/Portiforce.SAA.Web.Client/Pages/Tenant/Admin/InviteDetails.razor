@@ -40,7 +40,18 @@ else
                 <div>
                     <div class="h5 mb-1">@invite.InviteTargetValue</div>
                     <div class="text-muted">
-                        @invite.InviteChannel • @invite.InviteRole • @invite.InviteTier
+                        <div>
+                            <span>Channel: </span>
+                            @invite.InviteChannel
+                        </div>
+                        <div>
+                            <span>Role:</span>
+                            @invite.InviteRole
+                        </div>
+                        <div>
+                            <span>Tier:</span>
+                            @invite.InviteTier
+                        </div>
                     </div>
                 </div>
 
@@ -67,7 +78,7 @@ else
                 <dt class="col-sm-3">Accepted</dt>
                 <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "—")</dd>
 
-                <dt class="col-sm-3">Related account</dt>
+                <dt class="col-sm-3">Related account Id:</dt>
                 <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? "—")</dd>
             </dl>
         </div>

@@ -171,23 +171,11 @@ public class Program
 
 		var app = builder.Build();
 
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseWebAssemblyDebugging();
-		}
-		else
-		{
-			app.UseExceptionHandler("/Error");
-			app.UseHsts();
-		}
-
-		app.UseHttpsRedirection();
-		app.UseStaticFiles();
-		app.UseRouting();
-
 		var supportedCultures = new[]
 		{
+			new CultureInfo("en"),
 			new CultureInfo("en-US"),
+			new CultureInfo("uk"),
 			new CultureInfo("uk-UA")
 		};
 
@@ -203,6 +191,20 @@ public class Program
 		};
 
 		app.UseRequestLocalization(localizationOptions);
+
+		if (app.Environment.IsDevelopment())
+		{
+			app.UseWebAssemblyDebugging();
+		}
+		else
+		{
+			app.UseExceptionHandler("/Error");
+			app.UseHsts();
+		}
+
+		app.UseHttpsRedirection();
+		app.UseStaticFiles();
+		app.UseRouting();
 
 		// Tenant must run early
 		app.UseMiddleware<TenantResolutionMiddleware>();
