@@ -37,7 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Resources\Pages\Tenant\Admin\Invites.Designer.cs">
+		<Compile Update="Resources\Pages\Tenant\Admin\InviteFlow\Invites.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Invites.resx</DependentUpon>
@@ -45,7 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Resources\Pages\Tenant\Admin\Invites.resx">
+		<EmbeddedResource Update="Resources\Pages\Tenant\Admin\InviteFlow\Invites.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Invites.Designer.cs</LastGenOutput>
 		</EmbeddedResource>

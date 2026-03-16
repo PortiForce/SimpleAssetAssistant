@@ -98,4 +98,81 @@
 	<resheader name="writer">
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
+<data name="PageTitle" xml:space="preserve">
+    <value>Invite details</value>
+  </data>
+  <data name="IdLabel" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="BackToInvites" xml:space="preserve">
+    <value>Back to invites</value>
+  </data>
+  <data name="LoadingInviteDetails" xml:space="preserve">
+    <value>Loading invite details...</value>
+  </data>
+  <data name="InviteNotFound" xml:space="preserve">
+    <value>Invite not found.</value>
+  </data>
+  <data name="ChannelLabel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="RoleLabel" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="TierLabel" xml:space="preserve">
+    <value>Tier</value>
+  </data>
+  <data name="CreatedLabel" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="ExpiresLabel" xml:space="preserve">
+    <value>Expires</value>
+  </data>
+  <data name="InvitedByLabel" xml:space="preserve">
+    <value>Invited by</value>
+  </data>
+  <data name="SendCountLabel" xml:space="preserve">
+    <value>Send count</value>
+  </data>
+  <data name="AcceptedLabel" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="RelatedAccountIdLabel" xml:space="preserve">
+    <value>Related account Id</value>
+  </data>
+  <data name="ResendAction" xml:space="preserve">
+    <value>Resend</value>
+  </data>
+  <data name="RevokeAction" xml:space="preserve">
+    <value>Revoke</value>
+  </data>
+  <data name="ErrorCouldNotLoadInviteDetails" xml:space="preserve">
+    <value>Could not load invite details: {0}</value>
+  </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>—</value>
+  </data>
+
+  <data name="Status_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="Status_Accepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="Status_Revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="Status_Expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+
+  <data name="Channel_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Channel_Telegram" xml:space="preserve">
+    <value>Telegram</value>
+  </data>
+  <data name="Channel_AppleId" xml:space="preserve">
+    <value>Apple ID</value>
+  </data>
 </root>

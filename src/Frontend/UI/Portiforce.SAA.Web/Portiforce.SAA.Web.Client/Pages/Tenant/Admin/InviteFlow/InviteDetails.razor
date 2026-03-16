@@ -11,18 +11,21 @@
 
 @inject IAdminApiClient ApiClient
 
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<InviteDetails> L
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h3 class="mb-0">Invite details</h3>
-        <div class="text-muted small">Id: @InviteId</div>
+        <h3 class="mb-0">@L["PageTitle"]</h3>
+        <div class="text-muted small">@L["IdLabel"]: @InviteId</div>
     </div>
 
-    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">Back to invites</a>
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["BackToInvites"]</a>
 </div>
 
 @if (isLoading)
 {
-    <div class="text-muted">Loading invite details...</div>
+    <div class="text-muted">@L["LoadingInviteDetails"]</div>
 }
 else if (!string.IsNullOrWhiteSpace(error))
 {
@@ -30,7 +33,7 @@ else if (!string.IsNullOrWhiteSpace(error))
 }
 else if (invite is null)
 {
-    <div class="alert alert-warning">Invite not found.</div>
+    <div class="alert alert-warning">@L["InviteNotFound"]</div>
 }
 else
 {
@@ -41,15 +44,15 @@ else
                     <div class="h5 mb-1">@invite.InviteTargetValue</div>
                     <div class="text-muted">
                         <div>
-                            <span>Channel: </span>
+                            <span>@L["ChannelLabel"]:</span>
                             @invite.InviteChannel
                         </div>
                         <div>
-                            <span>Role:</span>
+                            <span>@L["RoleLabel"]:</span>
                             @invite.InviteRole
                         </div>
                         <div>
-                            <span>Tier:</span>
+                            <span>@L["TierLabel"]:</span>
                             @invite.InviteTier
                         </div>
                     </div>
@@ -63,33 +66,33 @@ else
             <hr />
 
             <dl class="row mb-0">
-                <dt class="col-sm-3">Created</dt>
+                <dt class="col-sm-3">@L["CreatedLabel"]</dt>
                 <dd class="col-sm-9">@invite.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
 
-                <dt class="col-sm-3">Expires</dt>
+                <dt class="col-sm-3">@L["ExpiresLabel"]</dt>
                 <dd class="col-sm-9">@invite.ExpiresAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
 
-                <dt class="col-sm-3">Invited by</dt>
+                <dt class="col-sm-3">@L["InvitedByLabel"]</dt>
                 <dd class="col-sm-9">@invite.InvitedBy</dd>
 
-                <dt class="col-sm-3">Send count</dt>
+                <dt class="col-sm-3">@L["SendCountLabel"]</dt>
                 <dd class="col-sm-9">@invite.SendTimesCount</dd>
 
-                <dt class="col-sm-3">Accepted</dt>
-                <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "—")</dd>
+                <dt class="col-sm-3">@L["AcceptedLabel"]</dt>
+                <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? L["EmptyValue"])</dd>
 
-                <dt class="col-sm-3">Related account Id:</dt>
-                <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? "—")</dd>
+                <dt class="col-sm-3">@L["RelatedAccountIdLabel"]</dt>
+                <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? L["EmptyValue"])</dd>
             </dl>
         </div>
         <div class="card-actions">
             @if (invite.CanResend)
             {
-                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">Resend</a>
+                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">@L["ResendAction"]</a>
             }
             @if (invite.CanRevoke)
             {
-                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">Revoke</a>
+                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">@L["RevokeAction"]</a>
             }
         </div>
     </div>
@@ -121,7 +124,7 @@ else
         catch (Exception ex)
         {
             invite = null;
-            error = "Could not load invite details: " + ex.Message;
+            error = string.Format(L["ErrorCouldNotLoadInviteDetails"], ex.Message);
         }
         finally
         {

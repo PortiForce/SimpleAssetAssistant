@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
+namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.Invites", typeof(Invites).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow.Invites", typeof(Invites).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -250,6 +250,15 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage Invites.
+        /// </summary>
+        internal static string PageTitle {
+            get {
+                return ResourceManager.GetString("PageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search targets.
         /// </summary>
         internal static string SearchTargetsLabel {
@@ -327,15 +336,6 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin {
         internal static string StatusRevoked {
             get {
                 return ResourceManager.GetString("StatusRevoked", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Manage Invites.
-        /// </summary>
-        internal static string Title {
-            get {
-                return ResourceManager.GetString("Title", resourceCulture);
             }
         }
     }

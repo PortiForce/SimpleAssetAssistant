@@ -117,97 +117,79 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Title" xml:space="preserve">
-    <value>Manage Invites</value>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Деталі запрошення</value>
   </data>
-  <data name="InviteUser" xml:space="preserve">
-    <value>Invite User</value>
+  <data name="IdLabel" xml:space="preserve">
+    <value>Ідентифікатор</value>
   </data>
-  <data name="SearchTargetsLabel" xml:space="preserve">
-    <value>Search targets</value>
+  <data name="BackToInvites" xml:space="preserve">
+    <value>До запрошень</value>
   </data>
-  <data name="SearchTargetsPlaceholder" xml:space="preserve">
-    <value>Search targets...</value>
+  <data name="LoadingInviteDetails" xml:space="preserve">
+    <value>Завантаження деталей запрошення...</value>
   </data>
-  <data name="ChannelsLabel" xml:space="preserve">
-    <value>Channels</value>
+  <data name="InviteNotFound" xml:space="preserve">
+    <value>Запрошення не знайдено.</value>
   </data>
-  <data name="AllChannels" xml:space="preserve">
-    <value>All Channels</value>
+  <data name="ChannelLabel" xml:space="preserve">
+    <value>Канал</value>
   </data>
-  <data name="StatusesLabel" xml:space="preserve">
-    <value>Statuses</value>
+  <data name="RoleLabel" xml:space="preserve">
+    <value>Роль</value>
   </data>
-  <data name="AllStatuses" xml:space="preserve">
-    <value>All Statuses</value>
+  <data name="TierLabel" xml:space="preserve">
+    <value>Рівень</value>
   </data>
-  <data name="AccountFilterLabel" xml:space="preserve">
-    <value>Account filter</value>
+  <data name="CreatedLabel" xml:space="preserve">
+    <value>Створено</value>
   </data>
-  <data name="AccountFilterAny" xml:space="preserve">
-    <value>Any option</value>
+  <data name="ExpiresLabel" xml:space="preserve">
+    <value>Діє до</value>
   </data>
-  <data name="AccountFilterOnlyWithAccount" xml:space="preserve">
-    <value>Only with account</value>
+  <data name="InvitedByLabel" xml:space="preserve">
+    <value>Запросив</value>
   </data>
-  <data name="AccountFilterOnlyWithoutAccount" xml:space="preserve">
-    <value>Only without account</value>
+  <data name="SendCountLabel" xml:space="preserve">
+    <value>Кількість відправлень</value>
   </data>
-  <data name="GridTarget" xml:space="preserve">
-    <value>Target</value>
+  <data name="AcceptedLabel" xml:space="preserve">
+    <value>Прийнято</value>
   </data>
-  <data name="GridStatus" xml:space="preserve">
-    <value>Status</value>
+  <data name="RelatedAccountIdLabel" xml:space="preserve">
+    <value>Ідентифікатор пов’язаного акаунта</value>
   </data>
-  <data name="GridChannel" xml:space="preserve">
-    <value>Channel</value>
+  <data name="ResendAction" xml:space="preserve">
+    <value>Надіслати повторно</value>
   </data>
-  <data name="GridRole" xml:space="preserve">
-    <value>Role</value>
+  <data name="RevokeAction" xml:space="preserve">
+    <value>Відкликати</value>
   </data>
-  <data name="ButtonResend" xml:space="preserve">
-    <value>Resend</value>
+  <data name="ErrorCouldNotLoadInviteDetails" xml:space="preserve">
+    <value>Не вдалося завантажити деталі запрошення: {0}</value>
   </data>
-  <data name="ButtonRevoke" xml:space="preserve">
-    <value>Revoke</value>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>—</value>
   </data>
-  <data name="NoInvitesFound" xml:space="preserve">
-    <value>No invites found matching your criteria.</value>
+  <data name="Status_Pending" xml:space="preserve">
+    <value>Очікує</value>
   </data>
-  <data name="CouldNotLoadInvites" xml:space="preserve">
-    <value>Could not load invites: {0}</value>
+  <data name="Status_Accepted" xml:space="preserve">
+    <value>Прийнято</value>
   </data>
-  <data name="ConfirmRevokeInvite" xml:space="preserve">
-    <value>Are you sure you want to revoke this invite?</value>
+  <data name="Status_Revoked" xml:space="preserve">
+    <value>Відкликано</value>
   </data>
-  <data name="CouldNotRevokeInvite" xml:space="preserve">
-    <value>Could not revoke invite: {0}</value>
+  <data name="Status_Expired" xml:space="preserve">
+    <value>Протерміновано</value>
   </data>
-  <data name="ChannelEmail" xml:space="preserve">
-    <value>Email</value>
+  <data name="Channel_Email" xml:space="preserve">
+    <value>Електронна пошта</value>
   </data>
-  <data name="ChannelTelegram" xml:space="preserve">
+  <data name="Channel_Telegram" xml:space="preserve">
     <value>Telegram</value>
   </data>
-  <data name="ChannelAppleId" xml:space="preserve">
+  <data name="Channel_AppleId" xml:space="preserve">
     <value>Apple ID</value>
-  </data>
-  <data name="StatusPending" xml:space="preserve">
-    <value>Pending</value>
-  </data>
-  <data name="StatusAccepted" xml:space="preserve">
-    <value>Accepted</value>
-  </data>
-  <data name="StatusRevoked" xml:space="preserve">
-    <value>Revoked</value>
-  </data>
-  <data name="StatusExpired" xml:space="preserve">
-    <value>Expired</value>
-  </data>
-  <data name="StatusDeclined" xml:space="preserve">
-    <value>Declined</value>
-  </data>
-  <data name="StatusFailed" xml:space="preserve">
-    <value>Failed</value>
   </data>
 </root>
