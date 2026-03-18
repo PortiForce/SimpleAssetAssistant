@@ -20,6 +20,7 @@
 @inject IStringLocalizer<Invites> L
 @inject IStringLocalizer<SharedActionResources> SharedActionL
 @inject IStringLocalizer<SharedGridResources> SharedGridL
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@L["PageTitle"]</h3>
@@ -48,7 +49,7 @@
                                   SelectedValues="selectedChannels"
                                   SelectedValuesChanged="OnSelectedChannelsChanged"
                                   ButtonText="@L["AllChannels"]"
-                                  ItemTextSelector="@(c => c.ToDisplayName(L))" />
+                                  ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
         </div>
 
         <div class="col-md-2">
@@ -58,7 +59,7 @@
                                   SelectedValues="selectedStatuses"
                                   SelectedValuesChanged="OnSelectedStatusesChanged"
                                   ButtonText="@L["AllStatuses"]"
-                                  ItemTextSelector="@(c => c.ToDisplayName(L))" />
+                                  ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
         </div>
 
         <div class="col-md-2">
@@ -103,16 +104,16 @@
                    Class="table table-striped table-hover align-middle"
                    Pagination="paginationState">
 
-            <PropertyColumn Property="x => x.InviteTargetValue" Title="@L["GridTarget"]" />
+            <PropertyColumn Property="x => x.InviteTargetValue" Title="@L["GridHeaderTarget"]" />
 
-            <TemplateColumn Title="@L["GridStatus"]" Context="item">
+            <TemplateColumn Title="@L["GridHeaderStatus"]" Context="item">
                 <span class="badge @(item.Status.ToCssBadgeClass())">
                     @item.Status.ToDisplayName(L)
                 </span>
             </TemplateColumn>
 
-            <PropertyColumn Property="x => x.InviteChannel" Title="@L["GridChannel"]" />
-            <PropertyColumn Property="x => x.InviteRole" Title="@L["GridRole"]" />
+            <PropertyColumn Property="x => x.InviteChannel" Title="@L["GridHeaderChannel"]" />
+            <PropertyColumn Property="x => x.InviteRole" Title="@L["GridHeaderRole"]" />
 
             <TemplateColumn Title="@SharedGridL["HeaderGridActions"]" Context="item">
                 <div class="d-flex gap-2 flex-wrap">
@@ -155,7 +156,7 @@
 
     @if (!isBusy && totalCount == 0 && string.IsNullOrWhiteSpace(error))
     {
-        <div class="alert alert-info mt-3">@L["NoInvitesFound"]</div>
+        <div class="alert alert-info mt-3">@L["InfoNoInvitesFound"]</div>
     }
 </div>
 
@@ -220,7 +221,7 @@
             catch (Exception ex)
             {
                 totalCount = 0;
-                error = L["CouldNotLoadInvites", ex.Message];
+                error = L["InfoCouldNotLoadInvites", ex.Message];
                 return GridItemsProviderResult.From(Array.Empty<InviteListItemResponse>(), 0);
             }
             finally
@@ -288,7 +289,7 @@
 
     private async Task RevokeInviteAsync(Guid inviteId)
     {
-        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmRevokeInvite"]);
+        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_RevokeInvite"]);
         if (!confirm)
         {
             return;
@@ -308,7 +309,7 @@
         }
         catch (Exception ex)
         {
-            error = L["CouldNotRevokeInvite", ex.Message];
+            error = L["InfoCouldNotRevokeInvite", ex.Message];
         }
         finally
         {

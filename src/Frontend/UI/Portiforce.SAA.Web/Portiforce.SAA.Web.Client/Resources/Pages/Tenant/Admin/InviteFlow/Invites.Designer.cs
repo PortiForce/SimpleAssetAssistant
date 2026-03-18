@@ -97,20 +97,11 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All Channels.
+        ///   Looks up a localized string similar to Invite User.
         /// </summary>
-        internal static string AllChannels {
+        internal static string ActionInviteUser {
             get {
-                return ResourceManager.GetString("AllChannels", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to All Statuses.
-        /// </summary>
-        internal static string AllStatuses {
-            get {
-                return ResourceManager.GetString("AllStatuses", resourceCulture);
+                return ResourceManager.GetString("ActionInviteUser", resourceCulture);
             }
         }
         
@@ -133,119 +124,74 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Apple ID.
-        /// </summary>
-        internal static string ChannelAppleId {
-            get {
-                return ResourceManager.GetString("ChannelAppleId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Email.
-        /// </summary>
-        internal static string ChannelEmail {
-            get {
-                return ResourceManager.GetString("ChannelEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Channels.
-        /// </summary>
-        internal static string ChannelsLabel {
-            get {
-                return ResourceManager.GetString("ChannelsLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram.
-        /// </summary>
-        internal static string ChannelTelegram {
-            get {
-                return ResourceManager.GetString("ChannelTelegram", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to revoke this invite?.
         /// </summary>
-        internal static string ConfirmRevokeInvite {
+        internal static string ConfirmMessageRevokeInvite {
             get {
-                return ResourceManager.GetString("ConfirmRevokeInvite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not load invites: {0}.
-        /// </summary>
-        internal static string CouldNotLoadInvites {
-            get {
-                return ResourceManager.GetString("CouldNotLoadInvites", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not revoke invite: {0}.
-        /// </summary>
-        internal static string CouldNotRevokeInvite {
-            get {
-                return ResourceManager.GetString("CouldNotRevokeInvite", resourceCulture);
+                return ResourceManager.GetString("ConfirmMessageRevokeInvite", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Channel.
         /// </summary>
-        internal static string GridChannel {
+        internal static string GridHeaderChannel {
             get {
-                return ResourceManager.GetString("GridChannel", resourceCulture);
+                return ResourceManager.GetString("GridHeaderChannel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Role.
         /// </summary>
-        internal static string GridRole {
+        internal static string GridHeaderRole {
             get {
-                return ResourceManager.GetString("GridRole", resourceCulture);
+                return ResourceManager.GetString("GridHeaderRole", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Status.
         /// </summary>
-        internal static string GridStatus {
+        internal static string GridHeaderStatus {
             get {
-                return ResourceManager.GetString("GridStatus", resourceCulture);
+                return ResourceManager.GetString("GridHeaderStatus", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Target.
         /// </summary>
-        internal static string GridTarget {
+        internal static string GridHeaderTarget {
             get {
-                return ResourceManager.GetString("GridTarget", resourceCulture);
+                return ResourceManager.GetString("GridHeaderTarget", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invite User.
+        ///   Looks up a localized string similar to Could not load invites: {0}.
         /// </summary>
-        internal static string InviteUser {
+        internal static string InfoCouldNotLoadInvites {
             get {
-                return ResourceManager.GetString("InviteUser", resourceCulture);
+                return ResourceManager.GetString("InfoCouldNotLoadInvites", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not revoke invite: {0}.
+        /// </summary>
+        internal static string InfoCouldNotRevokeInvite {
+            get {
+                return ResourceManager.GetString("InfoCouldNotRevokeInvite", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No invites found matching your criteria..
         /// </summary>
-        internal static string NoInvitesFound {
+        internal static string InfoNoInvitesFound {
             get {
-                return ResourceManager.GetString("NoInvitesFound", resourceCulture);
+                return ResourceManager.GetString("InfoNoInvitesFound", resourceCulture);
             }
         }
         
@@ -277,65 +223,11 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accepted.
-        /// </summary>
-        internal static string StatusAccepted {
-            get {
-                return ResourceManager.GetString("StatusAccepted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Declined.
-        /// </summary>
-        internal static string StatusDeclined {
-            get {
-                return ResourceManager.GetString("StatusDeclined", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Statuses.
         /// </summary>
         internal static string StatusesLabel {
             get {
                 return ResourceManager.GetString("StatusesLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expired.
-        /// </summary>
-        internal static string StatusExpired {
-            get {
-                return ResourceManager.GetString("StatusExpired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed.
-        /// </summary>
-        internal static string StatusFailed {
-            get {
-                return ResourceManager.GetString("StatusFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Pending.
-        /// </summary>
-        internal static string StatusPending {
-            get {
-                return ResourceManager.GetString("StatusPending", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Revoked.
-        /// </summary>
-        internal static string StatusRevoked {
-            get {
-                return ResourceManager.GetString("StatusRevoked", resourceCulture);
             }
         }
     }

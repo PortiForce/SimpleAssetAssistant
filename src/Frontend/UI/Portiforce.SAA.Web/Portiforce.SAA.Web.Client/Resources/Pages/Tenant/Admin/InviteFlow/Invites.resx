@@ -120,7 +120,7 @@
   <data name="PageTitle" xml:space="preserve">
     <value>Manage Invites</value>
   </data>
-  <data name="InviteUser" xml:space="preserve">
+  <data name="ActionInviteUser" xml:space="preserve">
     <value>Invite User</value>
   </data>
   <data name="SearchTargetsLabel" xml:space="preserve">
@@ -129,17 +129,8 @@
   <data name="SearchTargetsPlaceholder" xml:space="preserve">
     <value>Search targets...</value>
   </data>
-  <data name="ChannelsLabel" xml:space="preserve">
-    <value>Channels</value>
-  </data>
-  <data name="AllChannels" xml:space="preserve">
-    <value>All Channels</value>
-  </data>
   <data name="StatusesLabel" xml:space="preserve">
     <value>Statuses</value>
-  </data>
-  <data name="AllStatuses" xml:space="preserve">
-    <value>All Statuses</value>
   </data>
   <data name="AccountFilterLabel" xml:space="preserve">
     <value>Account filter</value>
@@ -153,16 +144,16 @@
   <data name="AccountFilterOnlyWithoutAccount" xml:space="preserve">
     <value>Only without account</value>
   </data>
-  <data name="GridTarget" xml:space="preserve">
+  <data name="GridHeaderTarget" xml:space="preserve">
     <value>Target</value>
   </data>
-  <data name="GridStatus" xml:space="preserve">
+  <data name="GridHeaderStatus" xml:space="preserve">
     <value>Status</value>
   </data>
-  <data name="GridChannel" xml:space="preserve">
+  <data name="GridHeaderChannel" xml:space="preserve">
     <value>Channel</value>
   </data>
-  <data name="GridRole" xml:space="preserve">
+  <data name="GridHeaderRole" xml:space="preserve">
     <value>Role</value>
   </data>
   <data name="ButtonResend" xml:space="preserve">
@@ -171,43 +162,16 @@
   <data name="ButtonRevoke" xml:space="preserve">
     <value>Revoke</value>
   </data>
-  <data name="NoInvitesFound" xml:space="preserve">
+  <data name="InfoNoInvitesFound" xml:space="preserve">
     <value>No invites found matching your criteria.</value>
   </data>
-  <data name="CouldNotLoadInvites" xml:space="preserve">
+  <data name="InfoCouldNotLoadInvites" xml:space="preserve">
     <value>Could not load invites: {0}</value>
   </data>
-  <data name="ConfirmRevokeInvite" xml:space="preserve">
+  <data name="ConfirmMessageRevokeInvite" xml:space="preserve">
     <value>Are you sure you want to revoke this invite?</value>
   </data>
-  <data name="CouldNotRevokeInvite" xml:space="preserve">
+  <data name="InfoCouldNotRevokeInvite" xml:space="preserve">
     <value>Could not revoke invite: {0}</value>
-  </data>
-  <data name="ChannelEmail" xml:space="preserve">
-    <value>Email</value>
-  </data>
-  <data name="ChannelTelegram" xml:space="preserve">
-    <value>Telegram</value>
-  </data>
-  <data name="ChannelAppleId" xml:space="preserve">
-    <value>Apple ID</value>
-  </data>
-  <data name="StatusPending" xml:space="preserve">
-    <value>Pending</value>
-  </data>
-  <data name="StatusAccepted" xml:space="preserve">
-    <value>Accepted</value>
-  </data>
-  <data name="StatusRevoked" xml:space="preserve">
-    <value>Revoked</value>
-  </data>
-  <data name="StatusExpired" xml:space="preserve">
-    <value>Expired</value>
-  </data>
-  <data name="StatusDeclined" xml:space="preserve">
-    <value>Declined</value>
-  </data>
-  <data name="StatusFailed" xml:space="preserve">
-    <value>Failed</value>
   </data>
 </root>

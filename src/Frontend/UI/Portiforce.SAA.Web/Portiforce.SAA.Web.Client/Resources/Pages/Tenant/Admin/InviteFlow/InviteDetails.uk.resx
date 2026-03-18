@@ -123,7 +123,7 @@
   <data name="IdLabel" xml:space="preserve">
     <value>Ідентифікатор</value>
   </data>
-  <data name="BackToInvites" xml:space="preserve">
+  <data name="ActionTextBackToInvites" xml:space="preserve">
     <value>До запрошень</value>
   </data>
   <data name="LoadingInviteDetails" xml:space="preserve">
@@ -170,26 +170,5 @@
   </data>
   <data name="EmptyValue" xml:space="preserve">
     <value>—</value>
-  </data>
-  <data name="Status_Pending" xml:space="preserve">
-    <value>Очікує</value>
-  </data>
-  <data name="Status_Accepted" xml:space="preserve">
-    <value>Прийнято</value>
-  </data>
-  <data name="Status_Revoked" xml:space="preserve">
-    <value>Відкликано</value>
-  </data>
-  <data name="Status_Expired" xml:space="preserve">
-    <value>Протерміновано</value>
-  </data>
-  <data name="Channel_Email" xml:space="preserve">
-    <value>Електронна пошта</value>
-  </data>
-  <data name="Channel_Telegram" xml:space="preserve">
-    <value>Telegram</value>
-  </data>
-  <data name="Channel_AppleId" xml:space="preserve">
-    <value>Apple ID</value>
   </data>
 </root>

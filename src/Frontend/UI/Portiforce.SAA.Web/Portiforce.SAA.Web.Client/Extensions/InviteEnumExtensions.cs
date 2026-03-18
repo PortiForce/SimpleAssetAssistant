@@ -6,6 +6,36 @@ namespace Portiforce.SAA.Web.Client.Extensions;
 
 public static class InviteEnumExtensions
 {
+	public static readonly IReadOnlyList<InviteChannel> ChannelOptions =
+	[
+		InviteChannel.Email,
+		InviteChannel.Telegram,
+		InviteChannel.AppleId
+	];
+
+	public static readonly IReadOnlyList<InviteStatus> StatusOptions =
+	[
+		InviteStatus.Pending,
+		InviteStatus.Accepted,
+		InviteStatus.Revoked,
+		InviteStatus.Expired,
+		InviteStatus.Declined,
+		InviteStatus.Failed
+	];
+
+	public static readonly IReadOnlyList<InviteTenantRole> RoleOptions =
+	[
+		InviteTenantRole.TenantUser,
+		InviteTenantRole.TenantAdmin
+	];
+
+	public static readonly IReadOnlyList<InviteAccountTier> TierOptions =
+	[
+		InviteAccountTier.Observer,
+		InviteAccountTier.Investor,
+		InviteAccountTier.Strategist
+	];
+
 	public static string ToDisplayName(this InviteChannel channel, IStringLocalizer localizer) => channel switch
 	{
 		InviteChannel.Email => localizer["ChannelEmail"],
@@ -23,6 +53,21 @@ public static class InviteEnumExtensions
 		InviteStatus.Declined => localizer["StatusDeclined"],
 		InviteStatus.Failed => localizer["StatusFailed"],
 		_ => status.ToString()
+	};
+
+	public static string ToDisplayName(this InviteTenantRole role, IStringLocalizer localizer) => role switch
+	{
+		InviteTenantRole.TenantUser => localizer["RoleTenantUser"],
+		InviteTenantRole.TenantAdmin => localizer["RoleTenantAdmin"],
+		_ => role.ToString()
+	};
+
+	public static string ToDisplayName(this InviteAccountTier tier, IStringLocalizer localizer) => tier switch
+	{
+		InviteAccountTier.Observer => localizer["TierObserver"],
+		InviteAccountTier.Investor => localizer["TierInvestor"],
+		InviteAccountTier.Strategist => localizer["TierStrategist"],
+		_ => tier.ToString()
 	};
 
 	public static string ToCssBadgeClass(this InviteStatus status) => status switch

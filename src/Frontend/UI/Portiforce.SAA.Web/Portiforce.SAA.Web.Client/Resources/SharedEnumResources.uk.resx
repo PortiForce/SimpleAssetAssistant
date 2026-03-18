@@ -117,22 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ButtonAdd" xml:space="preserve">
-    <value>Додати</value>
+  <data name="ChannelAll" xml:space="preserve">
+    <value>Всі канали</value>
   </data>
-  <data name="ButtonCancel" xml:space="preserve">
-    <value>Вiдхилити</value>
+  <data name="ChannelAppleId" xml:space="preserve">
+    <value>[Apple ID]</value>
   </data>
-  <data name="ButtonClear" xml:space="preserve">
-    <value>Очистити</value>
+  <data name="ChannelEmail" xml:space="preserve">
+    <value>Електрона пошта</value>
   </data>
-  <data name="ButtonDetails" xml:space="preserve">
-    <value>Деталі</value>
+  <data name="ChannelTelegram" xml:space="preserve">
+    <value>Teлеграм</value>
   </data>
-  <data name="ButtonRemove" xml:space="preserve">
-    <value>Видалити</value>
+  <data name="RoleAll" xml:space="preserve">
+    <value>Усi ролi</value>
   </data>
-  <data name="ButtonSearch" xml:space="preserve">
-    <value>Шукати</value>
+  <data name="RoleTenantAdmin" xml:space="preserve">
+    <value>Адміністратор тенанта</value>
+  </data>
+  <data name="RoleTenantUser" xml:space="preserve">
+    <value>Користувач тенанта</value>
+  </data>
+  <data name="StatusAccepted" xml:space="preserve">
+    <value>Запрошення прийнято</value>
+  </data>
+  <data name="StatusAll" xml:space="preserve">
+    <value>Всі статуси</value>
+  </data>
+  <data name="StatusDeclined" xml:space="preserve">
+    <value>Вiдхилено користувачем</value>
+  </data>
+  <data name="StatusExpired" xml:space="preserve">
+    <value>Застарiло</value>
+  </data>
+  <data name="StatusFailed" xml:space="preserve">
+    <value>Халепа</value>
+  </data>
+  <data name="StatusPending" xml:space="preserve">
+    <value>Oчiкування</value>
+  </data>
+  <data name="StatusRevoked" xml:space="preserve">
+    <value>Вiдкликано</value>
+  </data>
+  <data name="TierAll" xml:space="preserve">
+    <value>Усi рiвнi</value>
+  </data>
+  <data name="TierInvestor" xml:space="preserve">
+    <value>Інвестор</value>
+  </data>
+  <data name="TierObserver" xml:space="preserve">
+    <value>Спостерігач</value>
+  </data>
+  <data name="TierStrategist" xml:space="preserve">
+    <value>Стратег</value>
   </data>
 </root>

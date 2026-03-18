@@ -1,9 +1,12 @@
 ﻿@page "/admin/invites/new"
 
+@using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.Configuration
 @using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Contracts.UiSetup
+@using Portiforce.SAA.Web.Client.Extensions
+@using Portiforce.SAA.Web.Client.Models.Tenant.Admin.InviteFlow
 @using Portiforce.SAA.Web.Client.Services.Interfaces
 
 @attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
@@ -12,14 +15,18 @@
 @inject IAdminApiClient ApiClient
 @inject NavigationManager Nav
 
-<PageTitle>Invite User</PageTitle>
+@inject IStringLocalizer<InviteUser> L
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
+@inject IStringLocalizer<SharedActionResources> SharedActionL
+
+<PageTitle>@L["PageTitle"]</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h3 class="mb-0">Invite New User</h3>
-        <p class="text-muted">Send an invitation to add a user to your tenant.</p>
+        <h3 class="mb-0">@L["Header_Title"]</h3>
+        <p class="text-muted">@L["Header_Description"].</p>
     </div>
-    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">Back to invites</a>
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["ActionTextBackToInvites"]</a>
 </div>
 
 <div class="container mt-4">
@@ -30,41 +37,45 @@
             <div class="row g-3">
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Invite channel</label>
-                    <InputSelect @bind-Value="inviteModel.Channel"
+                    <label class="form-label fw-bold">@L["InviteChannel_Label"]</label>
+                                                         <InputSelect @bind-Value="inviteModel.Channel"
                                  @bind-Value:after="OnChannelChanged"
                                  class="form-select">
-                        <option value="@InviteChannel.Email">Email</option>
-                        <option value="@InviteChannel.Telegram">Telegram</option>
-                        <option value="@InviteChannel.AppleId">Apple ID</option>
+                        @foreach (InviteChannel channel in InviteEnumExtensions.ChannelOptions)
+                        {
+                            <option value="@channel">channel.ToDisplayName(SharedEnumL)</option>
+                        }
                     </InputSelect>
                     <ValidationMessage For="@(() => inviteModel.Channel)" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">@ValueLabel</label>
+                    <label class="form-label fw-bold">@CurrentChannelInfo.Label</label>
                     <InputText @bind-Value="inviteModel.TargetValue"
                                class="form-control"
-                               placeholder="@ValuePlaceholder" />
-                    <div class="form-text">@ValueHelpText</div>
+                               placeholder="@CurrentChannelInfo.Placeholder" />
+                    <div class="form-text">@CurrentChannelInfo.HelpText</div>
                     <ValidationMessage For="@(() => inviteModel.TargetValue)" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Intended role</label>
+                    <label class="form-label fw-bold">@L["IntendedRole_Label"]</label>
                     <InputSelect @bind-Value="inviteModel.IntendedRole" class="form-select">
-                        <option value="@InviteTenantRole.TenantUser">Tenant user</option>
-                        <option value="@InviteTenantRole.TenantAdmin">Tenant admin</option>
+                        @foreach (InviteTenantRole role in InviteEnumExtensions.RoleOptions)
+                        {
+                            <option value="@role">role.ToDisplayName(SharedEnumL)</option>
+                        }
                     </InputSelect>
                     <ValidationMessage For="@(() => inviteModel.IntendedRole)" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Account tier</label>
+                    <label class="form-label fw-bold">@L["AccountTier_Label"]</label>
                     <InputSelect @bind-Value="inviteModel.IntendedTier" class="form-select">
-                        <option value="@InviteAccountTier.Observer">Observer</option>
-                        <option value="@InviteAccountTier.Investor">Investor</option>
-                        <option value="@InviteAccountTier.Strategist">Strategist</option>
+                        @foreach (InviteAccountTier tier in InviteEnumExtensions.TierOptions)
+                        {
+                            <option value="@tier">tier.ToDisplayName(SharedEnumL)</option>
+                        }
                     </InputSelect>
                     <ValidationMessage For="@(() => inviteModel.IntendedTier)" />
                 </div>
@@ -72,10 +83,10 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2 mt-4">
-                <a href="@UiRoutes.AdminRoutes.Invites.List" class="btn btn-outline-secondary">Cancel</a>
+                <a href="@UiRoutes.AdminRoutes.Invites.List" class="btn btn-outline-secondary">@SharedActionL["ButtonCancel"]</a>
                 <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
                     <i class="bi bi-envelope"></i>
-                    @(isSubmitting ? "Sending..." : "Send Invite")
+                    @(isSubmitting? L["InfoSending"] : L["InfoSendInvite"])
                 </button>
             </div>
 
@@ -99,28 +110,12 @@
     private bool isSubmitting;
     private string? error;
 
-    private string ValueLabel => inviteModel.Channel switch
+    private InviteChannelUiInfo CurrentChannelInfo => inviteModel.Channel switch
     {
-        InviteChannel.Email => "Email address",
-        InviteChannel.Telegram => "Telegram username",
-        InviteChannel.AppleId => "Apple ID",
-        _ => "Value"
-    };
-
-    private string ValuePlaceholder => inviteModel.Channel switch
-    {
-        InviteChannel.Email => "colleague@example.com",
-        InviteChannel.Telegram => "@nickname",
-        InviteChannel.AppleId => "name@icloud.com",
-        _ => ""
-    };
-
-    private string ValueHelpText => inviteModel.Channel switch
-    {
-        InviteChannel.Email => "We’ll send an email invitation link.",
-        InviteChannel.Telegram => "Enter Telegram username (with or without @).",
-        InviteChannel.AppleId => "Apple ID used to authenticate during acceptance (often an email).",
-        _ => ""
+        InviteChannel.Email => new(InviteChannel.Email.ToDisplayName(SharedEnumL), "colleague@example.com", L["TargetValue_HelpText_Email"]),
+        InviteChannel.Telegram => new(InviteChannel.Telegram.ToDisplayName(SharedEnumL), "@nickname", L["TargetValue_HelpText_Telegram"]),
+        InviteChannel.AppleId => new(InviteChannel.AppleId.ToDisplayName(SharedEnumL), "name@icloud.com", L["TargetValue_HelpText_AppleId"]),
+        _ => new("Value", string.Empty, string.Empty)
     };
 
     private void OnChannelChanged()

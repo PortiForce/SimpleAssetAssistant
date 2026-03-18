@@ -1,7 +1,6 @@
 ﻿@page "/admin/invites/{InviteId:guid}"
 
 @using Portiforce.SAA.Contracts.Configuration
-@using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Contracts.UiSetup
 @using Portiforce.SAA.Web.Client.Services.Interfaces
@@ -12,7 +11,9 @@
 @inject IAdminApiClient ApiClient
 
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Web.Client.Extensions
 @inject IStringLocalizer<InviteDetails> L
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -20,7 +21,7 @@
         <div class="text-muted small">@L["IdLabel"]: @InviteId</div>
     </div>
 
-    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["BackToInvites"]</a>
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["ActionTextBackToInvites"]</a>
 </div>
 
 @if (isLoading)
@@ -58,7 +59,7 @@ else
                     </div>
                 </div>
 
-                <span class="badge @GetStatusBadge(invite.State)">
+                <span class="badge @invite.State.ToCssBadgeClass())">
                     @invite.State
                 </span>
             </div>
@@ -67,10 +68,10 @@ else
 
             <dl class="row mb-0">
                 <dt class="col-sm-3">@L["CreatedLabel"]</dt>
-                <dd class="col-sm-9">@invite.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                <dd class="col-sm-9">@invite.CreatedAtUtc.ToUiDateTime()</dd>
 
                 <dt class="col-sm-3">@L["ExpiresLabel"]</dt>
-                <dd class="col-sm-9">@invite.ExpiresAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
 
                 <dt class="col-sm-3">@L["InvitedByLabel"]</dt>
                 <dd class="col-sm-9">@invite.InvitedBy</dd>
@@ -79,7 +80,7 @@ else
                 <dd class="col-sm-9">@invite.SendTimesCount</dd>
 
                 <dt class="col-sm-3">@L["AcceptedLabel"]</dt>
-                <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? L["EmptyValue"])</dd>
+                <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
 
                 <dt class="col-sm-3">@L["RelatedAccountIdLabel"]</dt>
                 <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? L["EmptyValue"])</dd>
@@ -131,13 +132,4 @@ else
             isLoading = false;
         }
     }
-
-    private static string GetStatusBadge(InviteStatus status) => status switch
-    {
-        InviteStatus.Pending => "bg-warning text-dark",
-        InviteStatus.Accepted => "bg-success",
-        InviteStatus.Revoked => "bg-secondary",
-        InviteStatus.Expired => "bg-dark",
-        _ => "bg-secondary"
-    };
 }

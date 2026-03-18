@@ -117,22 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ButtonAdd" xml:space="preserve">
-    <value>Додати</value>
+  <data name="ChannelAll" xml:space="preserve">
+    <value>All Channels</value>
   </data>
-  <data name="ButtonCancel" xml:space="preserve">
-    <value>Вiдхилити</value>
+  <data name="ChannelAppleId" xml:space="preserve">
+    <value>Apple ID</value>
   </data>
-  <data name="ButtonClear" xml:space="preserve">
-    <value>Очистити</value>
+  <data name="ChannelEmail" xml:space="preserve">
+    <value>Email</value>
   </data>
-  <data name="ButtonDetails" xml:space="preserve">
-    <value>Деталі</value>
+  <data name="ChannelTelegram" xml:space="preserve">
+    <value>Telegram</value>
   </data>
-  <data name="ButtonRemove" xml:space="preserve">
-    <value>Видалити</value>
+  <data name="RoleAll" xml:space="preserve">
+    <value>All Roles</value>
   </data>
-  <data name="ButtonSearch" xml:space="preserve">
-    <value>Шукати</value>
+  <data name="RoleTenantAdmin" xml:space="preserve">
+    <value>Tenant Admin</value>
+  </data>
+  <data name="RoleTenantUser" xml:space="preserve">
+    <value>Tenant User</value>
+  </data>
+  <data name="StatusAccepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="StatusAll" xml:space="preserve">
+    <value>All Statuses</value>
+  </data>
+  <data name="StatusDeclined" xml:space="preserve">
+    <value>Declined</value>
+  </data>
+  <data name="StatusExpired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="StatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="StatusPending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="StatusRevoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="TierAll" xml:space="preserve">
+    <value>All Tiers</value>
+  </data>
+  <data name="TierInvestor" xml:space="preserve">
+    <value>Investor</value>
+  </data>
+  <data name="TierObserver" xml:space="preserve">
+    <value>Observer</value>
+  </data>
+  <data name="TierStrategist" xml:space="preserve">
+    <value>Strategist</value>
   </data>
 </root>

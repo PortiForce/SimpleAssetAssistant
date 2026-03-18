@@ -120,7 +120,7 @@
   <data name="PageTitle" xml:space="preserve">
     <value>Керування запрошеннями</value>
   </data>
-  <data name="InviteUser" xml:space="preserve">
+  <data name="ActionInviteUser" xml:space="preserve">
     <value>Запросити користувача</value>
   </data>
   <data name="SearchTargetsLabel" xml:space="preserve">
@@ -129,17 +129,8 @@
   <data name="SearchTargetsPlaceholder" xml:space="preserve">
     <value>Пошук адресатів...</value>
   </data>
-  <data name="ChannelsLabel" xml:space="preserve">
-    <value>Канали</value>
-  </data>
-  <data name="AllChannels" xml:space="preserve">
-    <value>Всі канали</value>
-  </data>
   <data name="StatusesLabel" xml:space="preserve">
     <value>Статуси</value>
-  </data>
-  <data name="AllStatuses" xml:space="preserve">
-    <value>Всі статуси</value>
   </data>
   <data name="AccountFilterLabel" xml:space="preserve">
     <value>Фільтр акаунтів</value>
@@ -153,16 +144,16 @@
   <data name="AccountFilterOnlyWithoutAccount" xml:space="preserve">
     <value>Тільки без акаунта</value>
   </data>
-  <data name="GridTarget" xml:space="preserve">
+  <data name="GridHeaderTarget" xml:space="preserve">
     <value>Адресат</value>
   </data>
-  <data name="GridStatus" xml:space="preserve">
+  <data name="GridHeaderStatus" xml:space="preserve">
     <value>Статус</value>
   </data>
-  <data name="GridChannel" xml:space="preserve">
+  <data name="GridHeaderChannel" xml:space="preserve">
     <value>Канал</value>
   </data>
-  <data name="GridRole" xml:space="preserve">
+  <data name="GridHeaderRole" xml:space="preserve">
     <value>Роль</value>
   </data>
   <data name="ButtonResend" xml:space="preserve">
@@ -171,43 +162,16 @@
   <data name="ButtonRevoke" xml:space="preserve">
     <value>Відкликати</value>
   </data>
-  <data name="NoInvitesFound" xml:space="preserve">
+  <data name="InfoNoInvitesFound" xml:space="preserve">
     <value>За вашим запитом не знайдено жодного запрошення.</value>
   </data>
-  <data name="CouldNotLoadInvites" xml:space="preserve">
+  <data name="InfoCouldNotLoadInvites" xml:space="preserve">
     <value>Не вдалося завантажити запрошення: {0}</value>
   </data>
-  <data name="ConfirmRevokeInvite" xml:space="preserve">
+  <data name="ConfirmMessageRevokeInvite" xml:space="preserve">
     <value>Ви впевнені, що хочете відкликати це запрошення?</value>
   </data>
-  <data name="CouldNotRevokeInvite" xml:space="preserve">
+  <data name="InfoCouldNotRevokeInvite" xml:space="preserve">
     <value>Не вдалося вiдкликати запрошення: {0}</value>
-  </data>
-  <data name="ChannelEmail" xml:space="preserve">
-    <value>Електрона пошта</value>
-  </data>
-  <data name="ChannelTelegram" xml:space="preserve">
-    <value>Teлеграм</value>
-  </data>
-  <data name="ChannelAppleId" xml:space="preserve">
-    <value>Apple ID</value>
-  </data>
-  <data name="StatusPending" xml:space="preserve">
-    <value>Oчiкування</value>
-  </data>
-  <data name="StatusAccepted" xml:space="preserve">
-    <value>Запрошення прийнято</value>
-  </data>
-  <data name="StatusRevoked" xml:space="preserve">
-    <value>Вiдкликано</value>
-  </data>
-  <data name="StatusExpired" xml:space="preserve">
-    <value>Застарiло</value>
-  </data>
-  <data name="StatusDeclined" xml:space="preserve">
-    <value>Вiдхилено користувачем</value>
-  </data>
-  <data name="StatusFailed" xml:space="preserve">
-    <value>Халепа</value>
   </data>
 </root>
