@@ -123,25 +123,25 @@
   <data name="ActionInviteUser" xml:space="preserve">
     <value>Запросити користувача</value>
   </data>
-  <data name="SearchTargetsLabel" xml:space="preserve">
+  <data name="LabelSearchTargets" xml:space="preserve">
     <value>Пошук адресатів</value>
   </data>
-  <data name="SearchTargetsPlaceholder" xml:space="preserve">
+  <data name="PlaceholderSearchTargets" xml:space="preserve">
     <value>Пошук адресатів...</value>
   </data>
-  <data name="StatusesLabel" xml:space="preserve">
+  <data name="LabelStatuses" xml:space="preserve">
     <value>Статуси</value>
   </data>
-  <data name="AccountFilterLabel" xml:space="preserve">
+  <data name="LabelAccountFilter" xml:space="preserve">
     <value>Фільтр акаунтів</value>
   </data>
-  <data name="AccountFilterAny" xml:space="preserve">
+  <data name="SelectAccountAny" xml:space="preserve">
     <value>Будь-який варіант</value>
   </data>
-  <data name="AccountFilterOnlyWithAccount" xml:space="preserve">
+  <data name="SelectAccountWith" xml:space="preserve">
     <value>Тільки з акаунтом</value>
   </data>
-  <data name="AccountFilterOnlyWithoutAccount" xml:space="preserve">
+  <data name="SelectAccountWithout" xml:space="preserve">
     <value>Тільки без акаунта</value>
   </data>
   <data name="GridHeaderTarget" xml:space="preserve">
@@ -156,22 +156,19 @@
   <data name="GridHeaderRole" xml:space="preserve">
     <value>Роль</value>
   </data>
-  <data name="ButtonResend" xml:space="preserve">
-    <value>Надіслати повторно</value>
-  </data>
-  <data name="ButtonRevoke" xml:space="preserve">
-    <value>Відкликати</value>
-  </data>
-  <data name="InfoNoInvitesFound" xml:space="preserve">
+  <data name="MessageInfoNoInvites" xml:space="preserve">
     <value>За вашим запитом не знайдено жодного запрошення.</value>
   </data>
-  <data name="InfoCouldNotLoadInvites" xml:space="preserve">
+  <data name="MessageErrorLoadInvites" xml:space="preserve">
     <value>Не вдалося завантажити запрошення: {0}</value>
   </data>
-  <data name="ConfirmMessageRevokeInvite" xml:space="preserve">
+  <data name="ConfirmRevokeInvite" xml:space="preserve">
     <value>Ви впевнені, що хочете відкликати це запрошення?</value>
   </data>
-  <data name="InfoCouldNotRevokeInvite" xml:space="preserve">
+  <data name="MessageErrorRevokeInvite" xml:space="preserve">
     <value>Не вдалося вiдкликати запрошення: {0}</value>
+  </data>
+  <data name="LabelChannels" xml:space="preserve">
+    <value>Канал</value>
   </data>
 </root>

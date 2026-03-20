@@ -13,12 +13,13 @@
 @using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Web.Client.Extensions
 @inject IStringLocalizer<InviteDetails> L
+@inject IStringLocalizer<SharedActionResources> SharedActionL
 @inject IStringLocalizer<SharedEnumResources> SharedEnumL
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h3 class="mb-0">@L["PageTitle"]</h3>
-        <div class="text-muted small">@L["IdLabel"]: @InviteId</div>
+        <div class="text-muted small">@L["LabelId"]: @InviteId</div>
     </div>
 
     <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["ActionTextBackToInvites"]</a>
@@ -26,7 +27,7 @@
 
 @if (isLoading)
 {
-    <div class="text-muted">@L["LoadingInviteDetails"]</div>
+    <div class="text-muted">@L["MessageInfoLoadingInviteDetails"]</div>
 }
 else if (!string.IsNullOrWhiteSpace(error))
 {
@@ -34,7 +35,7 @@ else if (!string.IsNullOrWhiteSpace(error))
 }
 else if (invite is null)
 {
-    <div class="alert alert-warning">@L["InviteNotFound"]</div>
+    <div class="alert alert-warning">@L["MessageErrorCouldNotLoadInviteDetails"]</div>
 }
 else
 {
@@ -45,55 +46,55 @@ else
                     <div class="h5 mb-1">@invite.InviteTargetValue</div>
                     <div class="text-muted">
                         <div>
-                            <span>@L["ChannelLabel"]:</span>
-                            @invite.InviteChannel
+                            <span>@L["LabelChannel"]:</span>
+                            @invite.InviteChannel.ToDisplayName(SharedEnumL)
                         </div>
                         <div>
-                            <span>@L["RoleLabel"]:</span>
-                            @invite.InviteRole
+                            <span>@L["LabelRole"]:</span>
+                            @invite.InviteRole.ToDisplayName(SharedEnumL)
                         </div>
                         <div>
-                            <span>@L["TierLabel"]:</span>
-                            @invite.InviteTier
+                            <span>@L["LabelTier"]:</span>
+                            @invite.InviteTier.ToDisplayName(SharedEnumL)
                         </div>
                     </div>
                 </div>
 
                 <span class="badge @invite.State.ToCssBadgeClass())">
-                    @invite.State
+                    @invite.State.ToDisplayName(SharedEnumL)
                 </span>
             </div>
 
             <hr />
 
             <dl class="row mb-0">
-                <dt class="col-sm-3">@L["CreatedLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelCreated"]</dt>
                 <dd class="col-sm-9">@invite.CreatedAtUtc.ToUiDateTime()</dd>
 
-                <dt class="col-sm-3">@L["ExpiresLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelExpires"]</dt>
                 <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
 
-                <dt class="col-sm-3">@L["InvitedByLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelInvitedBy"]</dt>
                 <dd class="col-sm-9">@invite.InvitedBy</dd>
 
-                <dt class="col-sm-3">@L["SendCountLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelSendCount"]</dt>
                 <dd class="col-sm-9">@invite.SendTimesCount</dd>
 
-                <dt class="col-sm-3">@L["AcceptedLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelAccepted"]</dt>
                 <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
 
-                <dt class="col-sm-3">@L["RelatedAccountIdLabel"]</dt>
+                <dt class="col-sm-3">@L["LabelRelatedAccountId"]</dt>
                 <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? L["EmptyValue"])</dd>
             </dl>
         </div>
         <div class="card-actions">
             @if (invite.CanResend)
             {
-                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">@L["ResendAction"]</a>
+                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">@SharedActionL["ActionResend"]</a>
             }
             @if (invite.CanRevoke)
             {
-                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">@L["RevokeAction"]</a>
+                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">@SharedActionL["ActionRevoke"]</a>
             }
         </div>
     </div>
@@ -125,7 +126,7 @@ else
         catch (Exception ex)
         {
             invite = null;
-            error = string.Format(L["ErrorCouldNotLoadInviteDetails"], ex.Message);
+            error = string.Format(L["MessageErrorCouldNotLoadInviteDetails"], ex.Message);
         }
         finally
         {

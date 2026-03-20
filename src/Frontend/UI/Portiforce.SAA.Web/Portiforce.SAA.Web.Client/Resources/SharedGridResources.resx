@@ -123,7 +123,16 @@
   <data name="PagingShowingPageOfTotal" xml:space="preserve">
     <value>Showing page {0} of {1} ({2} total)</value>
   </data>
-  <data name="StatusLoading" xml:space="preserve">
+  <data name="MessageInfoStatusLoading" xml:space="preserve">
     <value>Loading, please wait...</value>
+  </data>
+  <data name="ButtonNextPage" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ButtonPreviousPage" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="AriaLabelPagination" xml:space="preserve">
+    <value>Page navigation</value>
   </data>
 </root>

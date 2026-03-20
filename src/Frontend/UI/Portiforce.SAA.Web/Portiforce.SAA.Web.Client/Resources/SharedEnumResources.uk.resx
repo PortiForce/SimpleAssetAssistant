@@ -121,10 +121,13 @@
     <value>Всі канали</value>
   </data>
   <data name="ChannelAppleId" xml:space="preserve">
-    <value>[Apple ID]</value>
+    <value>Apple ID</value>
   </data>
   <data name="ChannelEmail" xml:space="preserve">
     <value>Електрона пошта</value>
+  </data>
+  <data name="ChannelNone" xml:space="preserve">
+    <value>Приховано</value>
   </data>
   <data name="ChannelTelegram" xml:space="preserve">
     <value>Teлеграм</value>

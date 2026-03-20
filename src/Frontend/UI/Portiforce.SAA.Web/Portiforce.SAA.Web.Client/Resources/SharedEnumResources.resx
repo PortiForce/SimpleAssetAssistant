@@ -126,6 +126,9 @@
   <data name="ChannelEmail" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="ChannelNone" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
   <data name="ChannelTelegram" xml:space="preserve">
     <value>Telegram</value>
   </data>

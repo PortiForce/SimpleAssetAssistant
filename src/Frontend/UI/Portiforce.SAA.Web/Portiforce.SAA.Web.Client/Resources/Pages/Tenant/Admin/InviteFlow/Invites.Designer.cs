@@ -61,42 +61,6 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Any option.
-        /// </summary>
-        internal static string AccountFilterAny {
-            get {
-                return ResourceManager.GetString("AccountFilterAny", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Account filter.
-        /// </summary>
-        internal static string AccountFilterLabel {
-            get {
-                return ResourceManager.GetString("AccountFilterLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Only with account.
-        /// </summary>
-        internal static string AccountFilterOnlyWithAccount {
-            get {
-                return ResourceManager.GetString("AccountFilterOnlyWithAccount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Only without account.
-        /// </summary>
-        internal static string AccountFilterOnlyWithoutAccount {
-            get {
-                return ResourceManager.GetString("AccountFilterOnlyWithoutAccount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invite User.
         /// </summary>
         internal static string ActionInviteUser {
@@ -106,29 +70,11 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resend.
-        /// </summary>
-        internal static string ButtonResend {
-            get {
-                return ResourceManager.GetString("ButtonResend", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Revoke.
-        /// </summary>
-        internal static string ButtonRevoke {
-            get {
-                return ResourceManager.GetString("ButtonRevoke", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to revoke this invite?.
         /// </summary>
-        internal static string ConfirmMessageRevokeInvite {
+        internal static string ConfirmRevokeInvite {
             get {
-                return ResourceManager.GetString("ConfirmMessageRevokeInvite", resourceCulture);
+                return ResourceManager.GetString("ConfirmRevokeInvite", resourceCulture);
             }
         }
         
@@ -169,29 +115,65 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account filter.
+        /// </summary>
+        internal static string LabelAccountFilter {
+            get {
+                return ResourceManager.GetString("LabelAccountFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channels.
+        /// </summary>
+        internal static string LabelChannels {
+            get {
+                return ResourceManager.GetString("LabelChannels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search targets.
+        /// </summary>
+        internal static string LabelSearchTargets {
+            get {
+                return ResourceManager.GetString("LabelSearchTargets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Statuses.
+        /// </summary>
+        internal static string LabelStatuses {
+            get {
+                return ResourceManager.GetString("LabelStatuses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not load invites: {0}.
         /// </summary>
-        internal static string InfoCouldNotLoadInvites {
+        internal static string MessageErrorLoadInvites {
             get {
-                return ResourceManager.GetString("InfoCouldNotLoadInvites", resourceCulture);
+                return ResourceManager.GetString("MessageErrorLoadInvites", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Could not revoke invite: {0}.
         /// </summary>
-        internal static string InfoCouldNotRevokeInvite {
+        internal static string MessageErrorRevokeInvite {
             get {
-                return ResourceManager.GetString("InfoCouldNotRevokeInvite", resourceCulture);
+                return ResourceManager.GetString("MessageErrorRevokeInvite", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No invites found matching your criteria..
         /// </summary>
-        internal static string InfoNoInvitesFound {
+        internal static string MessageInfoNoInvites {
             get {
-                return ResourceManager.GetString("InfoNoInvitesFound", resourceCulture);
+                return ResourceManager.GetString("MessageInfoNoInvites", resourceCulture);
             }
         }
         
@@ -205,29 +187,38 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search targets.
-        /// </summary>
-        internal static string SearchTargetsLabel {
-            get {
-                return ResourceManager.GetString("SearchTargetsLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Search targets....
         /// </summary>
-        internal static string SearchTargetsPlaceholder {
+        internal static string PlaceholderSearchTargets {
             get {
-                return ResourceManager.GetString("SearchTargetsPlaceholder", resourceCulture);
+                return ResourceManager.GetString("PlaceholderSearchTargets", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Statuses.
+        ///   Looks up a localized string similar to Any option.
         /// </summary>
-        internal static string StatusesLabel {
+        internal static string SelectAccountAny {
             get {
-                return ResourceManager.GetString("StatusesLabel", resourceCulture);
+                return ResourceManager.GetString("SelectAccountAny", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only with account.
+        /// </summary>
+        internal static string SelectAccountWith {
+            get {
+                return ResourceManager.GetString("SelectAccountWith", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only without account.
+        /// </summary>
+        internal static string SelectAccountWithout {
+            get {
+                return ResourceManager.GetString("SelectAccountWithout", resourceCulture);
             }
         }
     }

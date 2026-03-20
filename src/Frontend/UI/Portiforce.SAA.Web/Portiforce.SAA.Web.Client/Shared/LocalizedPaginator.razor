@@ -1,0 +1,73 @@
+﻿@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Web.Client.Resources
+
+@inject IStringLocalizer<SharedGridResources> SharedGridL
+@implements IDisposable
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-3">
+    
+    <div class="text-muted small">
+        @if (State.TotalItemCount is > 0)
+        {
+            <span>@SharedGridL["PagingShowingPageOfTotal", (State.CurrentPageIndex + 1), TotalPages, State.TotalItemCount.Value]</span>
+        }
+    </div>
+
+   <nav aria-label="@SharedGridL["AriaLabelPagination"]">
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(CanGoBack ? string.Empty : "disabled")">
+                <button type="button"
+                        class="page-link"
+                        @onclick="GoBackAsync"
+                        disabled="@(!CanGoBack)"
+                        aria-label="@SharedGridL["ButtonPreviousPage"]"
+                        title="@SharedGridL["ButtonPreviousPage"]">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+            </li>
+            
+            <li class="page-item @(CanGoForwards ? string.Empty : "disabled")">
+                <button type="button"
+                        class="page-link"
+                        @onclick="GoForwardsAsync"
+                        disabled="@(!CanGoForwards)"
+                        aria-label="@SharedGridL["ButtonNextPage"]"
+                        title="@SharedGridL["ButtonNextPage"]">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PaginationState State { get; set; } = default!;
+
+    private int TotalPages => (State.TotalItemCount ?? 0) <= 0 
+        ? 0 
+        : (int)Math.Ceiling(State.TotalItemCount.Value / (double)State.ItemsPerPage);
+
+    private bool CanGoBack => State.CurrentPageIndex > 0;
+    private bool CanGoForwards => State.CurrentPageIndex < TotalPages - 1;
+
+    protected override void OnInitialized()
+    {
+        State.TotalItemCountChanged += HandleTotalItemCountChanged;
+    }
+
+    private void HandleTotalItemCountChanged(object? sender, int? e)
+    {
+        StateHasChanged();
+    }
+
+    private Task GoBackAsync() => State.SetCurrentPageIndexAsync(State.CurrentPageIndex - 1);
+    
+    private Task GoForwardsAsync() => State.SetCurrentPageIndexAsync(State.CurrentPageIndex + 1);
+
+    public void Dispose()
+    {
+        State.TotalItemCountChanged -= HandleTotalItemCountChanged;
+    }
+}

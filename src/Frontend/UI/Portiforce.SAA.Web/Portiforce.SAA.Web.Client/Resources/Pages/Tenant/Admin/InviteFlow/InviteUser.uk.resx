@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountTier_Label" xml:space="preserve">
+  <data name="LabelAccountTier" xml:space="preserve">
     <value>Рівень акаунта</value>
   </data>
   <data name="ActionTextBackToInvites" xml:space="preserve">
@@ -126,37 +126,37 @@
   <data name="ActionTextSendInvite" xml:space="preserve">
     <value>Надіслати запрошення</value>
   </data>
-  <data name="Header_Description" xml:space="preserve">
+  <data name="HeaderDescription" xml:space="preserve">
     <value>Надішліть запрошення, щоб додати користувача до вашого тенанта.</value>
   </data>
-  <data name="Header_Title" xml:space="preserve">
+  <data name="HeaderTitle" xml:space="preserve">
     <value>Запросити нового користувача</value>
   </data>
-  <data name="InfoSending" xml:space="preserve">
+  <data name="MessageInfoSending" xml:space="preserve">
     <value>Надсилання...</value>
   </data>
-  <data name="InfoSendInvite" xml:space="preserve">
+  <data name="MessageInfoSendInvite" xml:space="preserve">
     <value>Вiдправити</value>
   </data>
-  <data name="IntendedRole_Label" xml:space="preserve">
+  <data name="LabelIntendedRole" xml:space="preserve">
     <value>Призначена роль</value>
   </data>
-  <data name="InviteChannel_Label" xml:space="preserve">
+  <data name="LabelInviteChannel" xml:space="preserve">
     <value>Канал запрошення</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Запросити користувача</value>
   </data>
-  <data name="TargetValue_HelpText_AppleId" xml:space="preserve">
+  <data name="HelpTextAppleId" xml:space="preserve">
     <value>Apple ID, який буде використано для автентифікації під час прийняття запрошення (зазвичай це email).</value>
   </data>
-  <data name="TargetValue_HelpText_Email" xml:space="preserve">
+  <data name="HelpTextEmail" xml:space="preserve">
     <value>Ми надішлемо лист із посиланням для запрошення.</value>
   </data>
-  <data name="TargetValue_HelpText_Telegram" xml:space="preserve">
+  <data name="HelpTextTelegram" xml:space="preserve">
     <value>Введіть ім’я користувача Telegram (з @ або без нього).</value>
   </data>
-  <data name="TargetValue_Label_Default" xml:space="preserve">
+  <data name="LabelDefaultValue" xml:space="preserve">
     <value>Значення</value>
   </data>
 </root>

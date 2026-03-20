@@ -29,45 +29,45 @@
 <div class="container card p-4 shadow-sm">
     <div class="actions-area-top mb-3">
         <a href="@UiRoutes.AdminRoutes.Invites.New" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> @L["InviteUser"]
+            <i class="bi bi-person-plus"></i> @L["ActionInviteUser"]
         </a>
     </div>
 
     <form @onsubmit="ApplySearchAsync" class="row g-2 mb-3 data-manipulation-area align-items-end">
 
         <div class="col-md-3">
-            <label class="form-label">@L["SearchTargetsLabel"]</label>
+            <label class="form-label">@L["LabelSearchTargets"]</label>
             <input class="form-control"
-                   placeholder="@L["SearchTargetsPlaceholder"]"
+                   placeholder="@L["PlaceholderSearchTargets"]"
                    @bind="searchText" />
         </div>
 
         <div class="col-md-2">
-            <label class="form-label">@L["ChannelsLabel"]</label>
+            <label class="form-label">@L["LabelChannels"]</label>
             <DropdownCheckboxList TItem="InviteChannel"
                                   Items="InviteFilterOptions.Channels"
                                   SelectedValues="selectedChannels"
                                   SelectedValuesChanged="OnSelectedChannelsChanged"
-                                  ButtonText="@L["AllChannels"]"
+                                  ButtonText="@SharedEnumL["ChannelAll"]"
                                   ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
         </div>
 
         <div class="col-md-2">
-            <label class="form-label">@L["StatusesLabel"]</label>
+            <label class="form-label">@L["LabelStatuses"]</label>
             <DropdownCheckboxList TItem="InviteStatus"
                                   Items="InviteFilterOptions.Statuses"
                                   SelectedValues="selectedStatuses"
                                   SelectedValuesChanged="OnSelectedStatusesChanged"
-                                  ButtonText="@L["AllStatuses"]"
+                                  ButtonText="@SharedEnumL["StatusAll"]"
                                   ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
         </div>
 
         <div class="col-md-2">
-            <label class="form-label">@L["AccountFilterLabel"]</label>
+            <label class="form-label">@L["LabelAccountFilter"]</label>
             <select class="form-select" @bind="SearchHasAccountString">
-                <option value="">@L["AccountFilterAny"]</option>
-                <option value="true">@L["AccountFilterOnlyWithAccount"]</option>
-                <option value="false">@L["AccountFilterOnlyWithoutAccount"]</option>
+                <option value="">@L["SelectAccountAny"]</option>
+                <option value="true">@L["SelectAccountWith"]</option>
+                <option value="false">@L["SelectAccountWithout"]</option>
             </select>
         </div>
 
@@ -87,17 +87,15 @@
     }
 
     <div class="invites-grid-wrapper position-relative">
-
         @if (isBusy)
         {
             <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                  style="background: rgba(255,255,255,0.7); z-index: 10;">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">@SharedGridL["StatusLoading"]</span>
+                    <span class="visually-hidden">@SharedGridL["MessageInfoStatusLoading"]</span>
                 </div>
             </div>
         }
-
         <QuickGrid TGridItem="InviteListItemResponse"
                    @ref="grid"
                    ItemsProvider="invitesProvider"
@@ -108,12 +106,12 @@
 
             <TemplateColumn Title="@L["GridHeaderStatus"]" Context="item">
                 <span class="badge @(item.Status.ToCssBadgeClass())">
-                    @item.Status.ToDisplayName(L)
+                    @item.Status.ToDisplayName(SharedEnumL)
                 </span>
             </TemplateColumn>
 
-            <PropertyColumn Property="x => x.InviteChannel" Title="@L["GridHeaderChannel"]" />
-            <PropertyColumn Property="x => x.InviteRole" Title="@L["GridHeaderRole"]" />
+            <PropertyColumn Property="x => x.InviteChannel.ToDisplayName(SharedEnumL)" Title="@L["GridHeaderChannel"]" />
+            <PropertyColumn Property="x => x.InviteRole.ToDisplayName(SharedEnumL)" Title="@L["GridHeaderRole"]" />
 
             <TemplateColumn Title="@SharedGridL["HeaderGridActions"]" Context="item">
                 <div class="d-flex gap-2 flex-wrap">
@@ -124,7 +122,7 @@
                     @if (item.CanResend)
                     {
                         <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)" class="btn btn-sm btn-outline-primary">
-                            @L["ButtonResend"]
+                            @SharedActionL["ActionResend"]
                         </a>
                     }
 
@@ -133,30 +131,18 @@
                         <button class="btn btn-sm btn-outline-danger"
                                 @onclick="() => RevokeInviteAsync(item.Id)"
                                 disabled="@isBusy">
-                            @L["ButtonRevoke"]
+                            @SharedActionL["ActionRevoke"]
                         </button>
                     }
                 </div>
             </TemplateColumn>
         </QuickGrid>
     </div>
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
-        <div class="text-muted small">
-            @if (totalCount > 0)
-            {
-                <span>
-                    @SharedGridL["PagingShowingPageOfTotal", (paginationState.CurrentPageIndex + 1), TotalPages, totalCount]
-                </span>
-            }
-        </div>
-
-        <Paginator State="paginationState" />
-    </div>
+    <LocalizedPaginator State="paginationState" />
 
     @if (!isBusy && totalCount == 0 && string.IsNullOrWhiteSpace(error))
     {
-        <div class="alert alert-info mt-3">@L["InfoNoInvitesFound"]</div>
+        <div class="alert alert-info mt-3">@L["MessageInfoNoInvites"]</div>
     }
 </div>
 
@@ -221,7 +207,7 @@
             catch (Exception ex)
             {
                 totalCount = 0;
-                error = L["InfoCouldNotLoadInvites", ex.Message];
+                error = L["MessageErrorLoadInvites", ex.Message];
                 return GridItemsProviderResult.From(Array.Empty<InviteListItemResponse>(), 0);
             }
             finally

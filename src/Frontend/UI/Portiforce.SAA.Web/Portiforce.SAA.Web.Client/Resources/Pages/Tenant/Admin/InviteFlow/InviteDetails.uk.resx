@@ -120,52 +120,46 @@
   <data name="PageTitle" xml:space="preserve">
     <value>Деталі запрошення</value>
   </data>
-  <data name="IdLabel" xml:space="preserve">
+  <data name="LabelId" xml:space="preserve">
     <value>Ідентифікатор</value>
   </data>
   <data name="ActionTextBackToInvites" xml:space="preserve">
     <value>До запрошень</value>
   </data>
-  <data name="LoadingInviteDetails" xml:space="preserve">
+  <data name="MessageInfoLoadingInviteDetails" xml:space="preserve">
     <value>Завантаження деталей запрошення...</value>
   </data>
   <data name="InviteNotFound" xml:space="preserve">
     <value>Запрошення не знайдено.</value>
   </data>
-  <data name="ChannelLabel" xml:space="preserve">
+  <data name="LabelChannel" xml:space="preserve">
     <value>Канал</value>
   </data>
-  <data name="RoleLabel" xml:space="preserve">
+  <data name="LabelRole" xml:space="preserve">
     <value>Роль</value>
   </data>
-  <data name="TierLabel" xml:space="preserve">
+  <data name="LabelTier" xml:space="preserve">
     <value>Рівень</value>
   </data>
-  <data name="CreatedLabel" xml:space="preserve">
+  <data name="LabelCreated" xml:space="preserve">
     <value>Створено</value>
   </data>
-  <data name="ExpiresLabel" xml:space="preserve">
+  <data name="LabelExpires" xml:space="preserve">
     <value>Діє до</value>
   </data>
-  <data name="InvitedByLabel" xml:space="preserve">
+  <data name="LabelInvitedBy" xml:space="preserve">
     <value>Запросив</value>
   </data>
-  <data name="SendCountLabel" xml:space="preserve">
+  <data name="LabelSendCount" xml:space="preserve">
     <value>Кількість відправлень</value>
   </data>
-  <data name="AcceptedLabel" xml:space="preserve">
+  <data name="LabelAccepted" xml:space="preserve">
     <value>Прийнято</value>
   </data>
-  <data name="RelatedAccountIdLabel" xml:space="preserve">
+  <data name="LabelRelatedAccountId" xml:space="preserve">
     <value>Ідентифікатор пов’язаного акаунта</value>
   </data>
-  <data name="ResendAction" xml:space="preserve">
-    <value>Надіслати повторно</value>
-  </data>
-  <data name="RevokeAction" xml:space="preserve">
-    <value>Відкликати</value>
-  </data>
-  <data name="ErrorCouldNotLoadInviteDetails" xml:space="preserve">
+  <data name="MessageErrorCouldNotLoadInviteDetails" xml:space="preserve">
     <value>Не вдалося завантажити деталі запрошення: {0}</value>
   </data>
   <data name="EmptyValue" xml:space="preserve">
