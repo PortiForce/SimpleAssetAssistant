@@ -126,7 +126,7 @@
   <data name="ChannelEmail" xml:space="preserve">
     <value>Електрона пошта</value>
   </data>
-  <data name="ChannelNone" xml:space="preserve">
+  <data name="None" xml:space="preserve">
     <value>Приховано</value>
   </data>
   <data name="ChannelTelegram" xml:space="preserve">

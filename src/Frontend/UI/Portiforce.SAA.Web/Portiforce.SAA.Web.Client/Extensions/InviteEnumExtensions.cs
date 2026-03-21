@@ -41,7 +41,7 @@ public static class InviteEnumExtensions
 		InviteChannel.Email => localizer["ChannelEmail"],
 		InviteChannel.Telegram => localizer["ChannelTelegram"],
 		InviteChannel.AppleId => localizer["ChannelAppleId"],
-		InviteChannel.None => localizer["ChannelNone"],
+		InviteChannel.None => localizer["None"],
 		_ => channel.ToString()
 	};
 
@@ -60,6 +60,7 @@ public static class InviteEnumExtensions
 	{
 		InviteTenantRole.TenantUser => localizer["RoleTenantUser"],
 		InviteTenantRole.TenantAdmin => localizer["RoleTenantAdmin"],
+		InviteTenantRole.None => localizer["None"],
 		_ => role.ToString()
 	};
 
