@@ -1,3 +1,5 @@
+using FluentAssertions.Specialized;
+
 using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Exceptions;
@@ -32,7 +34,9 @@ public sealed class AssetTests
 	{
 		var act = () => BuildTestAssetWithAssetCode(AssetId.New(), null);
 
-		act.Should().Throw<DomainValidationException>();
+		var exceptionAssertions = act.Should().Throw<DomainValidationException>();
+
+		exceptionAssertions.Which.Message.Should().Contain("AssetCode");
 	}
 
 	[Fact]

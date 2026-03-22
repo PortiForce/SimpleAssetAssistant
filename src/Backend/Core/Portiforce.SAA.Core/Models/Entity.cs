@@ -52,8 +52,18 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 			return true;
 		}
 
+		if (GetType() != other.GetType())
+		{
+			return false;
+		}
+
 		// If IDs are default (empty), they are not equal unless it's the exact same instance
 		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		{
+			return false;
+		}
+
+		if (EqualityComparer<TId>.Default.Equals(other.Id, default))
 		{
 			return false;
 		}
@@ -68,7 +78,7 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 			return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
 		}
 
-		return EqualityComparer<TId>.Default.GetHashCode(Id);
+		return HashCode.Combine(GetType(), Id);
 	}
 
 	public static bool operator ==(Entity<TId>? a, Entity<TId>? b)

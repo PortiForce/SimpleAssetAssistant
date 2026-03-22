@@ -36,7 +36,7 @@ public readonly record struct AssetId(Guid Value)
 	/// <returns><see langword="true"/> if the string was successfully parsed; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse(string? raw, out AssetId id)
 	{
-		if (GuidExtensions.TryParse(raw, out var g))
+		if (GuidExtensions.TryParse(raw, out var g) && g != Guid.Empty)
 		{
 			id = From(g);
 			return true;
