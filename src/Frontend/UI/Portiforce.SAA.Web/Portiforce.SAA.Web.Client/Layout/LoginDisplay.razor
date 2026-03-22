@@ -1,25 +1,30 @@
 @implements IDisposable
+@using Microsoft.Extensions.Localization
 
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<LoginDisplay> L
 
 <AuthorizeView>
     <Authorized>
         <div class="user-info">
-            <span class="user-greeting">Hello, @GetUserName(context.User)!</span>
+            <span class="user-greeting">@L["InfoGreetingHelloUser", GetUserName(context.User)]</span>
             <form action="@AuthRoutes.Logout" method="post">
                 <AntiforgeryToken />
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                 <button type="submit" class="btn-logout">
-                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span>@L["ActionLogout"]
                 </button>
             </form>
         </div>
     </Authorized>
     <NotAuthorized>
-        <a href="@AuthRoutes.Login" class="btn-login">
-            <span class="bi bi-person-circle"></span>
-            Login
-        </a>
+        @if (IsTenantResolved())
+        {
+            <a href="@AuthRoutes.Login" class="btn-login">
+                <span class="bi bi-person-circle"></span>
+                @L["ActionLogin"]
+            </a>
+        }
     </NotAuthorized>
 </AuthorizeView>
 
@@ -30,6 +35,12 @@
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private bool IsTenantResolved()
+    {
+        var parts = GetDomainParts();
+        return parts.Length > 2;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -51,5 +62,14 @@
             ?? user.FindFirst("preferred_username")?.Value
             ?? user.FindFirst("email")?.Value?.Split('@')[0]
             ?? "User";
+    }
+
+    private string[] GetDomainParts()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var host = uri.Host;
+
+        var parts = host.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return parts;
     }
 }
