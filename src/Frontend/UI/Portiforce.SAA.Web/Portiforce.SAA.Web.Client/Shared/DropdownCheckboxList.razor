@@ -1,5 +1,7 @@
 ﻿@typeparam TItem
 
+@using Microsoft.Extensions.Localization
+
 <div class="dropdown w-100" @onclick:stopPropagation="true" @onfocusout="CloseDropdown">
     
     <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center bg-white"
@@ -35,7 +37,7 @@
         }
         else
         {
-            <li><span class="dropdown-item-text text-muted">No options available</span></li>
+            <li><span class="dropdown-item-text text-muted">@SharedSelectorL["LabelNoOptions"]</span></li>
         }
     </ul>
 </div>
@@ -47,6 +49,18 @@
 </style>
 
 @code {
+
+    [Inject]
+    private IStringLocalizer<SharedSelectorResources> SharedSelectorL { get; set; } = default!;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(ButtonText))
+        {
+            ButtonText = SharedSelectorL["LabelSelectRecords"];
+        }
+    }
+
     [Parameter, EditorRequired]
     public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
 
@@ -56,8 +70,7 @@
     [Parameter]
     public EventCallback<HashSet<TItem>> SelectedValuesChanged { get; set; }
 
-    [Parameter]
-    public string ButtonText { get; set; } = "Select...";
+    [Parameter] public string ButtonText { get; set; } = string.Empty;
 
     [Parameter]
     public Func<TItem, string>? ItemTextSelector { get; set; }
@@ -98,10 +111,10 @@
 
             if (SelectedValues.Count == Items.Count())
             {
-                return $"{ButtonText} (All)";
+                return $"{ButtonText} ({SharedSelectorL["OptionAllRecords"]})";
             }
                 
-            return $"{SelectedValues.Count} selected";
+            return $"{SelectedValues.Count} {SharedSelectorL["OptionSelectedAmount"]}";
         }
     }
 
