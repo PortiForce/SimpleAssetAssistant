@@ -12,6 +12,8 @@ public interface IAdminApiClient
 
 	Task<CreateInviteResponse> InviteUserAsync(CreateInviteRequest request, CancellationToken ct = default);
 
+	Task<bool> RevokeInviteAsync(Guid inviteId, CancellationToken ct = default);
+
 	Task<AccountListResponse> GetUsersAsync(GetAccountListQueryRequest request, CancellationToken ct = default);
 
 	Task<AccountDetailsResponse> GetUserDetailsAsync(Guid accountId, CancellationToken ct = default);

@@ -43,21 +43,29 @@ public sealed class TenantResolutionMiddleware
 				return;
 			}
 
-			TenantResolution? resolved = await tenantResolver.ResolveByPrefixAsync(prefix, context.RequestAborted);
-			if (resolved is null)
+			try
 			{
-				context.Response.StatusCode = StatusCodes.Status404NotFound;
-				await context.Response.WriteAsync("Unknown tenant.");
+				TenantResolution? resolved = await tenantResolver.ResolveByPrefixAsync(prefix, context.RequestAborted);
+				if (resolved is null)
+				{
+					context.Response.StatusCode = StatusCodes.Status404NotFound;
+					await context.Response.WriteAsync("Unknown tenant.");
+					return;
+				}
+
+				tenantContext.IsLanding = false;
+				tenantContext.Prefix = prefix;
+				tenantContext.TenantId = resolved.TenantId;
+				tenantContext.PublicName = resolved.Name;
+
+				await _next(context);
 				return;
 			}
-
-			tenantContext.IsLanding = false;
-			tenantContext.Prefix = prefix;
-			tenantContext.TenantId = resolved.TenantId;
-			tenantContext.PublicName = resolved.Name;
-
-			await _next(context);
-			return;
+			catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+			{
+				// request aborted by client; no extra handling needed
+				throw;
+			}
 		}
 
 		// 3) Invalid host for this environment

@@ -43,7 +43,11 @@ public static class DependencyInjection
 				sql =>
 				{
 					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
-					sql.EnableRetryOnFailure();
+					sql.CommandTimeout(30);
+					sql.EnableRetryOnFailure(
+						maxRetryCount: 5,
+						maxRetryDelay: TimeSpan.FromSeconds(20),
+						errorNumbersToAdd: null);
 				});
 			opt.EnableDetailedErrors();
 

@@ -1,7 +1,7 @@
 ﻿using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Activity.Projections;
 using Portiforce.SAA.Core.Activities.Enums;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.Interfaces.Persistence.Activity;

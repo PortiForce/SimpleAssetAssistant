@@ -1,0 +1,138 @@
+﻿@typeparam TItem
+
+@using Microsoft.Extensions.Localization
+
+<div class="dropdown w-100" @onclick:stopPropagation="true" @onfocusout="CloseDropdown">
+    
+    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center bg-white"
+            type="button"
+            @onclick="ToggleDropdown"
+            aria-expanded="@isOpen.ToString().ToLower()">
+        <span class="text-truncate">@DisplayButtonText</span>
+    </button>
+    
+    <ul class="dropdown-menu shadow p-2 w-100 @(isOpen ? "show" : "")"
+        style="@(isOpen ? "display: block;" : "display: none;") max-height: 300px; overflow-y: auto;">
+        
+        @if (Items is not null && Items.Any())
+        {
+            @foreach (var item in Items)
+            {
+               var domId = $"chk_{GetHashCode()}_{item?.ToString()}";
+
+                <li>
+                    <div class="form-check m-1">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="@domId"
+                               checked="@IsChecked(item)"
+                               @onchange="(e) => OnCheckboxChanged(item, e.Value)" />
+                        
+                        <label class="form-check-label w-100 cursor-pointer" for="@domId">
+                            @GetItemText(item)
+                        </label>
+                    </div>
+                </li>
+            }
+        }
+        else
+        {
+            <li><span class="dropdown-item-text text-muted">@SharedSelectorL["LabelNoOptions"]</span></li>
+        }
+    </ul>
+</div>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@code {
+
+    [Inject]
+    private IStringLocalizer<SharedSelectorResources> SharedSelectorL { get; set; } = default!;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(ButtonText))
+        {
+            ButtonText = SharedSelectorL["LabelSelectRecords"];
+        }
+    }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    [Parameter]
+    public HashSet<TItem> SelectedValues { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<HashSet<TItem>> SelectedValuesChanged { get; set; }
+
+    [Parameter] public string ButtonText { get; set; } = string.Empty;
+
+    [Parameter]
+    public Func<TItem, string>? ItemTextSelector { get; set; }
+
+    private bool isOpen = false;
+
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+
+    private async Task CloseDropdown()
+    {
+        await Task.Delay(150);
+        isOpen = false;
+        StateHasChanged();
+    }
+
+    private bool IsChecked(TItem item) => SelectedValues is not null && SelectedValues.Contains(item);
+
+    private string GetItemText(TItem item)
+    {
+        if (ItemTextSelector is not null)
+        {
+            return ItemTextSelector(item);
+        }
+        return item?.ToString() ?? string.Empty;
+    }
+
+    private string DisplayButtonText
+    {
+        get
+        {
+            if (SelectedValues is null || SelectedValues.Count == 0)
+            {
+                return ButtonText;
+            }
+
+            if (SelectedValues.Count == Items.Count())
+            {
+                return $"{ButtonText} ({SharedSelectorL["OptionAllRecords"]})";
+            }
+                
+            return $"{SelectedValues.Count} {SharedSelectorL["OptionSelectedAmount"]}";
+        }
+    }
+
+    private async Task OnCheckboxChanged(TItem item, object? checkedValue)
+    {
+        bool isChecked = (bool)(checkedValue ?? false);
+        
+        var newSet = new HashSet<TItem>(SelectedValues ?? []);
+
+        if (isChecked)
+        {
+            newSet.Add(item);
+        }
+        else
+        {
+            newSet.Remove(item);
+        }
+
+        await SelectedValuesChanged.InvokeAsync(newSet);
+    }
+}

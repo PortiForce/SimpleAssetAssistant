@@ -1,102 +1,115 @@
+/* Mobile toggler (kept, but styled for light sidebar) */
 .navbar-toggler {
     appearance: none;
     cursor: pointer;
-    width: 3.5rem;
+    width: 3.25rem;
     height: 2.5rem;
-    color: white;
     position: absolute;
     top: 0.5rem;
     right: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.4);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.65%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1.25rem;
     z-index: 3;
 }
 
 .navbar-toggler:checked {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0.04);
 }
 
-.top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.navbar-brand {
-    font-size: 1.1rem;
-}
-
-.bi {
-    display: inline-block;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
-    vertical-align: text-bottom;
-}
-
-.nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
-}
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item ::deep .nav-link {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-        width: 100%;
-        text-decoration: none;
-        padding: 0 1rem;
-    }
-
-.nav-item ::deep .nav-link.active {
-    background-color: rgba(255,255,255,0.37);
-    color: white;
-}
-
-.nav-item ::deep .nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.nav-section {
-    margin-top: 1.5rem;
-}
-
-.nav-section-header {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.5rem 0;
-    margin-bottom: 0.25rem;
-    display: flex;
-    align-items: center;
-}
-
-    .nav-section-header .bi {
-        margin-right: 0.5rem;
-        opacity: 0.7;
-    }
-
+/* Scroll container */
 .nav-scrollable {
     display: block;
+    padding: 0.75rem 0;
 }
 
+/* Hide nav when toggled (mobile) */
 .navbar-toggler:checked ~ .nav-scrollable {
     display: none;
 }
 
+/* typography */
+nav {
+    font-size: 0.9rem;
+    line-height: 1.25rem;
+    color: #212529;
+}
+
+/* section */
+.nav-section {
+    margin-top: 0.75rem;
+}
+
+.nav-section:first-child {
+    margin-top: 0.25rem;
+}
+
+.nav-section-header {
+    color: rgba(33, 37, 41, 0.68);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.nav-section-header .bi {
+    margin-right: 0.5rem;
+    opacity: 0.7;
+}
+
+/* items */
+.nav-section-items {
+    padding: 0.15rem 0;
+}
+
+.nav-item {
+    padding-bottom: 0.15rem;
+}
+
+.nav-item ::deep .nav-link {
+    color: rgba(33, 37, 41, 0.86);
+    text-decoration: none;
+    border-radius: 0.6rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: 100%;
+    padding: 0 0.75rem;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.nav-item ::deep .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.nav-item ::deep .nav-link.active {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #111418;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* icons smaller + tighter (ChatGPT-like) */
+.bi {
+    display: inline-block;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-right: 0.25rem;
+    vertical-align: text-bottom;
+    opacity: 0.85;
+}
+
+/* Desktop: real scrolling, subtle scrollbar */
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
@@ -106,9 +119,17 @@
         display: block;
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
+        scrollbar-gutter: stable;
     }
 
-    .navbar-toggler:checked ~ .nav-scrollable {
-        display: block;
+    .nav-scrollable::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .nav-scrollable::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.12);
+        border-radius: 999px;
+        border: 3px solid transparent;
+        background-clip: content-box;
     }
 }

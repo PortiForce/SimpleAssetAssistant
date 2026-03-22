@@ -10,6 +10,7 @@ using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Contracts.Configuration;
+using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
@@ -17,7 +18,6 @@ using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
-using GetInviteListQueryRequest = Portiforce.SAA.Contracts.Models.Client.Invite.GetInviteListQueryRequest;
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
@@ -82,7 +82,12 @@ public sealed class InviteEndpoints : IEndpoint
 	}
 
 	private static async Task<Results<Ok<InviteListResponse>, UnauthorizedHttpResult, ForbidHttpResult>> ListInvitesAsync(
-		[AsParameters] GetInviteListQueryRequest request,
+		[FromQuery] string? search,
+		[FromQuery] InviteStatus[]? statuses,
+		[FromQuery] InviteChannel[]? channels,
+		[FromQuery] int page,
+		[FromQuery] int pageSize,
+		[FromQuery] bool? hasAccount,
 		[FromServices] IMediator mediator,
 		[FromServices] ICurrentUser currentUser,
 		CancellationToken ct)
@@ -92,17 +97,18 @@ public sealed class InviteEndpoints : IEndpoint
 			return TypedResults.Forbid();
 		}
 
-		InviteState? status = request.Status?.ToBusiness();
-		Core.Identity.Enums.InviteChannel? channel = request.Channel?.ToBusiness();
+		HashSet<InviteState> statusList = statuses?.ToBusinessSet();
+		HashSet<Core.Identity.Enums.InviteChannel> channelList = channels?.ToBusinessSet();
 
 		var query = new GetInviteListQuery(
 			currentUser.TenantId,
-			request.Search,
-			status,
-			channel,
+			search,
+			statusList,
+			channelList,
+			hasAccount,
 			new PageRequest(
-				request.Page,
-				request.PageSize));
+				page,
+				pageSize));
 
 		PagedResult<InviteListItem> result = await mediator.Send(query, ct);
 
