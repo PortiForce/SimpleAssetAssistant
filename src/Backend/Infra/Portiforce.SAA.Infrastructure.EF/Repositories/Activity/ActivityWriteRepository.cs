@@ -1,5 +1,5 @@
 ﻿using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
 namespace Portiforce.SAA.Infrastructure.EF.Repositories.Activity;

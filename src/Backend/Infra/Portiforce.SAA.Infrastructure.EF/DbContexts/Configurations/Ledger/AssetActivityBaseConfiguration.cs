@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Portiforce.SAA.Core.Activities.Enums;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Core.StaticResources;
 using Portiforce.SAA.Infrastructure.EF.Configuration;

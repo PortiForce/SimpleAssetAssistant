@@ -13,8 +13,8 @@
     <ProjectReference Include="..\..\..\..\Backend\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
     <ProjectReference Include="..\Portiforce.SAA.Web.Client\Portiforce.SAA.Web.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.5" />
     <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
   </ItemGroup>
 

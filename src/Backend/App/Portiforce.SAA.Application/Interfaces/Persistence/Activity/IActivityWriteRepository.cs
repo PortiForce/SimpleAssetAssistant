@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Activities.Models.Activities;
+﻿using Portiforce.SAA.Core.Activities.Models.Actions;
 
 namespace Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 

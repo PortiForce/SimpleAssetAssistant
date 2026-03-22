@@ -4,10 +4,11 @@ namespace Portiforce.SAA.Contracts.Models.Client.Invite;
 
 public sealed record GetInviteListQueryRequest(
 	string? Search,
-	InviteStatus? Status,
-	InviteChannel? Channel,
+	HashSet<InviteStatus>? Statuses,
+	HashSet<InviteChannel>? Channels,
 	int Page = 1,
-	int PageSize = 20)
+	int PageSize = 20,
+	bool? HasAccount = null)
 {
 	public IEnumerable<KeyValuePair<string, string>> ToQueryParameters()
 	{
@@ -16,14 +17,25 @@ public sealed record GetInviteListQueryRequest(
 			yield return new KeyValuePair<string, string>("search", Search);
 		}
 
-		if (Status is not null)
+		if (Statuses is not null && Statuses.Any())
 		{
-			yield return new KeyValuePair<string, string>("status", Status.ToString()!);
+			foreach (var status in Statuses)
+			{
+				yield return new KeyValuePair<string, string>("statuses", status.ToString());
+			}
 		}
 
-		if (Channel is not null)
+		if (Channels is not null && Channels.Any())
 		{
-			yield return new KeyValuePair<string, string>("channel", Channel.ToString()!);
+			foreach (var channel in Channels)
+			{
+				yield return new KeyValuePair<string, string>("channels", channel.ToString());
+			}
+		}
+
+		if (HasAccount is not null)
+		{
+			yield return new KeyValuePair<string, string>("hasAccount", HasAccount.Value.ToString());
 		}
 
 		yield return new KeyValuePair<string, string>("page", Page.ToString());

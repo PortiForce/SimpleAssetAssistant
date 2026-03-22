@@ -1,0 +1,305 @@
+﻿@page "/admin/invites"
+
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Configuration
+@using Portiforce.SAA.Contracts.Enums
+@using Portiforce.SAA.Contracts.Models.Client.Invite
+@using Portiforce.SAA.Contracts.UiSetup
+@using Portiforce.SAA.Web.Client.Configuration
+@using Portiforce.SAA.Web.Client.Extensions
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+@using Portiforce.SAA.Web.Client.Shared
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@inject IAdminApiClient ApiClient
+@inject IJSRuntime JSRuntime
+
+@inject IStringLocalizer<Invites> L
+@inject IStringLocalizer<SharedActionResources> SharedActionL
+@inject IStringLocalizer<SharedGridResources> SharedGridL
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>@L["PageTitle"]</h3>
+</div>
+                
+<div class="container card p-4 shadow-sm">
+    <div class="actions-area-top mb-3">
+        <a href="@UiRoutes.AdminRoutes.Invites.New" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> @L["ActionInviteUser"]
+        </a>
+    </div>
+
+    <form @onsubmit="ApplySearchAsync" class="row g-2 mb-3 data-manipulation-area align-items-end">
+
+        <div class="col-md-3">
+            <label class="form-label">@L["LabelSearchTargets"]</label>
+            <input class="form-control"
+                   placeholder="@L["PlaceholderSearchTargets"]"
+                   @bind="searchText" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelChannels"]</label>
+            <DropdownCheckboxList TItem="InviteChannel"
+                                  Items="InviteFilterOptions.Channels"
+                                  SelectedValues="selectedChannels"
+                                  SelectedValuesChanged="OnSelectedChannelsChanged"
+                                  ButtonText="@SharedEnumL["ChannelAll"]"
+                                  ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelStatuses"]</label>
+            <DropdownCheckboxList TItem="InviteStatus"
+                                  Items="InviteFilterOptions.Statuses"
+                                  SelectedValues="selectedStatuses"
+                                  SelectedValuesChanged="OnSelectedStatusesChanged"
+                                  ButtonText="@SharedEnumL["StatusAll"]"
+                                  ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelAccountFilter"]</label>
+            <select class="form-select" @bind="SearchHasAccountString">
+                <option value="">@L["SelectAccountAny"]</option>
+                <option value="true">@L["SelectAccountWith"]</option>
+                <option value="false">@L["SelectAccountWithout"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-auto ms-auto d-flex gap-2 justify-content-end">
+            <button type="submit" class="btn btn-outline-primary" disabled="@isBusy">
+                @SharedActionL["ButtonSearch"]
+            </button>
+            <button type="button" class="btn btn-outline-secondary" @onclick="ClearSearchAsync" disabled="@isBusy">
+                @SharedActionL["ButtonClear"]
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="invites-grid-wrapper position-relative">
+        @if (isBusy)
+        {
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                 style="background: rgba(255,255,255,0.7); z-index: 10;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">@SharedGridL["MessageInfoStatusLoading"]</span>
+                </div>
+            </div>
+        }
+        <QuickGrid TGridItem="InviteListItemResponse"
+                   @ref="grid"
+                   ItemsProvider="invitesProvider"
+                   Class="table table-striped table-hover align-middle"
+                   Pagination="paginationState">
+
+            <PropertyColumn Property="x => x.InviteTargetValue" Title="@L["GridHeaderTarget"]" />
+
+            <TemplateColumn Title="@L["GridHeaderStatus"]" Context="item">
+                <span class="badge @(item.Status.ToCssBadgeClass())">
+                    @item.Status.ToDisplayName(SharedEnumL)
+                </span>
+            </TemplateColumn>
+
+            <PropertyColumn Property="x => x.InviteChannel.ToDisplayName(SharedEnumL)" Title="@L["GridHeaderChannel"]" />
+            <PropertyColumn Property="x => x.InviteRole.ToDisplayName(SharedEnumL)" Title="@L["GridHeaderRole"]" />
+
+            <TemplateColumn Title="@SharedGridL["HeaderGridActions"]" Context="item">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="@UiRoutes.AdminRoutes.Invites.Details(item.Id)" class="btn btn-sm btn-outline-primary">
+                        @SharedActionL["ButtonDetails"]
+                    </a>
+
+                    @if (item.CanResend)
+                    {
+                        <a href="@UiRoutes.AdminRoutes.Invites.InviteResend(item.Id)" class="btn btn-sm btn-outline-primary">
+                            @SharedActionL["ActionResend"]
+                        </a>
+                    }
+
+                    @if (item.CanRevoke)
+                    {
+                        <button class="btn btn-sm btn-outline-danger"
+                                @onclick="() => RevokeInviteAsync(item.Id)"
+                                disabled="@isBusy">
+                            @SharedActionL["ActionRevoke"]
+                        </button>
+                    }
+                </div>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+    <LocalizedPaginator State="paginationState" />
+
+    @if (!isBusy && totalCount == 0 && string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-info mt-3">@L["MessageInfoNoInvites"]</div>
+    }
+</div>
+
+@code {
+    private const int DefaultPageSize = 10;
+
+    private readonly PaginationState paginationState = new() { ItemsPerPage = DefaultPageSize };
+
+    private QuickGrid<InviteListItemResponse>? grid;
+    private GridItemsProvider<InviteListItemResponse> invitesProvider = default!;
+
+    // UI input bindings
+    private string searchText = string.Empty;
+    private HashSet<InviteChannel> selectedChannels = [];
+    private HashSet<InviteStatus> selectedStatuses = [];
+    private bool? searchHasAccount = null;
+
+    // Applied filters
+    private string appliedSearchText = string.Empty;
+    private HashSet<InviteChannel> appliedChannels = [];
+    private HashSet<InviteStatus> appliedStatuses = [];
+    private bool? appliedHasAccount = null;
+
+    private bool isBusy;
+    private string? error;
+    private int totalCount;
+
+    private int TotalPages => totalCount <= 0
+        ? 0
+        : (int)Math.Ceiling(totalCount / (double)paginationState.ItemsPerPage);
+
+    protected override void OnInitialized()
+    {
+        invitesProvider = async request =>
+        {
+            isBusy = true;
+            error = null;
+            _ = InvokeAsync(StateHasChanged);
+
+            try
+            {
+                int pageSize = request.Count ?? paginationState.ItemsPerPage;
+                int page = (request.StartIndex / pageSize) + 1;
+
+                var apiRequest = new GetInviteListQueryRequest(
+                    Search: appliedSearchText,
+                    Statuses: appliedStatuses.Count > 0 ? appliedStatuses : null,
+                    Channels: appliedChannels.Count > 0 ? appliedChannels : null,
+                    HasAccount: appliedHasAccount,
+                    Page: page,
+                    PageSize: pageSize);
+
+                InviteListResponse response = await ApiClient.GetInvitesAsync(apiRequest, request.CancellationToken);
+                totalCount = response.TotalCount;
+
+                return GridItemsProviderResult.From(response.Items.ToList(), response.TotalCount);
+            }
+            catch (OperationCanceledException)
+            {
+                return GridItemsProviderResult.From(Array.Empty<InviteListItemResponse>(), totalCount);
+            }
+            catch (Exception ex)
+            {
+                totalCount = 0;
+                error = L["MessageErrorLoadInvites", ex.Message];
+                return GridItemsProviderResult.From(Array.Empty<InviteListItemResponse>(), 0);
+            }
+            finally
+            {
+                isBusy = false;
+                _ = InvokeAsync(StateHasChanged);
+            }
+        };
+    }
+
+    private string SearchHasAccountString
+    {
+        get => searchHasAccount switch { true => "true", false => "false", _ => "" };
+        set => searchHasAccount = value switch { "true" => true, "false" => false, _ => null };
+    }
+
+    private Task OnSelectedChannelsChanged(HashSet<InviteChannel> values)
+    {
+        selectedChannels = values;
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedStatusesChanged(HashSet<InviteStatus> values)
+    {
+        selectedStatuses = values;
+        return Task.CompletedTask;
+    }
+
+    private async Task ApplySearchAsync()
+    {
+        appliedSearchText = searchText.Trim();
+        appliedChannels = [.. selectedChannels];
+        appliedStatuses = [.. selectedStatuses];
+        appliedHasAccount = searchHasAccount;
+
+        await RefreshGridAsync();
+    }
+
+    private async Task ClearSearchAsync()
+    {
+        searchText = string.Empty;
+        selectedChannels.Clear();
+        selectedStatuses.Clear();
+        searchHasAccount = null;
+
+        appliedSearchText = string.Empty;
+        appliedChannels.Clear();
+        appliedStatuses.Clear();
+        appliedHasAccount = null;
+
+        await RefreshGridAsync();
+    }
+
+    private async Task RefreshGridAsync()
+    {
+        if (paginationState.CurrentPageIndex != 0)
+        {
+            await paginationState.SetCurrentPageIndexAsync(0);
+        }
+        else if (grid is not null)
+        {
+            await grid.RefreshDataAsync();
+        }
+    }
+
+    private async Task RevokeInviteAsync(Guid inviteId)
+    {
+        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_RevokeInvite"]);
+        if (!confirm)
+        {
+            return;
+        }
+
+        try
+        {
+            isBusy = true;
+            error = null;
+
+            await ApiClient.RevokeInviteAsync(inviteId);
+
+            if (grid is not null)
+            {
+                await grid.RefreshDataAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            error = L["InfoCouldNotRevokeInvite", ex.Message];
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+}

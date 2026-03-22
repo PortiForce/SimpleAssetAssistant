@@ -1,0 +1,229 @@
+﻿.pf-auth-shell {
+    min-height: calc(100vh - 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at top, rgba(13, 110, 253, 0.08), transparent 35%), linear-gradient(180deg, #f8fafc 0%, #f3f6fb 100%);
+}
+
+.pf-auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 2rem;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #e9eef5;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+}
+
+.pf-auth-card--info {
+    max-width: 520px;
+}
+
+.pf-auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.pf-auth-brand-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    background: linear-gradient(135deg, #0d6efd, #4f8cff);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.22);
+}
+
+.pf-auth-product {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.pf-auth-product-subtext {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.pf-auth-header {
+    margin-bottom: 1.5rem;
+}
+
+.pf-auth-title {
+    margin: 0;
+    font-size: 1.9rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.pf-auth-subtitle {
+    margin: 0.5rem 0 0;
+    color: #64748b;
+    font-size: 0.98rem;
+}
+
+.pf-auth-providers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.pf-provider-btn {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.875rem;
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    border: 1px solid #dbe4f0;
+    background: #fff;
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+    .pf-provider-btn:hover {
+        transform: translateY(-1px);
+        border-color: #bfd1ea;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        color: #0f172a;
+        text-decoration: none;
+    }
+
+.pf-provider-btn__icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+}
+
+.pf-provider-btn__icon--mono,
+.pf-provider-btn__icon--telegram {
+    color: #111827;
+}
+
+.pf-provider-btn__label {
+    flex: 1;
+    text-align: left;
+}
+
+.pf-provider-btn__badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+}
+
+.pf-provider-btn--disabled {
+    opacity: 0.72;
+    cursor: not-allowed;
+    background: #fbfcfe;
+}
+
+    .pf-provider-btn--disabled:hover {
+        transform: none;
+        box-shadow: none;
+        border-color: #dbe4f0;
+    }
+
+.pf-auth-divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0 1rem;
+}
+
+    .pf-auth-divider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        border-top: 1px solid #e5eaf1;
+        transform: translateY(-50%);
+    }
+
+    .pf-auth-divider span {
+        position: relative;
+        display: inline-block;
+        padding: 0 0.75rem;
+        background: #fff;
+        color: #94a3b8;
+        font-size: 0.875rem;
+        text-transform: lowercase;
+    }
+
+.pf-auth-note,
+.pf-auth-info-text {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #64748b;
+}
+
+.pf-auth-info-box {
+    margin-top: 1.25rem;
+    padding: 1rem 1rem 1.05rem;
+    border-radius: 14px;
+    background: #f8fbff;
+    border: 1px solid #dce9fb;
+}
+
+.pf-auth-info-title {
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.pf-auth-footer-actions {
+    margin-top: 1.25rem;
+}
+
+.pf-auth-link {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .pf-auth-link:hover {
+        text-decoration: underline;
+    }
+
+code {
+    font-size: 0.875em;
+    padding: 0.12rem 0.35rem;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #334155;
+}
+
+@media (max-width: 576px) {
+    .pf-auth-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .pf-auth-title {
+        font-size: 1.55rem;
+    }
+
+    .pf-provider-btn {
+        min-height: 50px;
+        padding: 0.85rem 0.9rem;
+    }
+}

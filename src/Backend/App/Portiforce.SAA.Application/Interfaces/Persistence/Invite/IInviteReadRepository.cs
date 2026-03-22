@@ -9,10 +9,11 @@ namespace Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 {
 	Task<PagedResult<InviteListItemRaw>> GetListAsync(
-		TenantId requestTenantId,
-		InviteChannel? requestChannel,
-		InviteState? requestState,
-		string? requestSearch,
+		TenantId tenantId,
+		HashSet<InviteChannel>? channels,
+		HashSet<InviteState>? states,
+		string? search,
+		bool? hasAccount,
 		PageRequest requestPageRequest,
 		CancellationToken ct);
 

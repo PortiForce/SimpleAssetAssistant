@@ -1,45 +1,47 @@
 ﻿@page "/"
-@using Microsoft.AspNetCore.Components.Authorization
-@using Portiforce.SAA.Web.Client.Security
-@inject NavigationManager Navigation
+@inject ITenantUrlContext TenantUrlContext
 
-<PageTitle>PortiForce</PageTitle>
+@using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Contexts
+@inject IStringLocalizer<Home> L
 
-@if (IsTenantResolved())
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+@if (TenantUrlContext.IsTenantResolved())
 {
     <div class="hero">
         <div class="hero-card">
-            <h1>PortiForce — Simple Asset Assistant</h1>
+            <h1>@L["TitleProductName"]</h1>
             <p class="lead">
-                Import trades, reconcile activity, and understand your portfolio with clarity.
+                @L["SubtitleTenantResolvedLead"]
             </p>
 
             <AuthorizeView>
                 <Authorized>
-                    <div class="badge ok">You are signed in.</div>
-                    <p class="mt">Use the menu to navigate to your tenant features.</p>
+                    <div class="badge ok">@L["StatusSignedIn"]</div>
+                    <p class="mt">@L["InfoNavigateToTenantFeatures"]</p>
                 </Authorized>
                 <NotAuthorized>
-                    <div class="badge warn">Invite-only access.</div>
+                    <div class="badge warn">@L["StatusInviteOnlyAccess"]</div>
                     <p class="mt">
-                        If you have an invitation link, open it to join your tenant.
+                        @L["InfoOpenInvitationLinkToJoinTenant"]
                     </p>
-                    <a class="btn btn-primary" href="@AuthRoutes.Login">Log in</a>
+                    <a class="btn btn-primary" href="@AuthRoutes.Login">@L["ActionLogIn"]</a>
                 </NotAuthorized>
             </AuthorizeView>
 
             <div class="tiles">
                 <div class="tile">
-                    <div class="tile-title">Tenant isolation</div>
-                    <div class="tile-text">Each tenant lives in its own subdomain. No switching.</div>
+                    <div class="tile-title">@L["TileTitleTenantIsolation"]</div>
+                    <div class="tile-text">@L["TileTextTenantIsolation"]</div>
                 </div>
                 <div class="tile">
-                    <div class="tile-title">Invite-only onboarding</div>
-                    <div class="tile-text">Accounts are created only via admin invitation.</div>
+                    <div class="tile-title">@L["TileTitleInviteOnlyOnboarding"]</div>
+                    <div class="tile-text">@L["TileTextInviteOnlyOnboarding"]</div>
                 </div>
                 <div class="tile">
-                    <div class="tile-title">External login</div>
-                    <div class="tile-text">Google now, Apple later, Passkeys afterwards.</div>
+                    <div class="tile-title">@L["TileTitleExternalLogin"]</div>
+                    <div class="tile-text">@L["TileTextExternalLogin"]</div>
                 </div>
             </div>
         </div>
@@ -49,44 +51,55 @@ else
 {
     <div class="landing">
         <div class="landing-card">
-            <h1>PortiForce — Simple Asset Assistant</h1>
+            <h1>@L["TitleProductName"]</h1>
             <p class="lead">
-                A multi-tenant portfolio management platform that helps you track, reconcile, and understand your investment activities.
+                @L["SubtitleLandingLead"]
             </p>
 
             <div class="section">
-                <h2>What is PortiForce?</h2>
+                <h2>@L["SectionTitleWhatIsPortiForce"]</h2>
                 <p>
-                    PortiForce is a secure, multi-tenant application designed for investment professionals and organizations
-                    who need to manage asset portfolios across different clients or business units.
+                    @L["SectionTextWhatIsPortiForce"]
                 </p>
             </div>
 
             <div class="section">
-                <h2>Key Features</h2>
+                <h2>@L["SectionTitleKeyFeatures"]</h2>
                 <ul class="features-list">
-                    <li><strong>Tenant Isolation:</strong> Each organization operates in its own secure subdomain with complete data separation.</li>
-                    <li><strong>Activity Tracking:</strong> Import and reconcile trades, transactions, and other portfolio activities.</li>
-                    <li><strong>Asset Management:</strong> Track various asset types with comprehensive lifecycle support.</li>
-                    <li><strong>Secure Authentication:</strong> OAuth 2.0 integration with Google, with planned support for Apple and Passkeys.</li>
-                    <li><strong>Invite-Only Access:</strong> Controlled onboarding ensures only authorized users can join your tenant.</li>
+                    <li>
+                        <strong>@L["FeatureTenantIsolationTitle"]</strong>
+                        @L["FeatureTenantIsolationText"]
+                    </li>
+                    <li>
+                        <strong>@L["FeatureActivityTrackingTitle"]</strong>
+                        @L["FeatureActivityTrackingText"]
+                    </li>
+                    <li>
+                        <strong>@L["FeatureAssetManagementTitle"]</strong>
+                        @L["FeatureAssetManagementText"]
+                    </li>
+                    <li>
+                        <strong>@L["FeatureSecureAuthenticationTitle"]</strong>
+                        @L["FeatureSecureAuthenticationText"]
+                    </li>
+                    <li>
+                        <strong>@L["FeatureInviteOnlyAccessTitle"]</strong>
+                        @L["FeatureInviteOnlyAccessText"]
+                    </li>
                 </ul>
             </div>
 
             <div class="section">
-                <h2>How It Works</h2>
+                <h2>@L["SectionTitleHowItWorks"]</h2>
                 <p>
-                    PortiForce uses a subdomain-based multi-tenancy model. To access your organization's instance,
-                    navigate to <strong>yourcompany.{baseDomain}</strong> where your data and users are completely isolated
-                    from other tenants.
+                    @L["SectionTextHowItWorks", $"yourcompany.{baseDomain}"]
                 </p>
             </div>
 
             <div class="section info-box">
-                <h3>Need Access?</h3>
+                <h3>@L["InfoBoxTitleNeedAccess"]</h3>
                 <p>
-                    PortiForce is an invite-only platform. If you've received an invitation link from your organization,
-                    use it to access your tenant. Otherwise, contact your organization's administrator.
+                    @L["InfoBoxTextNeedAccess"]
                 </p>
             </div>
         </div>
@@ -94,45 +107,16 @@ else
 }
 
 @code {
-    private bool IsTenantResolved()
+    private string baseDomain { get; set; }
+
+    protected override void OnInitialized()
     {
-        var uri = new Uri(Navigation.Uri);
-        var host = uri.Host;
-        
-        var parts = host.Split('.');
-        
-       return parts.Length > 2;
+        baseDomain = ResolveBaseDomain();
+    }
+
+    private string ResolveBaseDomain()
+    {
+        var parts = TenantUrlContext.GetDomainParts();
+        return parts.Length > 2 ? parts.Last() : string.Empty;
     }
 }
-
-<style>
-.hero { padding: 18px; display: flex; justify-content: center; }
-.hero-card { max-width: 900px; width: 100%; border: 1px solid #e5e7eb; border-radius: 18px; padding: 18px; }
-.lead { opacity: .85; }
-.mt { margin-top: 10px; }
-.btn { display: inline-block; padding: 10px 14px; border-radius: 12px; text-decoration: none; }
-.btn-primary { background: #111827; color: #fff; }
-.badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; margin-top: 10px; }
-.badge.ok { background: #dcfce7; color: #166534; }
-.badge.warn { background: #fef9c3; color: #854d0e; }
-.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 16px; }
-.tile { border: 1px solid #e5e7eb; border-radius: 14px; padding: 12px; }
-.tile-title { font-weight: 600; }
-.tile-text { opacity: .85; font-size: 13px; margin-top: 6px; }
-
-.landing { padding: 24px; display: flex; justify-content: center; background: linear-gradient(to bottom, #f9fafb, #ffffff); }
-.landing-card { max-width: 1000px; width: 100%; }
-.landing h1 { font-size: 2.5rem; margin-bottom: 16px; color: #111827; }
-.landing .lead { font-size: 1.25rem; margin-bottom: 32px; color: #4b5563; line-height: 1.6; }
-.section { margin-bottom: 32px; }
-.section h2 { font-size: 1.75rem; margin-bottom: 12px; color: #111827; }
-.section h3 { font-size: 1.25rem; margin-bottom: 8px; color: #111827; }
-.section p { color: #4b5563; line-height: 1.7; margin-bottom: 12px; }
-.features-list { list-style: none; padding: 0; }
-.features-list li { padding: 12px 0; border-bottom: 1px solid #e5e7eb; color: #4b5563; line-height: 1.7; }
-.features-list li:last-child { border-bottom: none; }
-.features-list strong { color: #111827; }
-.info-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 20px; }
-.info-box h3 { color: #0369a1; }
-.info-box p { color: #0c4a6e; margin-bottom: 0; }
-</style>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Portiforce.SAA.Core.Activities.Models.Activities;
+using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Ledger;

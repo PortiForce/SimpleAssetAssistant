@@ -28,4 +28,9 @@ public enum InviteState : byte
 	/// Edge case : invite were failed (unsuccessful during an accept attempt)
 	/// </summary>
 	AcceptAttemptFailed = 5,
+
+	/// <summary>
+	/// link has expired already
+	/// </summary>
+	Expired = 6
 }

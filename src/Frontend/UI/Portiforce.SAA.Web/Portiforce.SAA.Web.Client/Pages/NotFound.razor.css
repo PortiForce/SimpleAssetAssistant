@@ -1,0 +1,32 @@
+﻿.nf {
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+}
+
+.nf-card {
+    max-width: 700px;
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+}
+
+.nf-code {
+    font-size: 56px;
+    font-weight: 800;
+    opacity: .25;
+}
+
+.nf-text {
+    opacity: .85;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+}

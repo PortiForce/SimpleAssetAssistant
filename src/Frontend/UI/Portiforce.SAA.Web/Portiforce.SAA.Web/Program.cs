@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
@@ -62,6 +61,7 @@ public class Program
 		builder.Services.AddMemoryCache();
 
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
+		builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
 
 		// Scan and Register all Endpoints
 		builder.Services.AddEndpoints(typeof(Program).Assembly);
@@ -165,25 +165,17 @@ public class Program
 			options.HeaderName = "RequestVerificationToken";
 		});
 
+		builder.Services.AddProblemDetails();
+
+		builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 		var app = builder.Build();
-
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseWebAssemblyDebugging();
-		}
-		else
-		{
-			app.UseExceptionHandler("/Error");
-			app.UseHsts();
-		}
-
-		app.UseHttpsRedirection();
-		app.UseStaticFiles();
-		app.UseRouting();
 
 		var supportedCultures = new[]
 		{
+			new CultureInfo("en"),
 			new CultureInfo("en-US"),
+			new CultureInfo("uk"),
 			new CultureInfo("uk-UA")
 		};
 
@@ -199,6 +191,20 @@ public class Program
 		};
 
 		app.UseRequestLocalization(localizationOptions);
+
+		if (app.Environment.IsDevelopment())
+		{
+			app.UseWebAssemblyDebugging();
+		}
+		else
+		{
+			app.UseExceptionHandler("/Error");
+			app.UseHsts();
+		}
+
+		app.UseHttpsRedirection();
+		app.UseStaticFiles();
+		app.UseRouting();
 
 		// Tenant must run early
 		app.UseMiddleware<TenantResolutionMiddleware>();

@@ -1,0 +1,3 @@
+﻿::deep tbody tr[aria-hidden="true"] {
+    display: none;
+}

@@ -25,7 +25,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		{
 			throw new DomainValidationException("AssetId must be defined.");
 		}
-		if (string.IsNullOrWhiteSpace(code.Value))
+		if (code == null || string.IsNullOrWhiteSpace(code.Value))
 		{
 			throw new DomainValidationException("AssetCode must be defined.");
 		}
