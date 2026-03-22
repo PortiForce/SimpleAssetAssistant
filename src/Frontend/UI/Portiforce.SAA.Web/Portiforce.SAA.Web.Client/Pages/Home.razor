@@ -1,12 +1,13 @@
 ﻿@page "/"
-@inject NavigationManager Navigation
+@inject ITenantUrlContext TenantUrlContext
 
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Contexts
 @inject IStringLocalizer<Home> L
 
 <PageTitle>@L["PageTitle"]</PageTitle>
 
-@if (IsTenantResolved())
+@if (TenantUrlContext.IsTenantResolved())
 {
     <div class="hero">
         <div class="hero-card">
@@ -113,24 +114,9 @@ else
         baseDomain = ResolveBaseDomain();
     }
 
-    private bool IsTenantResolved()
-    {
-        var parts = GetDomainParts();
-        return parts.Length > 2;
-    }
-
     private string ResolveBaseDomain()
     {
-        var parts = GetDomainParts();
+        var parts = TenantUrlContext.GetDomainParts();
         return parts.Length > 2 ? parts.Last() : string.Empty;
-    }
-
-    private string[] GetDomainParts()
-    {
-        var uri = new Uri(Navigation.Uri);
-        var host = uri.Host;
-
-        var parts = host.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        return parts;
     }
 }

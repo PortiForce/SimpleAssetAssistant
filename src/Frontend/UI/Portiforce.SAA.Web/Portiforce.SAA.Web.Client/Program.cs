@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using System.Globalization;
 using Microsoft.JSInterop;
-
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Web.Client.Configuration;
 using Portiforce.SAA.Web.Client.Services;
 using Portiforce.SAA.Web.Client.Services.Interfaces;
 using Portiforce.SAA.Web.Client.Services.Security;
+using Portiforce.SAA.Contracts.Contexts;
 
 namespace Portiforce.SAA.Web.Client;
 
@@ -44,7 +44,9 @@ internal class Program
 		builder.Services.AddScoped<BrowserCredentialsHandler>();
 		builder.Services.AddScoped<AntiforgeryTokenStore>();
 		builder.Services.AddScoped<AntiforgeryHandler>();
-			
+
+		builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
+
 		builder.Services.AddHttpClient(WebClientConstants.NoAntiforgeryClientName, client =>
 			{
 				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);

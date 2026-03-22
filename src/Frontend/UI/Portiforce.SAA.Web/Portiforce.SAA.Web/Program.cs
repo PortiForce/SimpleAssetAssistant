@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
@@ -62,6 +61,7 @@ public class Program
 		builder.Services.AddMemoryCache();
 
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
+		builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
 
 		// Scan and Register all Endpoints
 		builder.Services.AddEndpoints(typeof(Program).Assembly);

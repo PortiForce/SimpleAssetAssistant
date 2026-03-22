@@ -1,6 +1,8 @@
 @implements IDisposable
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Contexts
 
+@inject ITenantUrlContext TenantUrlContext
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<LoginDisplay> L
 
@@ -39,7 +41,7 @@
 
     private bool IsTenantResolved()
     {
-        var parts = GetDomainParts();
+        var parts = TenantUrlContext.GetDomainParts();
         return parts.Length > 2;
     }
 
@@ -62,14 +64,5 @@
             ?? user.FindFirst("preferred_username")?.Value
             ?? user.FindFirst("email")?.Value?.Split('@')[0]
             ?? "User";
-    }
-
-    private string[] GetDomainParts()
-    {
-        var uri = new Uri(NavigationManager.Uri);
-        var host = uri.Host;
-
-        var parts = host.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        return parts;
     }
 }

@@ -1,12 +1,14 @@
 @page "/auth/login"
 @inject NavigationManager Navigation
 
+@inject ITenantUrlContext TenantUrlContext
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Contexts
 @inject IStringLocalizer<Login> L
 
 <PageTitle>@L["PageTitle"]</PageTitle>
 
-@if (!IsTenantResolved())
+@if (!TenantUrlContext.IsTenantResolved())
 {
     <div class="pf-auth-shell">
         <div class="pf-auth-card pf-auth-card--info">
@@ -109,15 +111,6 @@ else
     {
         var uri = new Uri(Navigation.Uri);
         _inviteToken = TryGetQueryParam(uri, "inviteToken");
-    }
-
-    private bool IsTenantResolved()
-    {
-        var uri = new Uri(Navigation.Uri);
-        var host = uri.Host;
-
-        var parts = host.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        return parts.Length > 2;
     }
 
     private static string? TryGetQueryParam(Uri uri, string key)
