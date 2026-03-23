@@ -1,7 +1,6 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
-using System.Globalization;
-
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Contracts.Contexts;
@@ -25,7 +24,7 @@ public class Program
 {
 	public static void Main(string[] args)
 	{
-		var builder = WebApplication.CreateBuilder(args);
+		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 		builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -45,7 +44,7 @@ public class Program
 		builder.Services.AddHttpClient<TenantApiClient>((sp, http) =>
 		{
 			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			                          ?? throw new InvalidOperationException("TenantApiClient requires an active HttpContext.");
+									  ?? throw new InvalidOperationException("TenantApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
 		});
@@ -53,11 +52,11 @@ public class Program
 		builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
 		{
 			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			                          ?? throw new InvalidOperationException("AdminApiClient requires an active HttpContext.");
+									  ?? throw new InvalidOperationException("AdminApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
 		});
-		
+
 		builder.Services.AddMemoryCache();
 
 		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
@@ -141,7 +140,7 @@ public class Program
 			options.AddPolicy(UiPolicies.PlatformAdmin, p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantAdmin, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 			options.AddPolicy(UiPolicies.TenantUser, p => p.RequireRole(UiRoles.TenantUser, UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-			
+
 			// Granular (start small)
 			options.AddPolicy(UiPolicies.InviteUsers, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 		});

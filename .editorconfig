@@ -287,3 +287,11 @@ dotnet_diagnostic.CA2007.severity = none
 
 # IDE0058: Expression value is never used
 dotnet_diagnostic.IDE0058.severity = none
+
+[*.cs]
+# tabs and spaces
+dotnet_diagnostic.SA1027.severity = none
+# elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+# using directive should appear within namespace declaration
+dotnet_diagnostic.SA1200.severity = none
