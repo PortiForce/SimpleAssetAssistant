@@ -295,3 +295,6 @@ dotnet_diagnostic.SA1027.severity = none
 dotnet_diagnostic.SA1600.severity = none
 # using directive should appear within namespace declaration
 dotnet_diagnostic.SA1200.severity = none
+
+[**/Portiforce.SAA.Domain.Tests*/**.cs]
+dotnet_diagnostic.CA1707.severity = none
