@@ -3,5 +3,6 @@
 public enum TransferDirection : byte
 {
 	Deposit = 1,
+
 	Withdrawal = 2
 }

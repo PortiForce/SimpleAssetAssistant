@@ -14,7 +14,8 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		TenantId tenantId,
 		AuthProvider provider,
 		string providerSubject,
-		bool isPrimary) : base(id)
+		bool isPrimary)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -33,21 +34,24 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 
 		string providerSubjectValue = NormalizeAndValidateProviderSubject(providerSubject);
 
-		AccountId = accountId;
-		TenantId = tenantId;
-		Provider = provider;
-		ProviderSubject = providerSubjectValue;
-		IsPrimary = isPrimary;
+		this.AccountId = accountId;
+		this.TenantId = tenantId;
+		this.Provider = provider;
+		this.ProviderSubject = providerSubjectValue;
+		this.IsPrimary = isPrimary;
 	}
 
 	// Private Empty Constructor for EF Core
 	private ExternalIdentity()
 	{
-
 	}
+
 	public TenantId TenantId { get; init; }
+
 	public AccountId AccountId { get; init; }
+
 	public AuthProvider Provider { get; init; }
+
 	public string ProviderSubject { get; init; }
 
 	public bool IsPrimary { get; private set; }
@@ -67,8 +71,9 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 			providerSubject,
 			isPrimary);
 
-	public void MarkPrimary() => IsPrimary = true;
-	public void UnmarkPrimary() => IsPrimary = false;
+	public void MarkPrimary() => this.IsPrimary = true;
+
+	public void UnmarkPrimary() => this.IsPrimary = false;
 
 	private static string NormalizeAndValidateProviderSubject(string providerSubject)
 	{
@@ -80,7 +85,8 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 		// Google 'sub' is short, passkey subjects can vary
 		if (providerSubject.Length > EntityConstraints.CommonSettings.ProviderSubjectMaxLength)
 		{
-			throw new DomainValidationException($"ProviderSubject is too long (max {EntityConstraints.CommonSettings.ProviderSubjectMaxLength}).");
+			throw new DomainValidationException(
+				$"ProviderSubject is too long (max {EntityConstraints.CommonSettings.ProviderSubjectMaxLength}).");
 		}
 
 		return providerSubject.Trim();

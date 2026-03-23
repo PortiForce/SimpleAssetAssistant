@@ -2,7 +2,7 @@
 
 namespace Portiforce.SAA.Core.Activities.Models;
 
-public sealed record ExternalMetadata 
+public sealed record ExternalMetadata
 {
 	public ExternalMetadata(
 		string source,
@@ -20,27 +20,26 @@ public sealed record ExternalMetadata
 			throw new DomainValidationException("Either externalId or fingerprint are required.");
 		}
 
-		Source = source;
-		ExternalId = externalId;
-		Fingerprint = fingerprint;
-		Notes = notes;
+		this.Source = source;
+		this.ExternalId = externalId;
+		this.Fingerprint = fingerprint;
+		this.Notes = notes;
 	}
 
 	// Private Empty Constructor for EF Core
-	private ExternalMetadata() { }
+	private ExternalMetadata()
+	{
+	}
 
 	public string Source { get; init; } = null!;
+
 	public string? ExternalId { get; init; }
+
 	public string? Fingerprint { get; init; }
+
 	public string? Notes { get; init; }
 
-	public bool IsExternalIdDriven()
-	{
-		return !string.IsNullOrWhiteSpace(ExternalId);
-	}
+	public bool IsExternalIdDriven() => !string.IsNullOrWhiteSpace(this.ExternalId);
 
-	public string GetPrimaryId()
-	{
-		return IsExternalIdDriven() ? ExternalId : Fingerprint;
-	}
+	public string GetPrimaryId() => this.IsExternalIdDriven() ? this.ExternalId : this.Fingerprint;
 }

@@ -9,6 +9,14 @@ namespace Portiforce.SAA.Core.Identity.Models.Client;
 
 public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 {
+	private readonly HashSet<AssetId> _restrictedAssets = [];
+
+	private readonly HashSet<PlatformId> _restrictedPlatforms = [];
+
+	private readonly List<TenantRestrictedAsset> _restrictedTenantAssets = [];
+
+	private readonly List<TenantRestrictedPlatform> _restrictedTenantPlatforms = [];
+
 	private Tenant(
 		TenantId id,
 		string name,
@@ -17,7 +25,8 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		string domainPrefix,
 		TenantState state,
 		TenantPlan plan,
-		TenantSettings settings) :base(id)
+		TenantSettings settings)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -31,46 +40,43 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 		name = NormalizeAndValidateTenantName(name);
 
-		Name = name;
-		Code = code;
-		BrandName = brandName;
-		DomainPrefix = domainPrefix;
-		State = state;
-		Plan = plan;
-		Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
+		this.Name = name;
+		this.Code = code;
+		this.BrandName = brandName;
+		this.DomainPrefix = domainPrefix;
+		this.State = state;
+		this.Plan = plan;
+		this.Settings = settings ?? throw new DomainValidationException("TenantSettings is required.");
 	}
 
 	// Private Empty Constructor for EF Core
 	private Tenant()
 	{
-		
 	}
 
 	public string Name { get; private set; }
+
 	public string Code { get; init; }
+
 	public string? BrandName { get; private set; }
+
 	public string DomainPrefix { get; init; }
+
 	public TenantState State { get; private set; }
+
 	public TenantSettings Settings { get; private set; }
+
 	public TenantPlan Plan { get; private set; }
 
-	private readonly HashSet<AssetId> _restrictedAssets = new();
-
-	private readonly HashSet<PlatformId> _restrictedPlatforms = new();
-
-	private readonly List<TenantRestrictedAsset> _restrictedTenantAssets = new();
-
-	private readonly List<TenantRestrictedPlatform> _restrictedTenantPlatforms = new();
+	/// <summary>
+	///     Company/tenant related country specific list of restricted assets
+	/// </summary>
+	public IReadOnlyCollection<TenantRestrictedAsset> RestrictedAssets => this._restrictedTenantAssets;
 
 	/// <summary>
-	/// Company/tenant related country specific list of restricted assets
+	///     Company/tenant related country specific list of restricted platforms
 	/// </summary>
-	public IReadOnlyCollection<TenantRestrictedAsset> RestrictedAssets => _restrictedTenantAssets;
-
-	/// <summary>
-	/// Company/tenant related country specific list of restricted platforms
-	/// </summary>
-	public IReadOnlyCollection<TenantRestrictedPlatform> RestrictedPlatforms => _restrictedTenantPlatforms;
+	public IReadOnlyCollection<TenantRestrictedPlatform> RestrictedPlatforms => this._restrictedTenantPlatforms;
 
 	public static Tenant Create(
 		string name,
@@ -93,7 +99,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 	public void Rename(string name)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
@@ -106,52 +112,52 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 			throw new DomainValidationException("Tenant name must be 2..100 characters.");
 		}
 
-		Name = name;
+		this.Name = name;
 	}
 
 	public void ChangeState(TenantState newState)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		// todo: keep state machine minimal for now
-		State = newState;
+		this.State = newState;
 	}
 
 	public void ChangePlan(TenantPlan plan)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
-		Plan = plan;
+		this.Plan = plan;
 	}
 
 	public void UpdateSettings(TenantSettings newSettings)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
-		Settings = newSettings ?? throw new DomainValidationException("Settings cannot be null.");
+		this.Settings = newSettings ?? throw new DomainValidationException("Settings cannot be null.");
 	}
 
 	private void SyncRestrictedAssetsFromEf()
 	{
-		_restrictedAssets.Clear();
-		foreach (var r in _restrictedTenantAssets)
+		this._restrictedAssets.Clear();
+		foreach (TenantRestrictedAsset r in this._restrictedTenantAssets)
 		{
-			_restrictedAssets.Add(r.AssetId);
+			_ = this._restrictedAssets.Add(r.AssetId);
 		}
 	}
 
 	private void SyncRestrictedPlatformsFromEf()
 	{
-		_restrictedPlatforms.Clear();
-		foreach (var r in _restrictedTenantPlatforms)
+		this._restrictedPlatforms.Clear();
+		foreach (TenantRestrictedPlatform r in this._restrictedTenantPlatforms)
 		{
-			_restrictedPlatforms.Add(r.PlatformId);
+			_ = this._restrictedPlatforms.Add(r.PlatformId);
 		}
 	}
 
 	public void UpdateRestrictedAssetList(IReadOnlyCollection<AssetId> assetIds, bool isRestricted)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (assetIds.Count == 0)
 		{
@@ -160,21 +166,21 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 		if (isRestricted)
 		{
-			foreach (var assetId in assetIds)
+			foreach (AssetId assetId in assetIds)
 			{
-				if (_restrictedAssets.Add(assetId))
+				if (this._restrictedAssets.Add(assetId))
 				{
-					_restrictedTenantAssets.Add(new TenantRestrictedAsset(Id, assetId));
+					this._restrictedTenantAssets.Add(new TenantRestrictedAsset(this.Id, assetId));
 				}
 			}
 		}
 		else
 		{
-			foreach (var assetId in assetIds)
+			foreach (AssetId assetId in assetIds)
 			{
-				if (_restrictedAssets.Remove(assetId))
+				if (this._restrictedAssets.Remove(assetId))
 				{
-					_restrictedTenantAssets.RemoveAll(x => x.AssetId == assetId);
+					_ = this._restrictedTenantAssets.RemoveAll(x => x.AssetId == assetId);
 				}
 			}
 		}
@@ -182,7 +188,7 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 	public void UpdateRestrictedPlatformList(IReadOnlyCollection<PlatformId> platformIds, bool isRestricted)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (platformIds.Count == 0)
 		{
@@ -191,21 +197,21 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 		if (isRestricted)
 		{
-			foreach (var platformId in platformIds)
+			foreach (PlatformId platformId in platformIds)
 			{
-				if (_restrictedPlatforms.Add(platformId))
+				if (this._restrictedPlatforms.Add(platformId))
 				{
-					_restrictedTenantPlatforms.Add(new TenantRestrictedPlatform(Id, platformId));
+					this._restrictedTenantPlatforms.Add(new TenantRestrictedPlatform(this.Id, platformId));
 				}
 			}
 		}
 		else
 		{
-			foreach (var platformId in platformIds)
+			foreach (PlatformId platformId in platformIds)
 			{
-				if (_restrictedPlatforms.Remove(platformId))
+				if (this._restrictedPlatforms.Remove(platformId))
 				{
-					_restrictedTenantPlatforms.RemoveAll(x => x.PlatformId == platformId);
+					_ = this._restrictedTenantPlatforms.RemoveAll(x => x.PlatformId == platformId);
 				}
 			}
 		}
@@ -213,9 +219,9 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 
 	private void EnsureEditable()
 	{
-		if (State is TenantState.Deleted)
+		if (this.State is TenantState.Deleted)
 		{
-			throw new DomainValidationException($"Tenant is deleted and cannot be changed. TenantId: {Id}");
+			throw new DomainValidationException($"Tenant is deleted and cannot be changed. TenantId: {this.Id}");
 		}
 	}
 

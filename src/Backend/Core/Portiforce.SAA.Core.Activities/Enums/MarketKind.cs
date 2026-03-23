@@ -3,5 +3,6 @@
 public enum MarketKind : byte
 {
 	Spot = 1,
+
 	Futures = 2
 }

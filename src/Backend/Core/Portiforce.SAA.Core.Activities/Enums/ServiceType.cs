@@ -3,5 +3,6 @@
 public enum ServiceType : byte
 {
 	Custody = 1,
+
 	Subscription = 2
 }

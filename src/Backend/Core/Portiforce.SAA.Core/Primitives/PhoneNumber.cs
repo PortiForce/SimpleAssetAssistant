@@ -5,15 +5,14 @@ public sealed record PhoneNumber
 	// Private Empty Constructor for EF Core
 	private PhoneNumber()
 	{
-
 	}
-
-	public string Value { get; init; } = null!;
 
 	private PhoneNumber(string value)
 	{
-		Value = value;
+		this.Value = value;
 	}
+
+	public string Value { get; init; } = null!;
 
 	public static bool TryCreate(string rawData, out PhoneNumber phoneNumber)
 	{
@@ -36,7 +35,7 @@ public sealed record PhoneNumber
 			throw new ArgumentException("Phone number cannot be empty", nameof(rawData));
 		}
 
-		var normalized = Normalize(rawData);
+		string normalized = Normalize(rawData);
 
 		if (!IsValid(normalized))
 		{
@@ -46,7 +45,7 @@ public sealed record PhoneNumber
 		return new PhoneNumber(normalized);
 	}
 
-	public override string ToString() => Value;
+	public override string ToString() => this.Value;
 
 	private static string Normalize(string input)
 	{
@@ -57,7 +56,7 @@ public sealed record PhoneNumber
 			throw new ArgumentException("Phone number must be in E.164 international format (+...).", nameof(input));
 		}
 
-		string digitsOnly = new string(input.Skip(1).Where(char.IsDigit).ToArray());
+		string digitsOnly = new(input.Skip(1).Where(char.IsDigit).ToArray());
 		return "+" + digitsOnly;
 	}
 

@@ -9,7 +9,7 @@ public static class DateExtensions
 
 	public static bool TryFromUnixSeconds(string unixRawDate, out DateTimeOffset value)
 	{
-		if (long.TryParse(unixRawDate, NumberStyles.Integer, CultureInfo.InvariantCulture, out var seconds))
+		if (long.TryParse(unixRawDate, NumberStyles.Integer, CultureInfo.InvariantCulture, out long seconds))
 		{
 			value = DateTimeOffset.FromUnixTimeSeconds(seconds);
 			return true;

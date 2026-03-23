@@ -3,5 +3,6 @@
 public enum FuturesContractKind : byte
 {
 	Perpetual = 1,
+
 	Dated = 2
 }

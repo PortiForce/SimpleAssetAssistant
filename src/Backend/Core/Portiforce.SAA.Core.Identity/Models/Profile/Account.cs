@@ -17,7 +17,8 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		AccountState state,
 		AccountTier tier,
 		ContactInfo contact,
-		AccountSettings settings): base(id)
+		AccountSettings settings)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -31,31 +32,34 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 
 		alias = NormalizeAndValidateAlias(alias);
 
-		TenantId = tenantId;
-		Alias = alias;
+		this.TenantId = tenantId;
+		this.Alias = alias;
 
-		Role = role;
-		State = state;
-		Tier = tier;
+		this.Role = role;
+		this.State = state;
+		this.Tier = tier;
 
-		Contact = contact;
-		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
+		this.Contact = contact;
+		this.Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
 	// Private Empty Constructor for EF Core
 	private Account()
 	{
-
 	}
 
 	public TenantId TenantId { get; init; }
+
 	public string Alias { get; init; }
 
 	public Role Role { get; private set; }
+
 	public AccountState State { get; private set; }
+
 	public AccountTier Tier { get; private set; }
 
 	public ContactInfo Contact { get; private set; }
+
 	public AccountSettings Settings { get; private set; }
 
 	public static Account Create(
@@ -83,45 +87,46 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 
 	public void ChangeRole(Role role)
 	{
-		EnsureEditable();
-		Role = role;
+		this.EnsureEditable();
+		this.Role = role;
 	}
 
 	public void ChangeTier(AccountTier tier)
 	{
-		EnsureEditable();
-		Tier = tier;
+		this.EnsureEditable();
+		this.Tier = tier;
 	}
 
 	public void Suspend()
 	{
-		EnsureEditable();
-		State = AccountState.Suspended;
+		this.EnsureEditable();
+		this.State = AccountState.Suspended;
 	}
 
 	public void Disable()
 	{
-		EnsureEditable();
-		State = AccountState.Disabled;
+		this.EnsureEditable();
+		this.State = AccountState.Disabled;
 	}
 
 	public void UpdateContact(ContactInfo contact)
 	{
-		EnsureEditable();
-		Contact = contact;
+		this.EnsureEditable();
+		this.Contact = contact;
 	}
 
 	public void UpdateSettings(AccountSettings settings)
 	{
-		EnsureEditable();
-		Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
+		this.EnsureEditable();
+		this.Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
 	private void EnsureEditable()
 	{
-		if (State is AccountState.Disabled or AccountState.Deleted)
+		if (this.State is AccountState.Disabled or AccountState.Deleted)
 		{
-			throw new DomainValidationException($"Account is not editable in state: {State}. AccountId: {Id}");
+			throw new DomainValidationException(
+				$"Account is not editable in state: {this.State}. AccountId: {this.Id}");
 		}
 	}
 

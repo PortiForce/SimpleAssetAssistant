@@ -7,9 +7,9 @@ public sealed class FiatCurrencyTests
 	[Fact]
 	public void Create_ShouldTrimAndUppercase()
 	{
-		var c = FiatCurrency.Create("  usd  ");
-		c.Code.Should().Be("USD");
-		c.ToString().Should().Be("USD");
+		FiatCurrency c = FiatCurrency.Create("  usd  ");
+		_ = c.Code.Should().Be("USD");
+		_ = c.ToString().Should().Be("USD");
 	}
 
 	[Theory]
@@ -18,8 +18,8 @@ public sealed class FiatCurrencyTests
 	[InlineData("   ")]
 	public void Create_WhenEmpty_ShouldThrow(string? raw)
 	{
-		var act = () => FiatCurrency.Create(raw!);
-		act.Should().Throw<ArgumentException>();
+		Func<FiatCurrency> act = () => FiatCurrency.Create(raw!);
+		_ = act.Should().Throw<ArgumentException>();
 	}
 
 	[Theory]
@@ -29,7 +29,7 @@ public sealed class FiatCurrencyTests
 	[InlineData("12A")]
 	public void Create_WhenInvalidCode_ShouldThrow(string raw)
 	{
-		var act = () => FiatCurrency.Create(raw);
-		act.Should().Throw<ArgumentException>();
+		Func<FiatCurrency> act = () => FiatCurrency.Create(raw);
+		_ = act.Should().Throw<ArgumentException>();
 	}
 }

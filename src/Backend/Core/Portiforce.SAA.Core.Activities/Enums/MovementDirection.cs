@@ -3,5 +3,6 @@
 public enum MovementDirection : byte
 {
 	Outflow = 1,
+
 	Inflow = 2
 }

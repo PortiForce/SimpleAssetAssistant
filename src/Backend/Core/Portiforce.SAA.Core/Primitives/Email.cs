@@ -1,16 +1,20 @@
-﻿namespace Portiforce.SAA.Core.Primitives;
+﻿using System.Net.Mail;
+
+namespace Portiforce.SAA.Core.Primitives;
 
 public sealed record Email
 {
 	// Private Empty Constructor for EF Core
 	private Email()
 	{
+	}
 
+	private Email(string value)
+	{
+		this.Value = value;
 	}
 
 	public string Value { get; init; } = null!;
-
-	private Email(string value) => Value = value;
 
 	public static bool TryCreate(string rawData, out Email email)
 	{
@@ -48,13 +52,13 @@ public sealed record Email
 		return new Email(normalized);
 	}
 
-	public override string ToString() => Value;
+	public override string ToString() => this.Value;
 
 	private static bool IsValid(string email)
 	{
 		try
 		{
-			var addr = new System.Net.Mail.MailAddress(email);
+			MailAddress addr = new(email);
 
 			// This prevents some edge cases where MailAddress accepts but normalizes unexpectedly.
 			// It also ensures we don't accept values with display names etc.

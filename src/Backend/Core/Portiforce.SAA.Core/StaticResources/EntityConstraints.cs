@@ -14,7 +14,7 @@ public static class EntityConstraints
 		public const int EmailAddressDefaultLength = 100;
 
 		/// <summary>
-		/// common naming validations
+		///     Common naming validations
 		/// </summary>
 		public const int NameMaxLength = 100;
 
@@ -60,7 +60,7 @@ public static class EntityConstraints
 			public const int EmailMaxLength = 100;
 			public const int PhoneNumberMaxLength = 15;
 		}
-		
+
 		public static class Platform
 		{
 			public const int NameMinLength = 3;

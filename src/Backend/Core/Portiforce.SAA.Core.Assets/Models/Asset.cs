@@ -11,7 +11,7 @@ namespace Portiforce.SAA.Core.Assets.Models;
 
 public sealed class Asset : Entity<AssetId>, IAggregateRoot
 {
-	private readonly HashSet<AssetCode> _synonyms = new();
+	private readonly HashSet<AssetCode> _synonyms = [];
 
 	private Asset(
 		AssetId id,
@@ -19,47 +19,58 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 		AssetKind kind,
 		AssetLifecycleState state,
 		string? name,
-		byte nativeDecimals) : base(id)
+		byte nativeDecimals)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
 			throw new DomainValidationException("AssetId must be defined.");
 		}
+
 		if (code == null || string.IsNullOrWhiteSpace(code.Value))
 		{
 			throw new DomainValidationException("AssetCode must be defined.");
 		}
+
 		if (nativeDecimals > EntityConstraints.Domain.Asset.NativeDecimalsMaxLength)
 		{
-			throw new DomainValidationException($"NativeDecimals must be <= {EntityConstraints.Domain.Asset.NativeDecimalsMaxLength}.");
+			throw new DomainValidationException(
+				$"NativeDecimals must be <= {EntityConstraints.Domain.Asset.NativeDecimalsMaxLength}.");
 		}
+
 		if (state == AssetLifecycleState.Deleted)
 		{
 			throw new DomainValidationException("State  cannot be Deleted for new Entity");
 		}
 
-		if (name is {Length: > EntityConstraints.CommonSettings.NameMaxLength})
+		if (name is { Length: > EntityConstraints.CommonSettings.NameMaxLength })
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
+			throw new ArgumentException(
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
+				nameof(name));
 		}
 
-		Code = code;
-		Kind = kind;
-		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
-		NativeDecimals = nativeDecimals;
-		State = state;
+		this.Code = code;
+		this.Kind = kind;
+		this.Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+		this.NativeDecimals = nativeDecimals;
+		this.State = state;
 	}
 
 	// Private Empty Constructor for EF Core
 	private Asset()
 	{
-		_synonyms = new HashSet<AssetCode>();
+		this._synonyms = [];
 	}
 
 	public AssetCode Code { get; init; }
+
 	public AssetKind Kind { get; init; }
+
 	public string? Name { get; private set; }
+
 	public byte NativeDecimals { get; private set; }
+
 	public AssetLifecycleState State { get; private set; } = AssetLifecycleState.Draft;
 
 	public static Asset Create(
@@ -79,7 +90,7 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 
 	public void Rename(string? name)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
@@ -88,62 +99,61 @@ public sealed class Asset : Entity<AssetId>, IAggregateRoot
 
 		if (name.Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
+			throw new ArgumentException(
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
+				nameof(name));
 		}
-		Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+
+		this.Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
 	}
 
 	public bool RegisterSynonym(AssetCode code)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
-		if (code.Value == Code.Value)
+		if (code.Value == this.Code.Value)
 		{
 			return false;
 		}
 
-		return _synonyms.Add(code);
+		return this._synonyms.Add(code);
 	}
 
-	public IReadOnlySet<AssetCode> GetSynonyms()
-	{
-		return _synonyms;
-	}
+	public IReadOnlySet<AssetCode> GetSynonyms() => this._synonyms;
 
 	public bool Deactivate()
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
-		if (State == AssetLifecycleState.Disabled)
+		if (this.State == AssetLifecycleState.Disabled)
 		{
 			return false;
 		}
-		State = AssetLifecycleState.Disabled;
+
+		this.State = AssetLifecycleState.Disabled;
 		return true;
 	}
 
 	private void EnsureEditable()
 	{
-		if (IsReadonly())
+		if (this.IsReadonly())
 		{
-			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
+			throw new DomainValidationException(
+				$"It is not possible to update Readonly entity, state: {this.State}, id: {this.Id}");
 		}
 	}
 
 	private bool IsReadonly()
 	{
-		return State is
-			AssetLifecycleState.Disabled 
-			or AssetLifecycleState.ReadOnly 
+		return this.State is
+			AssetLifecycleState.Disabled
+			or AssetLifecycleState.ReadOnly
 			or AssetLifecycleState.Deleted;
 	}
 
 	/// <summary>
-	/// Verifies that Asset is Fiat or StableCoin related
+	///     Verifies that Asset is Fiat or StableCoin related
 	/// </summary>
 	/// <returns>true if asset belongs to Fiat or StableCoin kinds</returns>
-	public bool IsFiatOrStableKind()
-	{
-		return AssetExtensions.IsFiatOrStableKind(Kind);
-	}
+	public bool IsFiatOrStableKind() => AssetExtensions.IsFiatOrStableKind(this.Kind);
 }
