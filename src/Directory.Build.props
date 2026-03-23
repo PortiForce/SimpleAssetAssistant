@@ -1,0 +1,49 @@
+<Project>
+
+  <!--
+    Global MSBuild properties applied to every project in the solution.
+    Enables .NET Roslyn analyzers and adds community-standard analysis packages.
+  -->
+
+  <PropertyGroup>
+    <!-- Enable the .NET platform analyzers shipped with the SDK -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+    <!--
+      AnalysisMode controls which built-in CA/IDE rules are active.
+      "Recommended" activates the well-vetted subset; use "All" for maximum coverage.
+    -->
+    <AnalysisMode>Recommended</AnalysisMode>
+
+    <!-- Enforce code-style rules (IDE*) during build, not just in the IDE -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      StyleCop.Analyzers
+      Community-standard style and consistency enforcement for C#.
+      PrivateAssets=all keeps it out of transitive dependency graphs.
+    -->
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.563">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <!--
+      Roslynator.Analyzers
+      Large, community-maintained set of Roslyn analyzers and refactoring hints.
+      PrivateAssets=all keeps it out of transitive dependency graphs.
+    -->
+    <PackageReference Include="Roslynator.Analyzers" Version="4.12.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Make stylecop.json visible to all StyleCop analyzer instances -->
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+</Project>
