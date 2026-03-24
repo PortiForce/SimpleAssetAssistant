@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.StaticResources;
+using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Core.Primitives;
 
@@ -49,9 +49,17 @@ public sealed record AssetCode
 			return false;
 		}
 
+		if (!code.Any(char.IsLetterOrDigit))
+		{
+			return false;
+		}
+
 		foreach (char c in code)
 		{
-			if (!char.IsLetterOrDigit(c) && c != '.' && c != '-')
+			bool isAsciiLetter = c is >= 'A' and <= 'Z';
+			bool isDigit = c is >= '0' and <= '9';
+
+			if (!isAsciiLetter && !isDigit && c != '.' && c != '-')
 			{
 				return false;
 			}

@@ -1,16 +1,26 @@
-﻿namespace Portiforce.SAA.Core.Extensions;
+namespace Portiforce.SAA.Core.Extensions;
 
-internal static class StringExtensions
+public static class StringExtensions
 {
-	public static string Truncate(this string? value, int maxLength = 64)
+	public static string Truncate(this string? value, int maxTotalLength = 64)
 	{
+		ArgumentOutOfRangeException.ThrowIfNegative(maxTotalLength);
+
 		if (string.IsNullOrEmpty(value))
 		{
 			return "<null-or-empty>";
 		}
 
-		return value.Length <= maxLength
-			? value
-			: value[..maxLength] + "...";
+		if (value.Length <= maxTotalLength)
+		{
+			return value;
+		}
+
+		if (maxTotalLength <= 3)
+		{
+			return new string('.', maxTotalLength);
+		}
+
+		return value[..(maxTotalLength - 3)] + "...";
 	}
 }

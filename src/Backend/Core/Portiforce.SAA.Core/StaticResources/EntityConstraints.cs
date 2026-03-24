@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Core.StaticResources;
+namespace Portiforce.SAA.Core.StaticResources;
 
 public static class EntityConstraints
 {
@@ -12,6 +12,10 @@ public static class EntityConstraints
 		public const int ExtraLongStringLength = 1000;
 
 		public const int EmailAddressDefaultLength = 100;
+		public const int EmailAddressMaxLength = 255;
+
+		public const int PhoneNumberMinLength = 9;
+		public const int PhoneNumberMaxLength = 16;
 
 		/// <summary>
 		///     Common naming validations
@@ -25,6 +29,8 @@ public static class EntityConstraints
 
 		public const int CodeMaxLength = 25;
 		public const int GuidLikeRowMaxLength = 36;
+
+		public const int FiatCurrencyLength = 3;
 	}
 
 	public static class Domain

@@ -1,4 +1,6 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
+
+using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Core.Primitives;
 
@@ -24,7 +26,7 @@ public sealed record Email
 			email = Create(rawData);
 			return true;
 		}
-		catch
+		catch (ArgumentException)
 		{
 			return false;
 		}
@@ -39,9 +41,11 @@ public sealed record Email
 
 		string normalized = rawData.Trim().ToLowerInvariant();
 
-		if (normalized.Length > 255)
+		if (normalized.Length > EntityConstraints.CommonSettings.EmailAddressMaxLength)
 		{
-			throw new ArgumentException("Email is too long (max 255).", nameof(rawData));
+			throw new ArgumentException(
+				$"Email is too long (max {EntityConstraints.CommonSettings.EmailAddressMaxLength}).",
+				nameof(rawData));
 		}
 
 		if (!IsValid(normalized))
@@ -60,9 +64,20 @@ public sealed record Email
 		{
 			MailAddress addr = new(email);
 
-			// This prevents some edge cases where MailAddress accepts but normalizes unexpectedly.
-			// It also ensures we don't accept values with display names etc.
-			return string.Equals(addr.Address, email, StringComparison.OrdinalIgnoreCase);
+			if (!string.Equals(addr.Address, email, StringComparison.OrdinalIgnoreCase))
+			{
+				return false;
+			}
+
+			int atIndex = email.LastIndexOf('@');
+			if (atIndex <= 0 || atIndex == email.Length - 1)
+			{
+				return false;
+			}
+
+			string domain = email[(atIndex + 1)..];
+
+			return domain.Contains('.');
 		}
 		catch
 		{

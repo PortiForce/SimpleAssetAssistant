@@ -1,4 +1,6 @@
-namespace Portiforce.SAA.Core.Extensions;
+using Portiforce.SAA.Core.Extensions;
+
+namespace Portiforce.SAA.Core.Parsers;
 
 public static class GuidIdParser
 {
