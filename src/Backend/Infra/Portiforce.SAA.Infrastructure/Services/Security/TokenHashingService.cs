@@ -1,6 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+
 using Microsoft.Extensions.Options;
+
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Infrastructure.Configuration;
 
@@ -17,7 +19,7 @@ public sealed class TokenHashingService(IOptions<TokenHashingOptions> tokenHashi
 			throw new ArgumentException("Token is required.", nameof(rawToken));
 		}
 
-		using var hmac = new HMACSHA256(_key);
+		using HMACSHA256 hmac = new(this._key);
 		byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawToken));
 
 		return hash;

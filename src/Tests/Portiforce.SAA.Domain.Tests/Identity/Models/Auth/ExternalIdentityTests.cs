@@ -11,43 +11,43 @@ public sealed class ExternalIdentityTests
 	[Fact]
 	public void Create_ShouldTrimProviderSubject()
 	{
-		var ei = ExternalIdentity.Create(
-			accountId: AccountId.New(),
-			tenantId: TenantId.New(),
-			provider: AuthProvider.Google,
-			providerSubject: "  sub-123  ");
+		ExternalIdentity ei = ExternalIdentity.Create(
+			AccountId.New(),
+			TenantId.New(),
+			AuthProvider.Google,
+			"  sub-123  ");
 
-		ei.ProviderSubject.Should().Be("sub-123");
-		ei.IsPrimary.Should().BeFalse();
+		_ = ei.ProviderSubject.Should().Be("sub-123");
+		_ = ei.IsPrimary.Should().BeFalse();
 	}
 
 	[Fact]
 	public void Create_WhenProviderSubjectTooLong_ShouldThrow()
 	{
-		var longSub = new string('a', EntityConstraints.CommonSettings.ProviderSubjectMaxLength + 1);
+		string longSub = new('a', EntityConstraints.CommonSettings.ProviderSubjectMaxLength + 1);
 
-		var act = () => ExternalIdentity.Create(
-			accountId: AccountId.New(),
-			tenantId: TenantId.New(),
-			provider: AuthProvider.Google,
-			providerSubject: longSub);
+		Func<ExternalIdentity> act = () => ExternalIdentity.Create(
+			AccountId.New(),
+			TenantId.New(),
+			AuthProvider.Google,
+			longSub);
 
-		act.Should().Throw<DomainValidationException>();
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void MarkPrimary_And_UnmarkPrimary_ShouldToggle()
 	{
-		var ei = ExternalIdentity.Create(
-			accountId: AccountId.New(),
-			tenantId: TenantId.New(),
-			provider: AuthProvider.Google,
-			providerSubject: "sub");
+		ExternalIdentity ei = ExternalIdentity.Create(
+			AccountId.New(),
+			TenantId.New(),
+			AuthProvider.Google,
+			"sub");
 
 		ei.MarkPrimary();
-		ei.IsPrimary.Should().BeTrue();
+		_ = ei.IsPrimary.Should().BeTrue();
 
 		ei.UnmarkPrimary();
-		ei.IsPrimary.Should().BeFalse();
+		_ = ei.IsPrimary.Should().BeFalse();
 	}
 }

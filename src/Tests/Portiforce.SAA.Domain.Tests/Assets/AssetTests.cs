@@ -13,9 +13,9 @@ public sealed class AssetTests
 	[Fact]
 	public void Create_WhenStateDeleted_ShouldThrow()
 	{
-		var act = () => BuildTestAssetWithRawCode(AssetId.New(), state: AssetLifecycleState.Deleted);
+		Func<Asset> act = () => this.BuildTestAssetWithRawCode(AssetId.New(), state: AssetLifecycleState.Deleted);
 
-		act.Should().Throw<DomainValidationException>();
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Theory]
@@ -24,32 +24,33 @@ public sealed class AssetTests
 	[InlineData(null)]
 	public void Create_WhenCodeIsEmpty_ShouldThrow(string code)
 	{
-		var act = () => BuildTestAssetWithRawCode(AssetId.New(), code: code);
+		Func<Asset> act = () => this.BuildTestAssetWithRawCode(AssetId.New(), code);
 
-		act.Should().Throw<ArgumentException>();
+		_ = act.Should().Throw<ArgumentException>();
 	}
 
 	[Fact]
 	public void Create_WhenAssetCodeIsEmpty_ShouldThrow()
 	{
-		var act = () => BuildTestAssetWithAssetCode(AssetId.New(), null);
+		Func<Asset> act = () => this.BuildTestAssetWithAssetCode(AssetId.New(), null);
 
-		var exceptionAssertions = act.Should().Throw<DomainValidationException>();
+		ExceptionAssertions<DomainValidationException>? exceptionAssertions =
+			act.Should().Throw<DomainValidationException>();
 
-		exceptionAssertions.Which.Message.Should().Contain("AssetCode");
+		_ = exceptionAssertions.Which.Message.Should().Contain("AssetCode");
 	}
 
 	[Fact]
 	public void Rename_ShouldTrimAndSetName()
 	{
-		var asset = Asset.Create(
+		Asset asset = Asset.Create(
 			AssetCode.Create("BTC"),
 			AssetKind.Crypto,
 			AssetLifecycleState.Active,
-			name: "Bitcoin");
+			"Bitcoin");
 
 		asset.Rename("  Bitcoin  ");
-		asset.Name.Should().Be("Bitcoin");
+		_ = asset.Name.Should().Be("Bitcoin");
 	}
 
 	[Theory]
@@ -57,32 +58,32 @@ public sealed class AssetTests
 	[InlineData(AssetLifecycleState.Disabled)]
 	public void Rename_WhenReadonly_ShouldThrow(AssetLifecycleState state)
 	{
-		var asset = BuildTestAssetWithRawCode(AssetId.New(), state: state);
+		Asset asset = this.BuildTestAssetWithRawCode(AssetId.New(), state: state);
 
-		var act = () => asset.Rename("New Name");
-		act.Should().Throw<DomainValidationException>();
+		Action act = () => asset.Rename("New Name");
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void RegisterSynonym_WhenSameAsCode_ShouldReturnFalse()
 	{
-		var asset = BuildTestAssetWithRawCode(AssetId.New(), code: "BTC");
+		Asset asset = this.BuildTestAssetWithRawCode(AssetId.New());
 
-		var ok = asset.RegisterSynonym(AssetCode.Create("BTC"));
+		bool ok = asset.RegisterSynonym(AssetCode.Create("BTC"));
 
-		ok.Should().BeFalse();
-		asset.GetSynonyms().Should().BeEmpty();
+		_ = ok.Should().BeFalse();
+		_ = asset.GetSynonyms().Should().BeEmpty();
 	}
 
 	[Fact]
 	public void RegisterSynonym_WhenNew_ShouldBeAddedOnce()
 	{
-		var asset = BuildTestAssetWithRawCode(AssetId.New());
+		Asset asset = this.BuildTestAssetWithRawCode(AssetId.New());
 
-		asset.RegisterSynonym(AssetCode.Create("XBT")).Should().BeTrue();
-		asset.RegisterSynonym(AssetCode.Create("XBT")).Should().BeFalse();
+		_ = asset.RegisterSynonym(AssetCode.Create("XBT")).Should().BeTrue();
+		_ = asset.RegisterSynonym(AssetCode.Create("XBT")).Should().BeFalse();
 
-		asset.GetSynonyms().Select(x => x.Value).Should().BeEquivalentTo(["XBT"]);
+		_ = asset.GetSynonyms().Select(x => x.Value).Should().BeEquivalentTo("XBT");
 	}
 
 	[Theory]
@@ -90,14 +91,14 @@ public sealed class AssetTests
 	[InlineData(AssetLifecycleState.Archived)]
 	public void Deactivate_WhenActive_ShouldSwitchToDisabled_AndSecondCallReturnsFalse(AssetLifecycleState state)
 	{
-		var asset = BuildTestAssetWithRawCode(AssetId.New(), state: state);
+		Asset asset = this.BuildTestAssetWithRawCode(AssetId.New(), state: state);
 
-		asset.Deactivate().Should().BeTrue();
-		asset.State.Should().Be(AssetLifecycleState.Disabled);
+		_ = asset.Deactivate().Should().BeTrue();
+		_ = asset.State.Should().Be(AssetLifecycleState.Disabled);
 
 		Action act = () => asset.Deactivate();
 
-		act.Should()
+		_ = act.Should()
 			.Throw<DomainValidationException>()
 			.WithMessage("It is not possible to update Readonly entity*");
 	}
@@ -107,7 +108,7 @@ public sealed class AssetTests
 		string code = "BTC",
 		AssetLifecycleState state = AssetLifecycleState.Active)
 	{
-		var asset = Asset.Create(
+		Asset asset = Asset.Create(
 			AssetCode.Create(code),
 			AssetKind.Crypto,
 			state,
@@ -123,7 +124,7 @@ public sealed class AssetTests
 		AssetCode assetCode,
 		AssetLifecycleState state = AssetLifecycleState.Active)
 	{
-		var asset = Asset.Create(
+		Asset asset = Asset.Create(
 			assetCode,
 			AssetKind.Crypto,
 			state,

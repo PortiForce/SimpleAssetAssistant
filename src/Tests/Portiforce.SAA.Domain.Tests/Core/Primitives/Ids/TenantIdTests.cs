@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Domain.Tests.Core.Primitives.Ids.Common;
 
 namespace Portiforce.SAA.Domain.Tests.Core.Primitives.Ids;

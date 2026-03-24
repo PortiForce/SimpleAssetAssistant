@@ -1,5 +1,6 @@
 using Portiforce.SAA.Core.Activities.Enums;
 using Portiforce.SAA.Core.Activities.Models.Actions;
+using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -10,22 +11,17 @@ public sealed class ServiceActivityTests
 	[Fact]
 	public void Create_WhenPrincipalLegIsInflow_ShouldThrow()
 	{
-		var legs = new[]
-		{
-			ActivityTestFactory.PrincipalLeg(MovementDirection.Inflow)
-		};
+		AssetMovementLeg[] legs = [ActivityTestFactory.PrincipalLeg(MovementDirection.Inflow)];
 
-		var act = () => ServiceActivity.Create(
-			tenantId: TenantId.New(),
-			platformAccountId: PlatformAccountId.New(),
-			occurredAt: DateTimeOffset.UtcNow,
-			reason: AssetActivityReason.ServiceFee,
-			legs: legs,
-			externalMetadata: ActivityTestFactory.ExternalMetadata(),
-			serviceType: ServiceType.Custody,
-			id: null);
+		Func<ServiceActivity> act = () => ServiceActivity.Create(
+			TenantId.New(),
+			PlatformAccountId.New(),
+			DateTimeOffset.UtcNow,
+			AssetActivityReason.ServiceFee,
+			legs,
+			ActivityTestFactory.ExternalMetadata());
 
-		act.Should().Throw<DomainValidationException>()
+		_ = act.Should().Throw<DomainValidationException>()
 			.WithMessage("*only Outflow principal legs*");
 	}
 }

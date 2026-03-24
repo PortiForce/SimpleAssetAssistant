@@ -10,40 +10,40 @@ public sealed class TenantTests
 	[Fact]
 	public void Create_ShouldTrimAndValidateName()
 	{
-		var t = Tenant.Create(
-			name: "  Acme Corp  ",
-			code: "ACME",
-			brandName: "Acme",
-			domainPrefix: "acme",
-			state: TenantState.Active,
-			plan: TenantPlan.Demo,
-			settings: TenantSettings.Default());
+		Tenant t = Tenant.Create(
+			"  Acme Corp  ",
+			"ACME",
+			"Acme",
+			"acme",
+			TenantState.Active,
+			TenantPlan.Demo,
+			TenantSettings.Default());
 
-		t.Name.Should().Be("Acme Corp");
+		_ = t.Name.Should().Be("Acme Corp");
 	}
 
 	[Fact]
 	public void Rename_WhenEmpty_ShouldThrow()
 	{
-		var t = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant t = Tenant.Create("Acme", "ACME", "Acme", "acme");
 
-		var act = () => t.Rename("   ");
-		act.Should().Throw<DomainValidationException>();
+		Action act = () => t.Rename("   ");
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void UpdateRestrictedAssetList_ShouldAddUnique_AndRemove()
 	{
-		var t = Tenant.Create("Acme", "ACME", "Acme", "acme");
-		var a1 = AssetId.New();
-		var a2 = AssetId.New();
+		Tenant t = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		AssetId a1 = AssetId.New();
+		AssetId a2 = AssetId.New();
 
-		t.UpdateRestrictedAssetList([a1, a1, a2], isRestricted: true);
+		t.UpdateRestrictedAssetList([a1, a1, a2], true);
 
-		t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a1, a2]);
+		_ = t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a1, a2]);
 
-		t.UpdateRestrictedAssetList([a1], isRestricted: false);
+		t.UpdateRestrictedAssetList([a1], false);
 
-		t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a2]);
+		_ = t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a2]);
 	}
 }

@@ -9,18 +9,18 @@ public sealed class PlatformTests
 	[Fact]
 	public void Rename_ShouldTrimName()
 	{
-		var p = Platform.Create("  Binance  ", "BINANCE", PlatformKind.Exchange);
+		Platform p = Platform.Create("  Binance  ", "BINANCE", PlatformKind.Exchange);
 
 		p.Rename("  Binance US  ");
-		p.Name.Should().Be("Binance US");
+		_ = p.Name.Should().Be("Binance US");
 	}
 
 	[Fact]
 	public void Rename_WhenReadonly_ShouldThrow()
 	{
-		var p = Platform.Create("Binance", "BINANCE", PlatformKind.Exchange, state: PlatformState.ReadOnly);
+		Platform p = Platform.Create("Binance", "BINANCE", PlatformKind.Exchange, PlatformState.ReadOnly);
 
-		var act = () => p.Rename("New Name");
-		act.Should().Throw<DomainValidationException>();
+		Action act = () => p.Rename("New Name");
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 }

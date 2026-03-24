@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Client;
@@ -14,16 +14,16 @@ public class SystemAccountSeeder(IOptions<PlatformUsers> platformUsersOptions)
 
 	public Account BuildPlatformSystemAccount(Tenant rootTenant)
 	{
-		Enum.TryParse(_config.PlatformBackground.Tier, out AccountTier accountTier);
+		_ = Enum.TryParse(this._config.PlatformBackground.Tier, out AccountTier accountTier);
 
 		return Account.Create(
 			rootTenant.Id,
-			_config.PlatformBackground.Alias,
-			new ContactInfo(Email.Create(_config.PlatformBackground.Email)),
+			this._config.PlatformBackground.Alias,
+			new ContactInfo(Email.Create(this._config.PlatformBackground.Email)),
 			Role.TenantBackground,
 			AccountState.Active,
 			accountTier,
-			settings: new AccountSettings
+			new AccountSettings
 			{
 				DefaultCurrency = FiatCurrency.UAH,
 				Locale = "uk-UA",

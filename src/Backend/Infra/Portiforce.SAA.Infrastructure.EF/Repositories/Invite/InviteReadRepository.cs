@@ -1,5 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
+
 using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
@@ -26,8 +28,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			x.ExpiresAtUtc,
 			x.InvitedByAccountId,
 			x.AcceptedAtUtc,
-			x.AcceptedAccountId
-		);
+			x.AcceptedAccountId);
 
 	private static Expression<Func<TenantInvite, InviteDetailsRaw>> DetailsSelector =>
 		x => new InviteDetailsRaw(
@@ -47,38 +48,13 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 
 	public async Task<InviteDetailsRaw?> GetByIdAsync(Guid id, CancellationToken ct)
 	{
-		var data = await db.Invites
+		InviteDetailsRaw? data = await db.Invites
 			.AsNoTracking()
 			.Where(x => x.Id == id)
 			.Select(DetailsSelector)
 			.SingleOrDefaultAsync(ct);
 
 		return data;
-	}
-
-	public async Task<PagedResult<InviteListItemRaw>> GetByTenantIdAsync(
-		TenantId tenantId,
-		PageRequest pageRequest,
-		CancellationToken ct)
-	{
-		IQueryable<TenantInvite> query = db.Invites
-			.AsNoTracking()
-			.Where(x => x.TenantId == tenantId);
-
-		int totalCount = await query.CountAsync(ct);
-
-		List<InviteListItemRaw> items = await query
-			.OrderBy(x => x.Id)
-			.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
-			.Take(pageRequest.PageSize)
-			.Select(ListItemSelector)
-			.ToListAsync(ct);
-
-		return new PagedResult<InviteListItemRaw>(
-			items,
-			totalCount,
-			pageRequest.PageNumber,
-			pageRequest.PageSize);
 	}
 
 	public async Task<PagedResult<InviteListItemRaw>> GetListAsync(
@@ -111,12 +87,12 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 
 		if (hasAccount.HasValue)
 		{
-			query = hasAccount.Value 
-				? query.Where(x => x.AcceptedAccountId != AccountId.Empty && x.AcceptedAccountId != null) 
+			query = hasAccount.Value
+				? query.Where(x => x.AcceptedAccountId != AccountId.Empty && x.AcceptedAccountId != null)
 				: query.Where(x => x.AcceptedAccountId == null || x.AcceptedAccountId == AccountId.Empty);
 		}
 
-		int skip = (pageRequest.PageNumber - 1) *pageRequest.PageSize;
+		int skip = (pageRequest.PageNumber - 1) * pageRequest.PageSize;
 		int totalCount = await query.CountAsync(ct);
 
 		List<InviteListItemRaw> items = await query
@@ -133,9 +109,12 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			pageRequest.PageSize);
 	}
 
-	public async Task<InviteDetailsRaw?> GetByInviteTargetAndTenantAsync(InviteTarget inviteTarget, TenantId requestTenantId, CancellationToken ct)
+	public async Task<InviteDetailsRaw?> GetByInviteTargetAndTenantAsync(
+		InviteTarget inviteTarget,
+		TenantId requestTenantId,
+		CancellationToken ct)
 	{
-		var data = await db.Invites
+		InviteDetailsRaw? data = await db.Invites
 			.AsNoTracking()
 			.Where(x =>
 				x.InviteTarget == inviteTarget &&
@@ -155,9 +134,12 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			.ToListAsync(ct);
 	}
 
-	public async Task<TenantInvite?> GetByTenantAndTokenHashAsync(TenantId requestTenantId, byte[] tokenHash, CancellationToken ct)
+	public async Task<TenantInvite?> GetByTenantAndTokenHashAsync(
+		TenantId requestTenantId,
+		byte[] tokenHash,
+		CancellationToken ct)
 	{
-		var data = await db.Invites
+		TenantInvite? data = await db.Invites
 			.Where(x =>
 				x.TokenHash == tokenHash &&
 				x.TenantId == requestTenantId)
@@ -172,5 +154,30 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			.AsNoTracking()
 			.Where(x => x.TenantId == tenantId && x.State == InviteState.Created)
 			.CountAsync(ct);
+	}
+
+	public async Task<PagedResult<InviteListItemRaw>> GetByTenantIdAsync(
+		TenantId tenantId,
+		PageRequest pageRequest,
+		CancellationToken ct)
+	{
+		IQueryable<TenantInvite> query = db.Invites
+			.AsNoTracking()
+			.Where(x => x.TenantId == tenantId);
+
+		int totalCount = await query.CountAsync(ct);
+
+		List<InviteListItemRaw> items = await query
+			.OrderBy(x => x.Id)
+			.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
+			.Take(pageRequest.PageSize)
+			.Select(ListItemSelector)
+			.ToListAsync(ct);
+
+		return new PagedResult<InviteListItemRaw>(
+			items,
+			totalCount,
+			pageRequest.PageNumber,
+			pageRequest.PageSize);
 	}
 }

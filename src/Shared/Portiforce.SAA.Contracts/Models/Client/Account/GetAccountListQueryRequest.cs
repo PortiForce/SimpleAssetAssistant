@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Contracts.Models.Client.Account;
 
@@ -11,22 +11,23 @@ public sealed record GetAccountListQueryRequest(
 {
 	public IEnumerable<KeyValuePair<string, string>> ToQueryParameters()
 	{
-		if (!string.IsNullOrWhiteSpace(Search))
+		if (!string.IsNullOrWhiteSpace(this.Search))
 		{
-			yield return new KeyValuePair<string, string>("search", Search);
+			yield return new KeyValuePair<string, string>("search", this.Search);
 		}
 
-		if (State is not null)
+		if (this.State is not null)
 		{
-			yield return new KeyValuePair<string, string>("state", State.ToString()!);
+			yield return new KeyValuePair<string, string>("state", this.State.ToString()!);
 		}
 
-		if (Tier is not null)
+		if (this.Tier is not null)
 		{
-			yield return new KeyValuePair<string, string>("tier", Tier.ToString()!);
+			yield return new KeyValuePair<string, string>("tier", this.Tier.ToString()!);
 		}
 
-		yield return new KeyValuePair<string, string>("page", Page.ToString());
-		yield return new KeyValuePair<string, string>("pageSize", PageSize.ToString());
+		yield return new KeyValuePair<string, string>("page", this.Page.ToString());
+
+		yield return new KeyValuePair<string, string>("pageSize", this.PageSize.ToString());
 	}
 }
