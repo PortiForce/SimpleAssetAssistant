@@ -218,6 +218,7 @@ dotnet_naming_style.private_field_style.word_separator =
 # StyleCop
 dotnet_diagnostic.SA1027.severity = none
 dotnet_diagnostic.SA1200.severity = none
+dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1600.severity = none
 
 # Optional: avoid namespace/folder churn during refactors

@@ -1,8 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure.Configuration;
 
@@ -12,11 +14,14 @@ public sealed class ConfigureJwtBearerOptions : IConfigureOptions<JwtBearerOptio
 {
 	private readonly IOptions<JwtSettings> _jwt;
 
-	public ConfigureJwtBearerOptions(IOptions<JwtSettings> jwt) => _jwt = jwt;
+	public ConfigureJwtBearerOptions(IOptions<JwtSettings> jwt)
+	{
+		this._jwt = jwt;
+	}
 
 	public void Configure(JwtBearerOptions options)
 	{
-		var jwt = _jwt.Value;
+		JwtSettings jwt = this._jwt.Value;
 
 		options.TokenValidationParameters = new TokenValidationParameters
 		{
