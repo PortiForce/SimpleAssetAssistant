@@ -28,11 +28,13 @@ public sealed record ServiceActivity : ReasonedActivity
 			legs,
 			reason)
 	{
-		ServiceType = serviceType;
+		this.ServiceType = serviceType;
 	}
 
 	// Private Empty Constructor for EF Core
-	private ServiceActivity() : base() { }
+	private ServiceActivity()
+	{
+	}
 
 	public ServiceType ServiceType { get; init; }
 

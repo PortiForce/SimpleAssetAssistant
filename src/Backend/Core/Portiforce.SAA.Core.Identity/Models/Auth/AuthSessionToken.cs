@@ -23,7 +23,7 @@ public sealed class AuthSessionToken : Entity<Guid>
 			throw new DomainValidationException("SessionId is not defined");
 		}
 
-		if (tokenHash is null || tokenHash.Length != 32) 
+		if (tokenHash is null || tokenHash.Length != 32)
 		{
 			throw new DomainValidationException("tokenHash must be defined as 32 bytes");
 		}
@@ -43,41 +43,51 @@ public sealed class AuthSessionToken : Entity<Guid>
 			throw new DomainValidationException("Invalid token live time");
 		}
 
-		Id = GuidExtensions.New();
-		TenantId = tenantId;
-		AccountId = accountId;
-		SessionId = sessionId;
-		TokenHash = tokenHash;
-		CreatedByIp = createdByIp;
-		CreatedUserAgent = createdUserAgent;
-		CreatedAt = createdAt;
-		ExpiresAt = expiresAt;
+		this.Id = GuidExtensions.New();
+		this.TenantId = tenantId;
+		this.AccountId = accountId;
+		this.SessionId = sessionId;
+		this.TokenHash = tokenHash;
+		this.CreatedByIp = createdByIp;
+		this.CreatedUserAgent = createdUserAgent;
+		this.CreatedAt = createdAt;
+		this.ExpiresAt = expiresAt;
 	}
 
 	// Private Empty Constructor for EF Core
 	private AuthSessionToken()
 	{
-
 	}
 
 	public TenantId TenantId { get; init; }
+
 	public AccountId AccountId { get; init; }
+
 	public Guid SessionId { get; init; }
+
 	public byte[] TokenHash { get; private set; }
 
 	public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
+
 	public DateTimeOffset ExpiresAt { get; init; }
 
 	// Audit
 	public string? CreatedByIp { get; init; }
+
 	public string? CreatedUserAgent { get; private set; }
+
 	public string? UserAgentFingerprint { get; private set; }
 
 	// Revocation / Rotation
 	public DateTimeOffset? RevokedAt { get; private set; }
+
 	public string? RevokedByIp { get; private set; }
+
 	public byte[]? ReplacedByTokenHash { get; private set; }
+
 	public TokenRevokeReason? RevokedReason { get; private set; }
+
+	public bool IsRevoked => this.RevokedAt is not null;
 
 	public static AuthSessionToken Create(
 		TenantId tenantId,
@@ -100,9 +110,7 @@ public sealed class AuthSessionToken : Entity<Guid>
 			expiresAt);
 	}
 
-	public bool IsRevoked => RevokedAt is not null;
-
-	public bool IsActive(DateTimeOffset nowUtc) => !IsRevoked && ExpiresAt > nowUtc;
+	public bool IsActive(DateTimeOffset nowUtc) => !this.IsRevoked && this.ExpiresAt > nowUtc;
 
 	public void Revoke(
 		DateTimeOffset nowUtc,
@@ -111,14 +119,14 @@ public sealed class AuthSessionToken : Entity<Guid>
 		byte[]? replacedByHash = null)
 	{
 		// idempotent flow check
-		if (IsRevoked)
+		if (this.IsRevoked)
 		{
 			return;
 		}
 
-		RevokedAt = nowUtc;
-		RevokedReason = reason;
-		RevokedByIp = ip;
-		ReplacedByTokenHash = replacedByHash;
+		this.RevokedAt = nowUtc;
+		this.RevokedReason = reason;
+		this.RevokedByIp = ip;
+		this.ReplacedByTokenHash = replacedByHash;
 	}
 }

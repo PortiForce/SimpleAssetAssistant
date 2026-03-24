@@ -34,20 +34,22 @@ public sealed record TradeActivity : ExecutableActivity
 			reason,
 			completionType)
 	{
-		ExecutionType = executionType;
-		MarketKind = marketKind;
-		Futures = futures;
+		this.ExecutionType = executionType;
+		this.MarketKind = marketKind;
+		this.Futures = futures;
 	}
 
 	// Private Empty Constructor for EF Core
-	private TradeActivity() : base() { }
+	private TradeActivity()
+	{
+	}
 
 	public TradeExecutionType ExecutionType { get; init; }
 
 	public MarketKind MarketKind { get; init; }
 
 	/// <summary>
-	/// Futures-aware minimal fields.
+	///     Futures-aware minimal fields.
 	/// </summary>
 	public FuturesDescriptor? Futures { get; init; }
 
@@ -61,7 +63,7 @@ public sealed record TradeActivity : ExecutableActivity
 		IReadOnlyList<AssetMovementLeg> legs,
 		FuturesDescriptor? futures,
 		ExternalMetadata externalMetadata,
-		CompletionType  completionType,
+		CompletionType completionType,
 		ActivityId? id)
 	{
 		ActivityGuards.EnsureReasonKindPairAllowed(AssetActivityKind.Trade, reason);
@@ -80,7 +82,6 @@ public sealed record TradeActivity : ExecutableActivity
 		else if (marketKind == MarketKind.Spot && futures is not null)
 		{
 			throw new DomainValidationException("Futures models should be null for Spot trade");
-
 		}
 
 		return new TradeActivity(

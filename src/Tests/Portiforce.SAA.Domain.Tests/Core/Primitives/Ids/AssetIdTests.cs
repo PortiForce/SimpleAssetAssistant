@@ -1,33 +1,21 @@
 using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Domain.Tests.Core.Primitives.Ids.Common;
 
 namespace Portiforce.SAA.Domain.Tests.Core.Primitives.Ids;
 
-public sealed class AssetIdTests
+public sealed class AssetIdTests : StronglyTypedGuidIdTests<AssetId>
 {
-	[Fact]
-	public void Parse_WhenEmptyGuid_ShouldThrow()
-	{
-		var act = () => AssetId.Parse(Guid.Empty.ToString());
-		act.Should().Throw<FormatException>();
-	}
+	protected override AssetId Empty => AssetId.Empty;
 
-	[Fact]
-	public void TryParse_WhenNull_ShouldReturnFalse()
-	{
-		var ok = AssetId.TryParse(null, out var id);
+	protected override AssetId New() => AssetId.New();
 
-		ok.Should().BeFalse();
-		id.IsEmpty.Should().BeTrue();
-	}
+	protected override AssetId From(Guid value) => AssetId.From(value);
 
-	[Fact]
-	public void TryParse_WhenValidGuid_ShouldReturnTrue()
-	{
-		var g = Guid.NewGuid();
+	protected override AssetId Parse(string raw) => AssetId.Parse(raw);
 
-		var ok = AssetId.TryParse(g.ToString(), out var id);
+	protected override bool TryParse(string? raw, out AssetId id) => AssetId.TryParse(raw, out id);
 
-		ok.Should().BeTrue();
-		id.Value.Should().Be(g);
-	}
+	protected override Guid GetValue(AssetId id) => id.Value;
+
+	protected override bool IsEmpty(AssetId id) => id.IsEmpty;
 }

@@ -7,7 +7,6 @@ public sealed record InviteTarget
 	// Private Empty Constructor for EF Core
 	private InviteTarget()
 	{
-
 	}
 
 	private InviteTarget(string value, InviteChannel type)
@@ -17,11 +16,12 @@ public sealed record InviteTarget
 			throw new ArgumentException("Value is required.", nameof(value));
 		}
 
-		Value = value;
-		Type = type;
+		this.Value = value;
+		this.Type = type;
 	}
 
 	public string Value { get; init; }
+
 	public InviteChannel Type { get; init; }
 
 	public static InviteTarget Email(string email)

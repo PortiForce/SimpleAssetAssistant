@@ -1,6 +1,7 @@
 ﻿using Portiforce.SAA.Core.Activities.Enums;
 using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Core.Activities.Rules;
 
@@ -23,7 +24,7 @@ public static class LegGuards
 
 	public static void EnsureFeeLegsAreValid(IReadOnlyList<AssetMovementLeg> legs)
 	{
-		foreach (var fee in legs.Where(l => l.Role == MovementRole.Fee))
+		foreach (AssetMovementLeg fee in legs.Where(l => l.Role == MovementRole.Fee))
 		{
 			if (fee.Direction != MovementDirection.Outflow)
 			{
@@ -42,22 +43,23 @@ public static class LegGuards
 
 	public static void EnsureTradeOrExchangeShape(IReadOnlyList<AssetMovementLeg> legs)
 	{
-		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
+		List<AssetMovementLeg> principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count < 2)
 		{
 			throw new DomainValidationException("Trade/Exchange must contain at least 2 principal legs.");
 		}
 
 		if (principal.All(l => l.Direction != MovementDirection.Outflow) ||
-		    principal.All(l => l.Direction != MovementDirection.Inflow))
+			principal.All(l => l.Direction != MovementDirection.Inflow))
 		{
 			throw new DomainValidationException("Trade/Exchange must contain both Outflow and Inflow principal legs.");
 		}
-			
 
 		// optional: prevent same-asset principal swap (usually invalid)
-		var outAssetIds = principal.Where(l => l.Direction == MovementDirection.Outflow).Select(l => l.AssetId).ToHashSet();
-		var inAssetIds = principal.Where(l => l.Direction == MovementDirection.Inflow).Select(l => l.AssetId).ToHashSet();
+		HashSet<AssetId> outAssetIds = principal.Where(l => l.Direction == MovementDirection.Outflow)
+			.Select(l => l.AssetId).ToHashSet();
+		HashSet<AssetId> inAssetIds = principal.Where(l => l.Direction == MovementDirection.Inflow)
+			.Select(l => l.AssetId).ToHashSet();
 		if (outAssetIds.Overlaps(inAssetIds))
 		{
 			throw new DomainValidationException("Trade/Exchange principal inflow and outflow assets must differ.");
@@ -78,7 +80,7 @@ public static class LegGuards
 
 	public static void EnsureOneSidedInflow(IReadOnlyList<AssetMovementLeg> legs)
 	{
-		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
+		List<AssetMovementLeg> principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count == 0 || principal.Any(l => l.Direction != MovementDirection.Inflow))
 		{
 			throw new DomainValidationException("This activity must have only Inflow principal legs.");
@@ -87,7 +89,7 @@ public static class LegGuards
 
 	public static void EnsureOneSidedOutflow(IReadOnlyList<AssetMovementLeg> legs)
 	{
-		var principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
+		List<AssetMovementLeg> principal = legs.Where(l => l.Role == MovementRole.Principal).ToList();
 		if (principal.Count == 0 || principal.Any(l => l.Direction != MovementDirection.Outflow))
 		{
 			throw new DomainValidationException("This activity must have only Outflow principal legs.");
@@ -99,9 +101,10 @@ public static class LegGuards
 		if (marketKind == MarketKind.Futures)
 		{
 			// minimal invariant: at least one principal leg is Futures allocation
-			if (!legs.Any(l => l is {Role: MovementRole.Principal, Allocation: AssetAllocationType.Futures}))
+			if (!legs.Any(l => l is { Role: MovementRole.Principal, Allocation: AssetAllocationType.Futures }))
 			{
-				throw new DomainValidationException("Futures activities must include at least one Futures principal leg.");
+				throw new DomainValidationException(
+					"Futures activities must include at least one Futures principal leg.");
 			}
 		}
 		else
@@ -111,4 +114,3 @@ public static class LegGuards
 		}
 	}
 }
-
