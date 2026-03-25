@@ -93,7 +93,7 @@ internal sealed class InviteSummaryRepository(AssetAssistantDbContext db) : IInv
 
 	private static IReadOnlyList<InviteTrendPoint> BuildHourlyPoints(DateTimeOffset start, int count)
 	{
-		List<InviteTrendPoint> points = [with(count)];
+		List<InviteTrendPoint> points = [];
 
 		for (int i = 0; i < count; i++)
 		{
@@ -114,7 +114,7 @@ internal sealed class InviteSummaryRepository(AssetAssistantDbContext db) : IInv
 
 	private static IReadOnlyList<InviteTrendPoint> BuildDailyPoints(DateTimeOffset start, int count)
 	{
-		List<InviteTrendPoint> points = [with(count)];
+		List<InviteTrendPoint> points = [];
 
 		for (int i = 0; i < count; i++)
 		{
@@ -135,7 +135,7 @@ internal sealed class InviteSummaryRepository(AssetAssistantDbContext db) : IInv
 
 	private static IReadOnlyList<InviteTrendPoint> BuildWeeklyPoints(DateTimeOffset start, int count)
 	{
-		List<InviteTrendPoint> points = [with(count)];
+		List<InviteTrendPoint> points = [];
 
 		for (int i = 0; i < count; i++)
 		{
@@ -156,7 +156,7 @@ internal sealed class InviteSummaryRepository(AssetAssistantDbContext db) : IInv
 
 	private static IReadOnlyList<InviteTrendPoint> BuildMonthlyPoints(DateTimeOffset start, int count)
 	{
-		List<InviteTrendPoint> points = [with(count)];
+		List<InviteTrendPoint> points = [];
 
 		for (int i = 0; i < count; i++)
 		{
