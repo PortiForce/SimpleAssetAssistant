@@ -75,6 +75,7 @@ public static class DependencyInjection
 
 		services.AddScoped<IInviteReadRepository, InviteReadRepository>();
 		services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
+		services.AddScoped<IInviteSummaryRepository, InviteSummaryRepository>();
 
 		services.AddScoped<IAccountReadRepository, AccountReadRepository>();
 		services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();

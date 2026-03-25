@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Models.Common.DataAccess;
+using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
@@ -23,11 +23,11 @@ public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 		CancellationToken ct);
 
 	/// <summary>
-	/// Finds all invites across all tenants that share this email
+	///     Finds all invites across all tenants that share this email.
 	/// </summary>
-	/// <param name="inviteTarget">invite target</param>
-	/// <param name="ct"></param>
-	/// <returns>list of invites that match provided email address</returns>
+	/// <param name="inviteTarget">Invite target.</param>
+	/// <param name="ct">Cancellation token.</param>
+	/// <returns>List of invites that match provided email address.</returns>
 	Task<List<InviteListItemRaw>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct);
 
 	Task<TenantInvite?> GetByTenantAndTokenHashAsync(

@@ -18,6 +18,8 @@ public static class ApiRoutes
 	{
 		public const string Root = "/bff/invites";
 
+		public const string Summary = $"{Root}/summary";
+
 		public const string New = "/bff/invites/new";
 
 		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
