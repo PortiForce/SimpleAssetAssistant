@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,13 +45,14 @@ public static class DependencyInjection
 					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
 					sql.CommandTimeout(30);
 					sql.EnableRetryOnFailure(
-						maxRetryCount: 5,
-						maxRetryDelay: TimeSpan.FromSeconds(20),
-						errorNumbersToAdd: null);
+						5,
+						TimeSpan.FromSeconds(20),
+						null);
 				});
 			opt.EnableDetailedErrors();
 
 #if DEBUG
+
 			// only for local debugging
 			opt.EnableSensitiveDataLogging();
 #endif

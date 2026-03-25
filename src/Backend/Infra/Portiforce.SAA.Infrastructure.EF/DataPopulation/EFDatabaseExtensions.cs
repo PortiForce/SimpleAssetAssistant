@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Client;
@@ -18,10 +19,10 @@ public static class EFDatabaseExtensions
 
 	public static async Task PopulateGlobalDictionariesAndPrepareUserAsync(this WebApplication app)
 	{
-		using var scope = app.Services.CreateScope();
+		using IServiceScope scope = app.Services.CreateScope();
 
-		var services = scope.ServiceProvider;
-		var dbContext = services.GetRequiredService<AssetAssistantDbContext>();
+		IServiceProvider services = scope.ServiceProvider;
+		AssetAssistantDbContext dbContext = services.GetRequiredService<AssetAssistantDbContext>();
 
 		// Apply Schema Migrations First
 		await dbContext.Database.MigrateAsync();
@@ -36,7 +37,7 @@ public static class EFDatabaseExtensions
 				Console.WriteLine("Seeding Assets.");
 				List<Asset> assets = AssetDataSeeder.BuildAssets();
 				dbContext.Assets.AddRange(assets);
-				await dbContext.SaveChangesAsync();
+				_ = await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {assets.Count} Assets.");
 			}
 			else
@@ -50,7 +51,7 @@ public static class EFDatabaseExtensions
 				Console.WriteLine("Seeding Platforms.");
 				List<Platform> platforms = PlatformDataSeeder.BuildPlatforms();
 				dbContext.Platforms.AddRange(platforms);
-				await dbContext.SaveChangesAsync();
+				_ = await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {platforms.Count} Platforms.");
 			}
 
@@ -62,12 +63,12 @@ public static class EFDatabaseExtensions
 				dbContext.Tenants.AddRange(tenants);
 				rootTenant = tenants.FirstOrDefault(x => x.Code.ToUpper() == DefaultRootTenantCode);
 
-				await dbContext.SaveChangesAsync();
+				_ = await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {tenants.Count} Tenants.");
 			}
 			else
 			{
-				var tenants = dbContext.Tenants;
+				DbSet<Tenant> tenants = dbContext.Tenants;
 				rootTenant = tenants.FirstOrDefault(x => x.Code.ToUpper() == DefaultRootTenantCode);
 			}
 		}
@@ -85,9 +86,9 @@ public static class EFDatabaseExtensions
 				SystemAccountSeeder platformAccountsSeeder = services.GetRequiredService<SystemAccountSeeder>();
 
 				platformSystemAccount = platformAccountsSeeder.BuildPlatformSystemAccount(rootTenant);
-				dbContext.Accounts.Add(platformSystemAccount);
-				await dbContext.SaveChangesAsync();
-				Console.WriteLine($"Seeded Platform System Account.");
+				_ = dbContext.Accounts.Add(platformSystemAccount);
+				_ = await dbContext.SaveChangesAsync();
+				Console.WriteLine("Seeded Platform System Account.");
 			}
 			catch (Exception ex)
 			{
@@ -97,7 +98,8 @@ public static class EFDatabaseExtensions
 		}
 		else
 		{
-			platformSystemAccount = dbContext.Accounts.Single(x => x.Role == Role.TenantBackground && x.TenantId == rootTenant.Id);
+			platformSystemAccount =
+				dbContext.Accounts.Single(x => x.Role == Role.TenantBackground && x.TenantId == rootTenant.Id);
 		}
 
 		if (rootTenant != null && !dbContext.Invites.Any(x => x.TenantId == rootTenant.Id))
@@ -112,7 +114,7 @@ public static class EFDatabaseExtensions
 					platformSystemAccount);
 
 				dbContext.Invites.AddRange(platformUserInvites);
-				await dbContext.SaveChangesAsync();
+				_ = await dbContext.SaveChangesAsync();
 				Console.WriteLine($"Seeded {platformUserInvites.Count} Platform Invites.");
 			}
 			catch (Exception ex)
@@ -122,19 +124,9 @@ public static class EFDatabaseExtensions
 			}
 		}
 
-		try
-		{
-			DbUserSeeder dbUserSeeder = services.GetRequiredService<DbUserSeeder>();
+		DbUserSeeder dbUserSeeder = services.GetRequiredService<DbUserSeeder>();
 
-			// create Users (Dynamic credentials!)
-			await dbUserSeeder.CreateServiceUsersIfNotExistAsync();
-
-		}
-		catch (Exception ex)
-		{
-			// since I in static cotext: resolve logger
-			// var logger = services.GetRequiredService<ILogger<Program>>();
-			throw;
-		}
+		// create Users (Dynamic credentials!)
+		await dbUserSeeder.CreateServiceUsersIfNotExistAsync();
 	}
 }

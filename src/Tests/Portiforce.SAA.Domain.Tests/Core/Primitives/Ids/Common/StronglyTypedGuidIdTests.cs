@@ -1,28 +1,34 @@
-﻿namespace Portiforce.SAA.Domain.Tests.Core.Primitives.Ids.Common;
+namespace Portiforce.SAA.Domain.Tests.Core.Primitives.Ids.Common;
 
 /// <summary>
-/// Reusable behavioral contract for strongly typed Guid-based IDs.
-/// Intended for types like AssetId, AccountId, TenantId, etc.
+///     Reusable behavioral contract for strongly typed Guid-based IDs.
+///     Intended for types like AssetId, AccountId, TenantId, etc.
 /// </summary>
 /// <typeparam name="TId">Strongly typed identifier type.</typeparam>
 public abstract class StronglyTypedGuidIdTests<TId>
 	where TId : struct
 {
 	protected abstract TId Empty { get; }
+
 	protected abstract TId New();
+
 	protected abstract TId From(Guid value);
+
 	protected abstract TId Parse(string raw);
+
 	protected abstract bool TryParse(string? raw, out TId id);
+
 	protected abstract Guid GetValue(TId id);
+
 	protected abstract bool IsEmpty(TId id);
 
 	[Fact]
 	public void Empty_ShouldRepresentEmptyGuid()
 	{
-		TId id = Empty;
+		TId id = this.Empty;
 
-		GetValue(id).Should().Be(Guid.Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = this.GetValue(id).Should().Be(Guid.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
@@ -30,19 +36,19 @@ public abstract class StronglyTypedGuidIdTests<TId>
 	{
 		Guid value = Guid.NewGuid();
 
-		TId id = From(value);
+		TId id = this.From(value);
 
-		GetValue(id).Should().Be(value);
-		IsEmpty(id).Should().BeFalse();
+		_ = this.GetValue(id).Should().Be(value);
+		_ = this.IsEmpty(id).Should().BeFalse();
 	}
 
 	[Fact]
 	public void New_ShouldCreateNonEmptyId()
 	{
-		TId id = New();
+		TId id = this.New();
 
-		GetValue(id).Should().NotBe(Guid.Empty);
-		IsEmpty(id).Should().BeFalse();
+		_ = this.GetValue(id).Should().NotBe(Guid.Empty);
+		_ = this.IsEmpty(id).Should().BeFalse();
 	}
 
 	[Fact]
@@ -50,84 +56,84 @@ public abstract class StronglyTypedGuidIdTests<TId>
 	{
 		Guid value = Guid.NewGuid();
 
-		TId id = Parse(value.ToString());
+		TId id = this.Parse(value.ToString());
 
-		GetValue(id).Should().Be(value);
-		IsEmpty(id).Should().BeFalse();
+		_ = this.GetValue(id).Should().Be(value);
+		_ = this.IsEmpty(id).Should().BeFalse();
 	}
 
 	[Fact]
 	public void Parse_WhenEmptyGuid_ShouldThrowFormatException()
 	{
-		Action act = () => Parse(Guid.Empty.ToString());
+		Action act = () => this.Parse(Guid.Empty.ToString());
 
-		act.Should().Throw<FormatException>();
+		_ = act.Should().Throw<FormatException>();
 	}
 
 	[Fact]
 	public void Parse_WhenInvalidString_ShouldThrowFormatException()
 	{
-		Action act = () => Parse("not-a-guid");
+		Action act = () => this.Parse("not-a-guid");
 
-		act.Should().Throw<FormatException>();
+		_ = act.Should().Throw<FormatException>();
 	}
 
 	[Fact]
 	public void Parse_WhenNullString_ShouldThrow()
 	{
-		Action act = () => Parse(null!);
+		Action act = () => this.Parse(null!);
 
-		act.Should().Throw<Exception>();
+		_ = act.Should().Throw<Exception>();
 	}
 
 	[Fact]
 	public void TryParse_WhenNull_ShouldReturnFalse_AndEmptyId()
 	{
-		bool ok = TryParse(null, out TId id);
+		bool ok = this.TryParse(null, out TId id);
 
-		ok.Should().BeFalse();
-		id.Should().Be(Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = ok.Should().BeFalse();
+		_ = id.Should().Be(this.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
 	public void TryParse_WhenEmptyString_ShouldReturnFalse_AndEmptyId()
 	{
-		bool ok = TryParse(string.Empty, out TId id);
+		bool ok = this.TryParse(string.Empty, out TId id);
 
-		ok.Should().BeFalse();
-		id.Should().Be(Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = ok.Should().BeFalse();
+		_ = id.Should().Be(this.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
 	public void TryParse_WhenWhitespace_ShouldReturnFalse_AndEmptyId()
 	{
-		bool ok = TryParse("   ", out TId id);
+		bool ok = this.TryParse("   ", out TId id);
 
-		ok.Should().BeFalse();
-		id.Should().Be(Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = ok.Should().BeFalse();
+		_ = id.Should().Be(this.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
 	public void TryParse_WhenInvalidString_ShouldReturnFalse_AndEmptyId()
 	{
-		bool ok = TryParse("abc", out TId id);
+		bool ok = this.TryParse("abc", out TId id);
 
-		ok.Should().BeFalse();
-		id.Should().Be(Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = ok.Should().BeFalse();
+		_ = id.Should().Be(this.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
 	public void TryParse_WhenEmptyGuid_ShouldReturnFalse_AndEmptyId()
 	{
-		bool ok = TryParse(Guid.Empty.ToString(), out TId id);
+		bool ok = this.TryParse(Guid.Empty.ToString(), out TId id);
 
-		ok.Should().BeFalse();
-		id.Should().Be(Empty);
-		IsEmpty(id).Should().BeTrue();
+		_ = ok.Should().BeFalse();
+		_ = id.Should().Be(this.Empty);
+		_ = this.IsEmpty(id).Should().BeTrue();
 	}
 
 	[Fact]
@@ -135,11 +141,11 @@ public abstract class StronglyTypedGuidIdTests<TId>
 	{
 		Guid value = Guid.NewGuid();
 
-		bool ok = TryParse(value.ToString(), out TId id);
+		bool ok = this.TryParse(value.ToString(), out TId id);
 
-		ok.Should().BeTrue();
-		GetValue(id).Should().Be(value);
-		IsEmpty(id).Should().BeFalse();
+		_ = ok.Should().BeTrue();
+		_ = this.GetValue(id).Should().Be(value);
+		_ = this.IsEmpty(id).Should().BeFalse();
 	}
 
 	[Fact]
@@ -147,33 +153,33 @@ public abstract class StronglyTypedGuidIdTests<TId>
 	{
 		Guid value = Guid.NewGuid();
 
-		TId left = From(value);
-		TId right = From(value);
+		TId left = this.From(value);
+		TId right = this.From(value);
 
-		left.Should().Be(right);
-		left.GetHashCode().Should().Be(right.GetHashCode());
+		_ = left.Should().Be(right);
+		_ = left.GetHashCode().Should().Be(right.GetHashCode());
 	}
 
 	[Fact]
 	public void Equality_WhenDifferentUnderlyingGuid_ShouldNotBeEqual()
 	{
-		TId left = From(Guid.NewGuid());
-		TId right = From(Guid.NewGuid());
+		TId left = this.From(Guid.NewGuid());
+		TId right = this.From(Guid.NewGuid());
 
-		left.Should().NotBe(right);
+		_ = left.Should().NotBe(right);
 	}
 
 	[Fact]
 	public void ToString_WhenValueIsValid_ShouldRoundTripThroughParse()
 	{
-		TId original = New();
+		TId original = this.New();
 
 		string raw = original.ToString()!;
 
-		raw.Should().NotBeNullOrWhiteSpace();
+		_ = raw.Should().NotBeNullOrWhiteSpace();
 
-		TId parsed = Parse(raw);
+		TId parsed = this.Parse(raw);
 
-		parsed.Should().Be(original);
+		_ = parsed.Should().Be(original);
 	}
 }

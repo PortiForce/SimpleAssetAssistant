@@ -1,7 +1,4 @@
-﻿
-using System.Reflection.Metadata;
-
-namespace Portiforce.SAA.Infrastructure.EF.Configuration;
+﻿namespace Portiforce.SAA.Infrastructure.EF.Configuration;
 
 internal static class DbConstants
 {

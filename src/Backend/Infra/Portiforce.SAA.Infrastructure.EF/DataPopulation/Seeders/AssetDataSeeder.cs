@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Assets.Enums;
+using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Assets.Models;
 using Portiforce.SAA.Core.Primitives;
 using Portiforce.SAA.Core.StaticResources;
@@ -9,13 +9,13 @@ public static class AssetDataSeeder
 {
 	public static List<Asset> BuildAssets()
 	{
-		var assets = new List<Asset>();
+		List<Asset> assets = [];
 
 		// ---------------------------------------------------------
 		// 1. STOCKS (50 Total: EntityConstraints.Domain.Asset.NativeDecimalsAvgLength Requested + 40 Top Market Cap)
 		// ---------------------------------------------------------
-		var stockData = new List<(string Code, string Name)>
-		{
+		List<(string Code, string Name)> stockData =
+		[
 			("AMZN", "Amazon.com Inc"),
 			("MSFT", "Microsoft Corporation"),
 			("AAPL", "Apple Inc"),
@@ -26,9 +26,7 @@ public static class AssetDataSeeder
 			("AVGO", "Broadcom Inc"),
 			("NFLX", "Netflix Inc"),
 			("KO", "Coca-Cola Company"),
-
-			// Top Market Cap Fillers
-			 ("NVDA", "NVIDIA Corporation"),
+			("NVDA", "NVIDIA Corporation"),
 			("META", "Meta Platforms Inc"),
 			("TSLA", "Tesla Inc"),
 			("LLY", "Eli Lilly and Company"),
@@ -68,25 +66,25 @@ public static class AssetDataSeeder
 			("PM", "Philip Morris International Inc"),
 			("UNP", "Union Pacific Corporation"),
 			("INTC", "Intel Corporation")
-		};
+		];
 
-		foreach (var stock in stockData)
+		foreach ((string Code, string Name) stock in stockData)
 		{
-			assets.Add(Asset.Create(
-				AssetCode.Create(stock.Code),
-				AssetKind.Stock,
-				AssetLifecycleState.Active,
-				stock.Name,
-				nativeDecimals: 2
-			));
+			assets.Add(
+				Asset.Create(
+					AssetCode.Create(stock.Code),
+					AssetKind.Stock,
+					AssetLifecycleState.Active,
+					stock.Name,
+					2));
 		}
 
 		// ---------------------------------------------------------
 		// 2. CRYPTOCURRENCIES (Top 200)
 		// ---------------------------------------------------------
 		// Note: Native decimals vary (BTC=EntityConstraints.Domain.Asset.NativeDecimalsAvgLength, ETH=EntityConstraints.Domain.Asset.NativeDecimalsMaxLength)
-		var cryptoData = new List<(string Code, string Name, byte Decimals)>
-		{
+		List<(string Code, string Name, byte Decimals)> cryptoData =
+		[
 			("BTC", "Bitcoin", EntityConstraints.Domain.Asset.NativeDecimalsAvgLength),
 			("ETH", "Ethereum", EntityConstraints.Domain.Asset.NativeDecimalsMaxLength),
 			("USDT", "Tether", EntityConstraints.Domain.Asset.NativeDecimalsMinLength),
@@ -276,9 +274,9 @@ public static class AssetDataSeeder
 			("ILV", "Illuvium", EntityConstraints.Domain.Asset.NativeDecimalsMaxLength),
 			("GHST", "Aavegotchi", EntityConstraints.Domain.Asset.NativeDecimalsMaxLength),
 			("RARE", "SuperRare", EntityConstraints.Domain.Asset.NativeDecimalsMaxLength)
-		};
+		];
 
-		foreach (var crypto in cryptoData)
+		foreach ((string Code, string Name, byte Decimals) crypto in cryptoData)
 		{
 			assets.Add(
 				Asset.Create(
@@ -286,8 +284,7 @@ public static class AssetDataSeeder
 					AssetKind.Crypto,
 					AssetLifecycleState.Active,
 					crypto.Name,
-					nativeDecimals: crypto.Decimals
-			));
+					crypto.Decimals));
 		}
 
 		return assets;

@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Core.Enums;
+namespace Portiforce.SAA.Core.Enums;
 
 /// <summary>
 ///     Defines the high-level lifecycle status of a domain entity.

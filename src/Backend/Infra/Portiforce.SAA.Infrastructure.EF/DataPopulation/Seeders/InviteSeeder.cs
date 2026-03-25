@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
@@ -21,23 +21,23 @@ public class InviteSeeder(
 		Tenant rootTenant,
 		Account sysAccount)
 	{
-		var platformUserInvites = new List<TenantInvite>();
+		List<TenantInvite> platformUserInvites = [];
 
-		var ownerToken = tokenGenerator.GenerateInviteToken();
-		var ownerTokenHash = hashingService.HashInviteToken(ownerToken);
+		string ownerToken = tokenGenerator.GenerateInviteToken();
+		byte[] ownerTokenHash = hashingService.HashInviteToken(ownerToken);
 
-		var platformOwnerInvite = BuildPlatformOwnerInvite(
+		TenantInvite platformOwnerInvite = BuildPlatformOwnerInvite(
 			rootTenant,
-			_config.PlatformOwner,
+			this._config.PlatformOwner,
 			sysAccount,
 			ownerTokenHash);
 
-		var adminToken = tokenGenerator.GenerateInviteToken();
-		var adminTokenHash = hashingService.HashInviteToken(adminToken);
+		string adminToken = tokenGenerator.GenerateInviteToken();
+		byte[] adminTokenHash = hashingService.HashInviteToken(adminToken);
 
-		var platformAdminInvite = BuildPlatformAdminInvite(
+		TenantInvite platformAdminInvite = BuildPlatformAdminInvite(
 			rootTenant,
-			_config.PlatformAdmin,
+			this._config.PlatformAdmin,
 			sysAccount,
 			adminTokenHash);
 
@@ -53,7 +53,7 @@ public class InviteSeeder(
 		Account sysAccount,
 		byte[] tokenHash)
 	{
-		Enum.TryParse(owner.Tier, out AccountTier accountTier);
+		_ = Enum.TryParse(owner.Tier, out AccountTier accountTier);
 
 		InviteTarget inviteTarget = InviteTarget.Email(owner.Email);
 
@@ -74,7 +74,7 @@ public class InviteSeeder(
 		Account sysAccount,
 		byte[] tokenHash)
 	{
-		Enum.TryParse(admin.Tier, out AccountTier accountTier);
+		_ = Enum.TryParse(admin.Tier, out AccountTier accountTier);
 
 		InviteTarget inviteTarget = InviteTarget.Email(admin.Email);
 

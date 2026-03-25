@@ -1,4 +1,5 @@
 using Portiforce.SAA.Core.Activities.Enums;
+using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Activities.Rules;
 using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -11,30 +12,29 @@ public sealed class LegGuardsTests
 	[Fact]
 	public void EnsureTradeOrExchangeShape_WhenNoInflowPrincipal_ShouldThrow()
 	{
-		var legs = new[]
+		AssetMovementLeg[] legs = new[]
 		{
-			ActivityTestFactory.PrincipalLeg(direction: MovementDirection.Outflow),
-			ActivityTestFactory.PrincipalLeg(direction: MovementDirection.Outflow),
-			ActivityTestFactory.FeeLegOutflow()
+			ActivityTestFactory.PrincipalLeg(MovementDirection.Outflow),
+			ActivityTestFactory.PrincipalLeg(MovementDirection.Outflow), ActivityTestFactory.FeeLegOutflow()
 		};
 
-		var act = () => LegGuards.EnsureTradeOrExchangeShape(legs);
-		act.Should().Throw<DomainValidationException>();
+		Action act = () => LegGuards.EnsureTradeOrExchangeShape(legs);
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void EnsureTradeOrExchangeShape_WhenSameAssetInAndOut_ShouldThrow()
 	{
-		var asset = AssetId.New();
+		AssetId asset = AssetId.New();
 
-		var legs = new[]
+		AssetMovementLeg[] legs = new[]
 		{
-			ActivityTestFactory.PrincipalLeg(direction: MovementDirection.Outflow, assetId: asset),
-			ActivityTestFactory.PrincipalLeg(direction: MovementDirection.Inflow, assetId: asset)
+			ActivityTestFactory.PrincipalLeg(MovementDirection.Outflow, asset),
+			ActivityTestFactory.PrincipalLeg(MovementDirection.Inflow, asset)
 		};
 
-		var act = () => LegGuards.EnsureTradeOrExchangeShape(legs);
-		act.Should().Throw<DomainValidationException>()
+		Action act = () => LegGuards.EnsureTradeOrExchangeShape(legs);
+		_ = act.Should().Throw<DomainValidationException>()
 			.WithMessage("*assets must differ*");
 	}
 }
