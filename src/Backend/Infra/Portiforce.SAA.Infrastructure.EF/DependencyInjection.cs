@@ -101,6 +101,9 @@ public static class DependencyInjection
 		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
 		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
 
+		services.AddScoped<IAccountIdentifierReadRepository, AccountIdentifierReadRepository>();
+		services.AddScoped<IAccountIdentifierWriteRepository, AccountIdentifierWriteRepository>();
+
 		return services;
 	}
 }

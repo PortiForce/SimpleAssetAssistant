@@ -62,9 +62,7 @@ public static class EntityConstraints
 		public static class Account
 		{
 			public const int AliasMinLength = 3;
-			public const int AliasMaxLength = 105;
-			public const int EmailMaxLength = 100;
-			public const int PhoneNumberMaxLength = 15;
+			public const int AliasMaxLength = 255;
 		}
 
 		public static class Platform

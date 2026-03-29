@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Interfaces.Projections;
+using Portiforce.SAA.Application.Interfaces.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -9,6 +9,7 @@ public sealed record InviteDetails(
 	TenantId TenantId,
 	string InviteTargetValue,
 	InviteChannel InviteChannel,
+	InviteTargetKind InviteTargetKind,
 	AccountTier InviteTier,
 	Role InviteRole,
 	InviteState State,
@@ -18,15 +19,16 @@ public sealed record InviteDetails(
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
 	AccountId? RelatedAccountId,
+	bool? BlockFutureInvitesForTarget,
 	bool CanResend,
-	bool CanRevoke
-);
+	bool CanRevoke);
 
 public sealed record InviteDetailsRaw(
 	Guid Id,
 	TenantId TenantId,
 	string InviteTargetValue,
 	InviteChannel InviteChannel,
+	InviteTargetKind InviteTargetKind,
 	AccountTier InviteTier,
 	Role InviteRole,
 	InviteState State,
@@ -35,5 +37,5 @@ public sealed record InviteDetailsRaw(
 	AccountId InvitedBy,
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
-	AccountId? RelatedAccountId
-) : IDetailsProjection;
+	AccountId? RelatedAccountId,
+	bool? BlockFutureInvitesForTarget) : IDetailsProjection;

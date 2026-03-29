@@ -36,15 +36,6 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
 				// IMPORTANT: use explicit column names to keep indexes simple & stable
 				_ = cb.Property(x => x.Email)
 					.HasColumnName("ContactEmail")
-					.IsRequired()
-					.HasConversion(
-						v => v.Value,
-						v => Email.Create(v))
-					.HasMaxLength(EntityConstraints.CommonSettings.EmailAddressDefaultLength);
-
-				// nullable
-				_ = cb.Property(x => x.BackupEmail)
-					.HasColumnName("ContactBackupEmail")
 					.HasConversion(
 						v => v != null ? v.Value : null,
 						v => string.IsNullOrEmpty(v) ? null : Email.Create(v))
@@ -56,7 +47,7 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
 					.HasConversion(
 						v => v != null ? v.Value : null,
 						v => string.IsNullOrEmpty(v) ? null : PhoneNumber.Create(v))
-					.HasMaxLength(EntityConstraints.Domain.Account.PhoneNumberMaxLength);
+					.HasMaxLength(EntityConstraints.CommonSettings.PhoneNumberMaxLength);
 			});
 
 		// an alternative to OwnsOne, also NavigationProperty is not needed here

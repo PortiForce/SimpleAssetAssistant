@@ -18,7 +18,7 @@ public sealed record GetInviteSummaryRequest(
 	{
 		yield return new KeyValuePair<string, string>("range", this.Range.ToString());
 
-		yield return new KeyValuePair<string, string>("trend", this.Trend.ToString());
+		yield return new KeyValuePair<string, string>("trendBucket", this.Trend.ToString());
 
 		if (this.Statuses is not null && this.Statuses.Count != 0)
 		{

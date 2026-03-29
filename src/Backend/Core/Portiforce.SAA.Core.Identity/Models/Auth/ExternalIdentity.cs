@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Models;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -6,6 +6,11 @@ using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Core.Identity.Models.Auth;
 
+/// <summary>
+///     Represents a binding between an internal account and an external authentication provider identity.
+///     Answers to the question: Which external login/provider identity authenticated or is linked to this account?
+///     Part of the authentication / identity integration area.
+/// </summary>
 public sealed class ExternalIdentity : Entity<ExternalIdentityId>
 {
 	private ExternalIdentity(

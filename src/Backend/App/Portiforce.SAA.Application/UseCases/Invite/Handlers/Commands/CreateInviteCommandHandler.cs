@@ -1,13 +1,15 @@
-﻿using Portiforce.SAA.Application.Exceptions;
+using Portiforce.SAA.Application.Exceptions;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence;
+using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
+using Portiforce.SAA.Application.UseCases.Invite.Projections;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
@@ -20,6 +22,8 @@ public sealed class CreateInviteCommandHandler(
 	IHashingService hashingService,
 	IClock clock,
 	ITenantLimitsService tenantLimitsService,
+	IAccountIdentifierReadRepository accountIdentifierReadRepository,
+	IExternalIdentityReadRepository externalIdentityReadRepository,
 	IInviteReadRepository inviteReadRepository,
 	IInviteWriteRepository inviteWriteRepository,
 	IUnitOfWork unitOfWork)
@@ -37,63 +41,81 @@ public sealed class CreateInviteCommandHandler(
 			return TypedResult<CreateInviteResult>.Fail(ResultError.Validation("InvitedByAccountId is not defined."));
 		}
 
-		var now = clock.UtcNow;
+		DateTimeOffset now = clock.UtcNow;
 
-		var existing = await inviteReadRepository.GetByInviteTargetAndTenantAsync(request.InviteTarget, request.TenantId, ct);
-		if (existing is not null)
+		if (request.ExpiredAtUtc <= now)
 		{
-			var isExpired = existing.ExpiresAtUtc <= now && existing.State != InviteState.Accepted;
+			return TypedResult<CreateInviteResult>.Fail(
+				ResultError.Validation("Invite expiration must be in the future."));
+		}
+
+		bool isInviteValueOccupied = request.InviteTarget.Channel switch
+		{
+			InviteChannel.Email => await accountIdentifierReadRepository.ExistsAsync(
+				request.TenantId,
+				AccountIdentifierKind.Email,
+				request.InviteTarget.Value,
+				ct),
+
+			InviteChannel.Telegram => await accountIdentifierReadRepository.ExistsAsync(
+				request.TenantId,
+				AccountIdentifierKind.TelegramUserId,
+				request.InviteTarget.Value,
+				ct),
+
+			InviteChannel.AppleAccount => await accountIdentifierReadRepository.ExistsAsync(
+				request.TenantId,
+				request.InviteTarget.Kind == InviteTargetKind.Email
+					? AccountIdentifierKind.Email
+					: AccountIdentifierKind.Phone,
+				request.InviteTarget.Value,
+				ct),
+
+			_ => false
+		};
+
+		if (isInviteValueOccupied)
+		{
+			return TypedResult<CreateInviteResult>.Fail(
+				ResultError.Conflict("This identifier is already used by an account in this tenant."));
+		}
+
+		InviteDetailsRaw? existingInvite =
+			await inviteReadRepository.GetByInviteTargetAndTenantAsync(request.InviteTarget, request.TenantId, ct);
+		if (existingInvite is not null)
+		{
+			bool isExpired = existingInvite.ExpiresAtUtc <= now && existingInvite.State != InviteState.Accepted;
 
 			if (!isExpired)
 			{
-				return existing.State switch
-				{
-					InviteState.Accepted =>
-						TypedResult<CreateInviteResult>.Fail(ResultError.Conflict(
-							$"Invite already accepted for target '{request.InviteTarget.Value}' and channel: '{request.InviteTarget.Type}'.",
-							details: new Dictionary<string, object?>
-							{
-								["state"] = existing.State.ToString(),
-								["relatedAccountId"] = existing.RelatedAccountId?.Value.ToString()
-							})),
-
-					InviteState.RevokedByTenant =>
-						TypedResult<CreateInviteResult>.Fail(ResultError.Conflict(
-							$"Invite for '{request.InviteTarget.Value}' and channel: '{request.InviteTarget.Type}' was revoked by tenant.",
-							details: new Dictionary<string, object?> { ["state"] = existing.State.ToString() })),
-
-					InviteState.DeclinedByUser =>
-						TypedResult<CreateInviteResult>.Fail(ResultError.Conflict(
-							$"Invite for '{request.InviteTarget.Value}' and channel: '{request.InviteTarget.Type}' was declined by user.",
-							details: new Dictionary<string, object?> { ["state"] = existing.State.ToString() })),
-
-					// Created-Sent-AcceptAttemptFailed -> treat as pending
-					_ =>
-						TypedResult<CreateInviteResult>.Fail(ResultError.Conflict(
-							$"Invite already exists in state {existing.State}.",
-							details: new Dictionary<string, object?>
-							{
-								["state"] = existing.State.ToString(),
-								["expiresAtUtc"] = existing.ExpiresAtUtc
-							}))
-				};
+				return TypedResult<CreateInviteResult>.Fail(
+					ResultError.Conflict(
+						$"Invite already exists in state {existingInvite.State}.",
+						new Dictionary<string, object?>
+						{
+							["state"] = existingInvite.State.ToString(),
+							["expiresAtUtc"] = existingInvite.ExpiresAtUtc,
+							["relatedAccountId"] = existingInvite.RelatedAccountId?.Value.ToString()
+						}));
 			}
 
-			// Expired invites - allow creating a new one.
+			// todo: Expired invites - allow creating a new one.
 		}
 
-		FlowResult.Result limitChecksResult = await tenantLimitsService.EnsureTenantCanInviteOrActivateAccountAsync(request.TenantId, ct);
+		FlowResult.Result limitChecksResult =
+			await tenantLimitsService.EnsureTenantCanInviteOrActivateAccountAsync(request.TenantId, ct);
 		if (!limitChecksResult.IsSuccess)
 		{
-			return TypedResult<CreateInviteResult>.Fail(limitChecksResult.Error ?? ResultError.Validation("Tenant has no longer capability to create invites"));
+			return TypedResult<CreateInviteResult>.Fail(
+				limitChecksResult.Error ?? ResultError.Validation("Tenant has no longer capability to create invites"));
 		}
 
-		var expiresAt = request.ExpiredAtUtc;
+		DateTimeOffset expiresAt = request.ExpiredAtUtc;
 
-		var rawInviteToken = tokenGenerator.GenerateInviteToken();
-		var tokenHash = hashingService.HashInviteToken(rawInviteToken);
+		string rawInviteToken = tokenGenerator.GenerateInviteToken();
+		byte[] tokenHash = hashingService.HashInviteToken(rawInviteToken);
 
-		var invite = TenantInvite.Create(
+		TenantInvite invite = TenantInvite.Create(
 			request.TenantId,
 			request.InviteTarget,
 			request.InvitedByAccountId,
@@ -101,24 +123,24 @@ public sealed class CreateInviteCommandHandler(
 			request.IntendedTier,
 			tokenHash,
 			now,
-			expiresAtUtc: expiresAt
-		);
+			expiresAt);
 
 		try
 		{
 			await inviteWriteRepository.AddAsync(invite, ct);
-			await unitOfWork.SaveChangesAsync(ct);
+			_ = await unitOfWork.SaveChangesAsync(ct);
 		}
 		catch (UniqueConstraintViolationException)
 		{
-			return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict(
-				$"Invite with email '{request.InviteTarget.Value}' and channel: '{request.InviteTarget.Type}' already exists."));
+			return TypedResult<CreateInviteResult>.Fail(
+				ResultError.Conflict(
+					"Invite could not be created because an active invite already exists or the identifier is already in use."));
 		}
 
-		return TypedResult<CreateInviteResult>.Ok(new CreateInviteResult(
-			InviteId: invite.Id,
-			Token: rawInviteToken,
-			ExpiresAtUtc: expiresAt
-		));
+		return TypedResult<CreateInviteResult>.Ok(
+			new CreateInviteResult(
+				invite.Id,
+				rawInviteToken,
+				expiresAt));
 	}
 }

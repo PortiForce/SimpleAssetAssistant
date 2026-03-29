@@ -25,7 +25,7 @@ public sealed class AuthSessionTokenConfiguration : IEntityTypeConfiguration<Aut
 		_ = builder.Property(x => x.Id)
 			.ValueGeneratedNever();
 
-		// 3. Properties: 
+		// 3. Properties
 		_ = builder.Property(x => x.SessionId)
 			.IsRequired();
 

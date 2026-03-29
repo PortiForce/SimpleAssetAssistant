@@ -79,7 +79,7 @@ public static class InviteMapper
 		{
 			Core.Identity.Enums.InviteChannel.Email => InviteChannel.Email,
 			Core.Identity.Enums.InviteChannel.Telegram => InviteChannel.Telegram,
-			Core.Identity.Enums.InviteChannel.AppleId => InviteChannel.AppleId,
+			Core.Identity.Enums.InviteChannel.AppleAccount => InviteChannel.AppleAccount,
 			_ => InviteChannel.None
 		};
 
@@ -103,7 +103,7 @@ public static class InviteMapper
 		{
 			InviteChannel.Email => Core.Identity.Enums.InviteChannel.Email,
 			InviteChannel.Telegram => Core.Identity.Enums.InviteChannel.Telegram,
-			InviteChannel.AppleId => Core.Identity.Enums.InviteChannel.AppleId,
+			InviteChannel.AppleAccount => Core.Identity.Enums.InviteChannel.AppleAccount,
 			_ => null
 		};
 

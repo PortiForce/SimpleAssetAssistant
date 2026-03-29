@@ -36,6 +36,10 @@ public sealed class TenantInviteConfiguration : IEntityTypeConfiguration<TenantI
 		_ = builder.Property(x => x.RevokedByAccountId)
 			.HasConversion(new NullableStrongIdConverter<AccountId>(x => x.Value, AccountId.From));
 
+		_ = builder.Property(x => x.BlockFutureInvites)
+			.HasConversion<bool>()
+			.IsRequired(false);
+
 		// Owned InviteTarget
 		_ = builder.ComplexProperty(
 			x => x.InviteTarget,
@@ -47,10 +51,15 @@ public sealed class TenantInviteConfiguration : IEntityTypeConfiguration<TenantI
 					.IsRequired()
 					.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
 
-				_ = cb.Property(x => x.Type)
-					.HasColumnName("InviteTargetType")
+				_ = cb.Property(x => x.Kind)
+					.HasColumnName("InviteTargetKind")
 					.IsRequired()
-					.HasConversion<int>();
+					.HasConversion<byte>();
+
+				_ = cb.Property(x => x.Channel)
+					.HasColumnName("InviteTargetChannel")
+					.IsRequired()
+					.HasConversion<byte>();
 			});
 
 		_ = builder.Property(x => x.IntendedRole)
@@ -79,9 +88,7 @@ public sealed class TenantInviteConfiguration : IEntityTypeConfiguration<TenantI
 
 		_ = builder.Property(x => x.SentAtUtc);
 
-		_ = builder.Property(x => x.AcceptedAtUtc);
-
-		_ = builder.Property(x => x.RevokedAtUtc);
+		_ = builder.Property(x => x.UpdatedAtUtc);
 
 		_ = builder.Property(x => x.SendCount)
 			.IsRequired();

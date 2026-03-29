@@ -39,6 +39,8 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 	public DbSet<AssetMovementLeg> ActivityLegs => this.Set<AssetMovementLeg>();
 
 	// Auth
+	public DbSet<AccountIdentifier> AccountIdentifiers => this.Set<AccountIdentifier>();
+
 	public DbSet<ExternalIdentity> ExternalIdentities => this.Set<ExternalIdentity>();
 
 	public DbSet<PasskeyCredential> PasskeyCredentials => this.Set<PasskeyCredential>();
@@ -83,6 +85,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		_ = modelBuilder.ApplyConfiguration(new AssetMovementLegConfiguration());
 
 		// Auth
+		_ = modelBuilder.ApplyConfiguration(new AccountIdentifierConfiguration());
 		_ = modelBuilder.ApplyConfiguration(new ExternalIdentityConfiguration());
 		_ = modelBuilder.ApplyConfiguration(new PasskeyCredentialConfiguration());
 		_ = modelBuilder.ApplyConfiguration(new AuthSessionTokenConfiguration());
@@ -109,6 +112,13 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany()
 			.HasForeignKey(pa => pa.AccountId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		// Account -> AccountIdentifiers
+		_ = modelBuilder.Entity<AccountIdentifier>()
+			.HasOne<Account>()
+			.WithMany() // Account doesn't need a list of these
+			.HasForeignKey(x => x.AccountId)
+			.OnDelete(DeleteBehavior.Cascade); // If Account is deleted, remove reserved identifiers
 
 		// Platform -> PlatformAccounts
 		_ = modelBuilder.Entity<PlatformAccount>()
@@ -185,6 +195,13 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany()
 			.HasForeignKey(pa => pa.TenantId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		// Tenant -> AccountIdentifiers
+		_ = modelBuilder.Entity<AccountIdentifier>()
+			.HasOne<Tenant>()
+			.WithMany() // Tenant doesn't need a list of these
+			.HasForeignKey(x => x.TenantId)
+			.OnDelete(DeleteBehavior.Cascade); // If Tenant is deleted, remove reserved identifiers
 
 		// Account (who sent invite) -> Invite (same account can send many invites)
 		_ = modelBuilder.Entity<TenantInvite>()

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Interfaces;
 using Portiforce.SAA.Core.Models;
@@ -121,15 +121,6 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		this.Settings = settings ?? throw new DomainValidationException("AccountSettings is required.");
 	}
 
-	private void EnsureEditable()
-	{
-		if (this.State is AccountState.Disabled or AccountState.Deleted)
-		{
-			throw new DomainValidationException(
-				$"Account is not editable in state: {this.State}. AccountId: {this.Id}");
-		}
-	}
-
 	private static string NormalizeAndValidateAlias(string alias)
 	{
 		if (string.IsNullOrWhiteSpace(alias))
@@ -137,7 +128,7 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 			throw new DomainValidationException("Alias is required.");
 		}
 
-		alias = alias.Trim().ToLowerInvariant();
+		alias = alias.Trim().Replace("@", "_").Replace(".", "-").ToLowerInvariant();
 
 		int min = EntityConstraints.Domain.Account.AliasMinLength;
 		int max = EntityConstraints.Domain.Account.AliasMaxLength;
@@ -156,5 +147,14 @@ public sealed class Account : Entity<AccountId>, IAggregateRoot
 		}
 
 		return alias;
+	}
+
+	private void EnsureEditable()
+	{
+		if (this.State is AccountState.Disabled or AccountState.Deleted)
+		{
+			throw new DomainValidationException(
+				$"Account is not editable in state: {this.State}. AccountId: {this.Id}");
+		}
 	}
 }

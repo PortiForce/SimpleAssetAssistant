@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Extensions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Interfaces;
@@ -40,13 +40,13 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 
 	public int SendCount { get; private set; }
 
-	public DateTimeOffset? AcceptedAtUtc { get; private set; }
+	public DateTimeOffset? UpdatedAtUtc { get; private set; }
 
 	public AccountId? AcceptedAccountId { get; private set; }
 
-	public DateTimeOffset? RevokedAtUtc { get; private set; }
-
 	public AccountId? RevokedByAccountId { get; private set; }
+
+	public bool? BlockFutureInvites { get; private set; }
 
 	public static TenantInvite Create(
 		TenantId tenantId,
@@ -74,9 +74,9 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 			throw new ArgumentException("ExpiresAt must be in the future.", nameof(expiresAtUtc));
 		}
 
-		if (inviteTarget is null)
+		if (inviteTarget.IsEmpty)
 		{
-			throw new ArgumentNullException(nameof(inviteTarget));
+			throw new ArgumentException("InviteTarget is required.", nameof(inviteTarget));
 		}
 
 		if (tokenHash is null || tokenHash.Length != 32)
@@ -111,16 +111,26 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 			throw new InvalidOperationException("Cannot send an expired invite.");
 		}
 
+		if (this.BlockFutureInvites.HasValue && this.BlockFutureInvites.Value)
+		{
+			throw new InvalidOperationException("Cannot send an invite to blocked record.");
+		}
+
 		this.State = InviteState.Sent;
 		this.SentAtUtc = nowUtc;
 		this.SendCount++;
 	}
 
-	public void Accept(AccountId accountId, DateTimeOffset nowUtc)
+	public bool Accept(AccountId accountId, DateTimeOffset nowUtc)
 	{
 		if (accountId == AccountId.Empty)
 		{
 			throw new ArgumentException("AccountId is required.", nameof(accountId));
+		}
+
+		if (this.State is InviteState.Accepted)
+		{
+			return false;
 		}
 
 		if (this.State is InviteState.RevokedByTenant)
@@ -133,21 +143,22 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 			throw new InvalidOperationException("Invite expired.");
 		}
 
-		if (this.State is InviteState.Accepted)
-		{
-			throw new InvalidOperationException("Invite already accepted.");
-		}
-
 		this.State = InviteState.Accepted;
-		this.AcceptedAtUtc = nowUtc;
+		this.UpdatedAtUtc = nowUtc;
 		this.AcceptedAccountId = accountId;
+		return true;
 	}
 
-	public void Revoke(AccountId revokedByAccountId, DateTimeOffset nowUtc)
+	public bool Revoke(AccountId revokedByAccountId, DateTimeOffset nowUtc, bool blockFutureInvites)
 	{
 		if (revokedByAccountId == AccountId.Empty)
 		{
 			throw new ArgumentException("RevokedByAccountId is required.", nameof(revokedByAccountId));
+		}
+
+		if (this.State is InviteState.RevokedByTenant)
+		{
+			return false;
 		}
 
 		if (this.State is InviteState.Accepted)
@@ -155,9 +166,40 @@ public sealed class TenantInvite : Entity<Guid>, IAggregateRoot
 			throw new InvalidOperationException("Cannot revoke an accepted invite.");
 		}
 
+		if (this.State is InviteState.DeclinedByUser)
+		{
+			throw new InvalidOperationException("Cannot revoke declined invite.");
+		}
+
+		this.BlockFutureInvites = blockFutureInvites;
 		this.State = InviteState.RevokedByTenant;
-		this.RevokedAtUtc = nowUtc;
+		this.UpdatedAtUtc = nowUtc;
 		this.RevokedByAccountId = revokedByAccountId;
+		return true;
+	}
+
+	public bool Decline(DateTimeOffset nowUtc)
+	{
+		if (this.State == InviteState.DeclinedByUser)
+		{
+			return false;
+		}
+
+		// decline action is more priority over revoke as it is expresses user's intent, while revoke is tenant's intent. So we allow decline even if the invite is revoked, but not the opposite.
+		if (this.State is InviteState.Accepted)
+		{
+			throw new InvalidOperationException("Cannot decline an accepted invite.");
+		}
+
+		if (this.State is not InviteState.RevokedByTenant and not InviteState.Expired)
+		{
+			this.State = InviteState.DeclinedByUser;
+		}
+
+		// express intention of the person do no longer receive any invites
+		this.BlockFutureInvites = true;
+		this.UpdatedAtUtc = nowUtc;
+		return true;
 	}
 
 	public bool IsExpired(DateTimeOffset nowUtc) => nowUtc >= this.ExpiresAtUtc && this.State != InviteState.Accepted;

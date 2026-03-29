@@ -4,13 +4,13 @@ using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 
-public interface IExternalIdentityReadRepository
+public interface IAccountIdentifierReadRepository
 {
-	Task<ExternalIdentityDetails?> FindGoogleIdentityAsync(string googleUserExternalId, CancellationToken ct);
+	Task<AccountIdentifierDetails?> FindGoogleIdentityAsync(string googleUserExternalId, CancellationToken ct);
 
 	Task<bool> ExistsAsync(
 		TenantId tenantId,
-		AuthProvider provider,
-		string value,
+		AccountIdentifierKind verificationKind,
+		string verificationValue,
 		CancellationToken ct);
 }

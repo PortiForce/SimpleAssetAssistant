@@ -12,6 +12,8 @@ public sealed record CreateInviteRequest : IValidatableObject
 	[StringLength(256, MinimumLength = 2)]
 	public string TargetValue { get; set; } = string.Empty;
 
+	[Required] public InviteTargetKind TargetKind { get; set; } = InviteTargetKind.None;
+
 	[Required] public InviteTenantRole IntendedRole { get; set; } = InviteTenantRole.TenantUser;
 
 	[Required] public InviteAccountTier IntendedTier { get; set; } = InviteAccountTier.Investor;
@@ -29,7 +31,6 @@ public sealed record CreateInviteRequest : IValidatableObject
 		switch (this.Channel)
 		{
 			case InviteChannel.Email:
-				// Let server be the source of truth, but catch obvious issues here.
 				if (!new EmailAddressAttribute().IsValid(rawValue))
 				{
 					yield return new ValidationResult(
@@ -59,9 +60,8 @@ public sealed record CreateInviteRequest : IValidatableObject
 
 				break;
 
-			case InviteChannel.AppleId:
+			case InviteChannel.AppleAccount:
 				// Usually an email, but could be a stable Apple subject on server side.
-				// In UI we’ll treat it as an email-like identifier.
 				if (!new EmailAddressAttribute().IsValid(rawValue))
 				{
 					yield return new ValidationResult(

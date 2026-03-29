@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -26,29 +26,29 @@ public sealed class AuthEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup(ApiRoutes.Auth).WithTags("Authentication");
+		RouteGroupBuilder group = app.MapGroup(ApiRoutes.Auth).WithTags("Authentication");
 
-		group.MapPost("/login", LoginAsync)
+		_ = group.MapPost("/login", LoginAsync)
 			.WithName("LocalLogin");
 
-		group.MapGet("/login/google", TriggerGoogleLogin)
+		_ = group.MapGet("/login/google", TriggerGoogleLogin)
 			.WithName("GoogleLogin");
 
-		group.MapGet("/google-callback", HandleGoogleCallbackAsync)
+		_ = group.MapGet("/google-callback", HandleGoogleCallbackAsync)
 			.WithName("GoogleCallback");
 
-		group.MapGet("/access-denied", () => Results.Text("Access denied."));
+		_ = group.MapGet("/access-denied", () => Results.Text("Access denied."));
 
-		group.MapPost("/logout", LogoutAsync)
+		_ = group.MapPost("/logout", LogoutAsync)
 			.WithName("LogoutPost");
 	}
 
 	private static async Task<IResult> LoginAsync(
-			[FromBody] LoginRequest request,
-			[FromServices] IMediator mediator,
-			[FromServices] ITenantContext tenantContext,
-			HttpContext context,
-			CancellationToken ct)
+		[FromBody] LoginRequest request,
+		[FromServices] IMediator mediator,
+		[FromServices] ITenantContext tenantContext,
+		HttpContext context,
+		CancellationToken ct)
 	{
 		Guid? tenantId = tenantContext.TenantId;
 		if (tenantId == null || tenantId == Guid.Empty)
@@ -71,10 +71,7 @@ public sealed class AuthEndpoints : IEndpoint
 			return TypedResults.Redirect("/auth/access-denied?reason=tenant_context_lost");
 		}
 
-		var properties = new AuthenticationProperties
-		{
-			RedirectUri = "/auth/google-callback"
-		};
+		AuthenticationProperties properties = new() { RedirectUri = "/auth/google-callback" };
 
 		properties.Items[WebConstants.TenantIdName] = tenantContext.TenantId.Value.ToString();
 
@@ -89,9 +86,9 @@ public sealed class AuthEndpoints : IEndpoint
 	}
 
 	private static async Task<IResult> HandleGoogleCallbackAsync(
-	HttpContext context,
-	[FromServices] IMediator mediator,
-	CancellationToken ct)
+		HttpContext context,
+		[FromServices] IMediator mediator,
+		CancellationToken ct)
 	{
 		AuthenticateResult authenticateResult =
 			await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
@@ -141,13 +138,15 @@ public sealed class AuthEndpoints : IEndpoint
 
 		if (!string.IsNullOrWhiteSpace(inviteTokenStr))
 		{
-			var command = new AcceptInviteWithGoogleCommand(
+			// todo : check where to get verified status
+			AcceptInviteWithGoogleCommand command = new(
 				tenantId,
 				inviteTokenStr,
 				email,
 				subjectId,
 				firstName,
-				lastName);
+				lastName,
+				true);
 
 			TypedResult<AcceptInviteResult> result = await mediator.Send(command, ct);
 
@@ -163,7 +162,7 @@ public sealed class AuthEndpoints : IEndpoint
 		}
 		else
 		{
-			var command = new LoginWithGoogleExternalIdCommand(
+			LoginWithGoogleExternalIdCommand command = new(
 				tenantId,
 				subjectId,
 				firstName,
@@ -182,31 +181,28 @@ public sealed class AuthEndpoints : IEndpoint
 			state = result.Value.State;
 		}
 
-		var claims = new List<Claim>
-	{
-		new(ClaimTypes.NameIdentifier, accountId.ToString()),
-		new(ClaimTypes.Name, $"{firstName} {lastName}".Trim()),
-		new(ClaimTypes.Email, email),
-		new(ClaimTypes.Role, role.ToString()),
-		new(CustomClaimTypes.State, state.ToString()),
-		new(CustomClaimTypes.TenantId, tenantId.ToString())
+		List<Claim> claims =
+		[
+			new(ClaimTypes.NameIdentifier, accountId.ToString()),
+			new(ClaimTypes.Name, $"{firstName} {lastName}".Trim()),
+			new(ClaimTypes.Email, email),
+			new(ClaimTypes.Role, role.ToString()),
+			new(CustomClaimTypes.State, state.ToString()),
+			new(CustomClaimTypes.TenantId, tenantId.ToString())
 #if DEBUG
-        ,new("GoogleSub", subjectId)
+            ,
+			new("GoogleSub", subjectId)
 #endif
-    };
+        ];
 
-		var identity = new ClaimsIdentity(
+		ClaimsIdentity identity = new(
 			claims,
 			CookieAuthenticationDefaults.AuthenticationScheme);
 
 		await context.SignInAsync(
 			CookieAuthenticationDefaults.AuthenticationScheme,
 			new ClaimsPrincipal(identity),
-			new AuthenticationProperties
-			{
-				IsPersistent = false,
-				ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-			});
+			new AuthenticationProperties { IsPersistent = false, ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8) });
 
 		return TypedResults.Redirect("/");
 	}

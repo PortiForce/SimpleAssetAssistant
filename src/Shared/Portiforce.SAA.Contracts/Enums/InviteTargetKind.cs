@@ -1,12 +1,12 @@
 namespace Portiforce.SAA.Contracts.Enums;
 
-public enum InviteChannel : byte
+public enum InviteTargetKind : byte
 {
 	None = 0,
 
 	Email = 1,
 
-	Telegram = 2,
+	Phone = 2,
 
-	AppleAccount = 3
+	TelegramUserName = 3
 }

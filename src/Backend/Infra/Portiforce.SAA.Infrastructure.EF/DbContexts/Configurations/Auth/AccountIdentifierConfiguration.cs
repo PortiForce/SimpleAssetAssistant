@@ -9,14 +9,14 @@ using Portiforce.SAA.Infrastructure.EF.Converters;
 
 namespace Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Auth;
 
-public sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<ExternalIdentity>
+public sealed class AccountIdentifierConfiguration : IEntityTypeConfiguration<AccountIdentifier>
 {
 	// todo tech: review
-	public void Configure(EntityTypeBuilder<ExternalIdentity> builder)
+	public void Configure(EntityTypeBuilder<AccountIdentifier> builder)
 	{
 		// 1. Table Name
 		_ = builder.ToTable(
-			DbConstants.Domain.Entities.AuthSchema.ExternalIdentityTableName,
+			DbConstants.Domain.Entities.AuthSchema.AccountIdentifierTableName,
 			DbConstants.Domain.Entities.AuthSchema.SchemaName);
 
 		// 2. Primary Key
@@ -24,16 +24,24 @@ public sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<Ext
 
 		_ = builder.Property(x => x.Id)
 			.ValueGeneratedNever()
-			.HasConversion(new StrongIdConverter<ExternalIdentityId>(x => x.Value, ExternalIdentityId.From));
+			.HasConversion(new StrongIdConverter<AccountIdentifierId>(x => x.Value, AccountIdentifierId.From));
 
 		// 3. Properties
-		_ = builder.Property(x => x.Provider)
+		_ = builder.Property(x => x.Kind)
 			.IsRequired()
 			.HasConversion<byte>();
 
-		_ = builder.Property(x => x.ProviderSubject)
+		_ = builder.Property(x => x.Value)
 			.IsRequired()
 			.HasMaxLength(EntityConstraints.CommonSettings.ProviderSubjectMaxLength);
+
+		_ = builder.Property(x => x.IsVerified)
+			.IsRequired()
+			.HasConversion<bool>();
+
+		_ = builder.Property(x => x.IsPrimary)
+			.IsRequired()
+			.HasConversion<bool>();
 
 		// 4. Relationships
 		_ = builder.Property(x => x.AccountId)
@@ -45,8 +53,8 @@ public sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<Ext
 			.IsRequired();
 
 		// 5. The Login Lookup Index
-		_ = builder.HasIndex(x => new { x.Provider, x.ProviderSubject })
+		_ = builder.HasIndex(x => new { x.TenantId, x.Kind, x.Value })
 			.IsUnique()
-			.HasDatabaseName("UX_ExternalIdentity_Provider_ExternalId");
+			.HasDatabaseName("UX_AccountIdentifier_Tenant_Kind_Value");
 	}
 }

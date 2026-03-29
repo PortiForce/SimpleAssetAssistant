@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Web.Client.Configuration;
 
@@ -8,7 +8,7 @@ public static class InviteFilterOptions
 	[
 		InviteChannel.Email,
 		InviteChannel.Telegram,
-		InviteChannel.AppleId
+		InviteChannel.AppleAccount
 	];
 
 	public static readonly IReadOnlyList<InviteStatus> Statuses =

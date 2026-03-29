@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
@@ -12,9 +13,11 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 namespace Portiforce.SAA.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    partial class AssetAssistantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260329221110_AddBlockFutureInvitesToTenantInvite")]
+    partial class AddBlockFutureInvitesToTenantInvite
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

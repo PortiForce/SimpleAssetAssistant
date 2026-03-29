@@ -37,4 +37,8 @@
     <PackageReference Update="Roslynator.Analyzers" Version="4.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Identity\Models\Profile\" />
+  </ItemGroup>
+
 </Project>

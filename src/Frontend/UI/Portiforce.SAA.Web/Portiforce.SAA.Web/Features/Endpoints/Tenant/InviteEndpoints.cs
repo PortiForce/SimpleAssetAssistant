@@ -24,6 +24,7 @@ using Portiforce.SAA.Web.Mappers;
 
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
 using InviteSummaryRange = Portiforce.SAA.Contracts.Enums.InviteSummaryRange;
+using InviteTargetKind = Portiforce.SAA.Contracts.Enums.InviteTargetKind;
 using InviteTrendBucket = Portiforce.SAA.Contracts.Enums.InviteTrendBucket;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
@@ -223,12 +224,14 @@ public sealed class InviteEndpoints : IEndpoint
 		InviteTarget inviteTarget;
 		try
 		{
-			inviteTarget = request.Channel switch
+			inviteTarget = request.TargetKind switch
 			{
-				InviteChannel.Email => InviteTarget.Email(request.TargetValue),
-				InviteChannel.Telegram => InviteTarget.Telegram(request.TargetValue),
-				InviteChannel.AppleId => InviteTarget.AppleId(request.TargetValue),
-				_ => throw new ArgumentOutOfRangeException(nameof(request.Channel))
+				InviteTargetKind.Phone => InviteTarget.ApplePhone(request.TargetValue),
+				InviteTargetKind.Email => request.Channel == InviteChannel.AppleAccount
+					? InviteTarget.AppleEmail(request.TargetValue)
+					: InviteTarget.Email(request.TargetValue),
+				InviteTargetKind.TelegramUserName => InviteTarget.TelegramUserName(request.TargetValue),
+				_ => throw new ArgumentOutOfRangeException(nameof(request.TargetKind))
 			};
 		}
 		catch (ArgumentException ex)

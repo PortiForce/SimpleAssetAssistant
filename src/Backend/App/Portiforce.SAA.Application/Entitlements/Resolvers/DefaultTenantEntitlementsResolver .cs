@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Interfaces.Resolvers;
+using Portiforce.SAA.Application.Interfaces.Resolvers;
 using Portiforce.SAA.Core.Identity.Enums;
 
 namespace Portiforce.SAA.Application.Entitlements.Resolvers;
@@ -10,50 +10,49 @@ public sealed class DefaultTenantEntitlementsResolver : ITenantEntitlementsResol
 	public TenantEntitlements Resolve(TenantPlan plan) => plan switch
 	{
 		TenantPlan.Demo => new TenantEntitlements(
-			MaxActiveUsers: 10,
-			MaxPendingInvites: 30,
-			MaxPlatforms: 5,
-			MaxDistinctAssets: 20,
-			MaxImportRows: 5_000,
-			AllowProjections: false,
-			AllowAdvancedAnalytics: false),
+			25,
+			60,
+			20,
+			100,
+			5_000,
+			false,
+			false),
 
 		TenantPlan.Basic => new TenantEntitlements(
-			MaxActiveUsers: 50,
-			MaxPendingInvites: 100,
-			MaxPlatforms: 10,
-			MaxDistinctAssets: 200,
-			MaxImportRows: 10_000,
-			AllowProjections: true,
-			AllowAdvancedAnalytics: false),
-
+			50,
+			100,
+			10,
+			200,
+			10_000,
+			true,
+			false),
 
 		TenantPlan.Advanced => new TenantEntitlements(
-			MaxActiveUsers: 100,
-			MaxPendingInvites: 200,
-			MaxPlatforms: 20,
-			MaxDistinctAssets: 500,
-			MaxImportRows: 12_000,
-			AllowProjections: true,
-			AllowAdvancedAnalytics: false),
+			100,
+			200,
+			20,
+			500,
+			12_000,
+			true,
+			false),
 
 		TenantPlan.Pro => new TenantEntitlements(
-			MaxActiveUsers: 200,
-			MaxPendingInvites: 500,
-			MaxPlatforms: 50,
-			MaxDistinctAssets: 1000,
-			MaxImportRows: 20_000,
-			AllowProjections: true,
-			AllowAdvancedAnalytics: true),
+			200,
+			500,
+			50,
+			1000,
+			20_000,
+			true,
+			true),
 
 		TenantPlan.Custom => new TenantEntitlements(
-			MaxActiveUsers: 25,
-			MaxPendingInvites: 50,
-			MaxPlatforms: 50,
-			MaxDistinctAssets: 1000,
-			MaxImportRows: 20_000,
-			AllowProjections: true,
-			AllowAdvancedAnalytics: true),
+			25,
+			50,
+			50,
+			1000,
+			20_000,
+			true,
+			true),
 
 		_ => throw new ArgumentOutOfRangeException(nameof(plan))
 	};

@@ -20,22 +20,25 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			x.Id,
 			x.TenantId,
 			x.InviteTarget.Value,
-			x.InviteTarget.Type,
+			x.InviteTarget.Channel,
+			x.InviteTarget.Kind,
 			x.IntendedTier,
 			x.IntendedRole,
 			x.State,
 			x.CreatedAtUtc,
 			x.ExpiresAtUtc,
 			x.InvitedByAccountId,
-			x.AcceptedAtUtc,
-			x.AcceptedAccountId);
+			x.UpdatedAtUtc,
+			x.AcceptedAccountId,
+			x.BlockFutureInvites);
 
 	private static Expression<Func<TenantInvite, InviteDetailsRaw>> DetailsSelector =>
 		x => new InviteDetailsRaw(
 			x.Id,
 			x.TenantId,
 			x.InviteTarget.Value,
-			x.InviteTarget.Type,
+			x.InviteTarget.Channel,
+			x.InviteTarget.Kind,
 			x.IntendedTier,
 			x.IntendedRole,
 			x.State,
@@ -43,8 +46,9 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 			x.ExpiresAtUtc,
 			x.InvitedByAccountId,
 			x.SendCount,
-			x.AcceptedAtUtc,
-			x.AcceptedAccountId);
+			x.UpdatedAtUtc,
+			x.AcceptedAccountId,
+			x.BlockFutureInvites);
 
 	public async Task<InviteDetailsRaw?> GetByIdAsync(Guid id, CancellationToken ct)
 	{
@@ -72,7 +76,7 @@ internal sealed class InviteReadRepository(AssetAssistantDbContext db) : IInvite
 
 		if (channels is { Count: > 0 })
 		{
-			query = query.Where(x => channels.Contains(x.InviteTarget.Type));
+			query = query.Where(x => channels.Contains(x.InviteTarget.Channel));
 		}
 
 		if (states is { Count: > 0 })

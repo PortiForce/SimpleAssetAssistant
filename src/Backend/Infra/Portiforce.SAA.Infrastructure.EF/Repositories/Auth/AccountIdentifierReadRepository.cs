@@ -8,38 +8,40 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
 namespace Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
 
-internal sealed class ExternalIdentityReadRepository(AssetAssistantDbContext db) : IExternalIdentityReadRepository
+internal sealed class AccountIdentifierReadRepository(AssetAssistantDbContext db) : IAccountIdentifierReadRepository
 {
-	public async Task<ExternalIdentityDetails?> FindGoogleIdentityAsync(
+	public async Task<AccountIdentifierDetails?> FindGoogleIdentityAsync(
 		string googleUserExternalId,
 		CancellationToken ct)
 	{
-		return await db.ExternalIdentities
+		return await db.AccountIdentifiers
 			.AsNoTracking()
 			.Where(x =>
-				x.Provider == AuthProvider.Google &&
-				x.ProviderSubject == googleUserExternalId)
-			.Select(x => new ExternalIdentityDetails(
+				x.Kind == AccountIdentifierKind.Email &&
+				x.Value == googleUserExternalId)
+			.Select(x => new AccountIdentifierDetails(
 				x.Id,
 				x.TenantId,
 				x.AccountId,
-				x.Provider,
+				x.Kind,
+				x.Value,
+				x.IsVerified,
 				x.IsPrimary))
 			.SingleOrDefaultAsync(ct);
 	}
 
 	public async Task<bool> ExistsAsync(
 		TenantId tenantId,
-		AuthProvider provider,
-		string providerSubject,
+		AccountIdentifierKind verificationKind,
+		string verificationValue,
 		CancellationToken ct)
 	{
-		return await db.ExternalIdentities
+		return await db.AccountIdentifiers
 			.AsNoTracking()
 			.AnyAsync(
 				x => x.TenantId == tenantId &&
-					 x.Provider == provider &&
-					 x.ProviderSubject == providerSubject,
+					 x.Kind == verificationKind &&
+					 x.Value == verificationValue,
 				ct);
 	}
 }
