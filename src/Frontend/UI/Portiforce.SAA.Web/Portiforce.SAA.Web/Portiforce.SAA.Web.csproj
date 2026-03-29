@@ -26,4 +26,8 @@
     <Folder Include="Infrastructure\Interfaces\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Roslynator.Analyzers" Version="4.15.0" />
+  </ItemGroup>
+
 </Project>

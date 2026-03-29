@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Localization;
 
 using Portiforce.SAA.Contracts.Enums;
 
@@ -10,7 +10,7 @@ public static class InviteEnumExtensions
 	[
 		InviteChannel.Email,
 		InviteChannel.Telegram,
-		InviteChannel.AppleId
+		InviteChannel.AppleAccount
 	];
 
 	public static readonly IReadOnlyList<InviteStatus> StatusOptions =
@@ -40,7 +40,7 @@ public static class InviteEnumExtensions
 	{
 		InviteChannel.Email => localizer["ChannelEmail"],
 		InviteChannel.Telegram => localizer["ChannelTelegram"],
-		InviteChannel.AppleId => localizer["ChannelAppleId"],
+		InviteChannel.AppleAccount => localizer["ChannelAppleId"],
 		InviteChannel.None => localizer["None"],
 		_ => channel.ToString()
 	};

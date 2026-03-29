@@ -1,4 +1,4 @@
-﻿@page "/admin/invites/new"
+@page "/admin/invites/new"
 
 @using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.Configuration
@@ -102,6 +102,7 @@
     private CreateInviteRequest inviteModel = new()
     {
         Channel = InviteChannel.Email,
+        TargetKind = InviteTargetKind.Email,
         IntendedRole = InviteTenantRole.TenantUser,
         IntendedTier = InviteAccountTier.Investor,
         TargetValue = string.Empty
@@ -114,7 +115,7 @@
     {
         InviteChannel.Email => new(InviteChannel.Email.ToDisplayName(SharedEnumL), "colleague@example.com", L["HelpTextEmail"]),
         InviteChannel.Telegram => new(InviteChannel.Telegram.ToDisplayName(SharedEnumL), "@nickname", L["HelpTextTelegram"]),
-        InviteChannel.AppleId => new(InviteChannel.AppleId.ToDisplayName(SharedEnumL), "name@icloud.com", L["HelpTextAppleId"]),
+        InviteChannel.AppleAccount => new(InviteChannel.AppleAccount.ToDisplayName(SharedEnumL), "name@icloud.com", L["HelpTextAppleId"]),
         _ => new(L["LabelDefaultValue"], string.Empty, string.Empty)
     };
 

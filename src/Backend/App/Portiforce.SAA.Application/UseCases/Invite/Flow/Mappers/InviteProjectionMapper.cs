@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.UseCases.Invite.Flow.Rules;
+using Portiforce.SAA.Application.UseCases.Invite.Flow.Rules;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
 
 internal static class InviteProjectionMapper
@@ -10,6 +10,7 @@ internal static class InviteProjectionMapper
 			raw.TenantId,
 			raw.InviteTargetValue,
 			raw.InviteChannel,
+			raw.InviteTargetKind,
 			raw.InviteTier,
 			raw.InviteRole,
 			raw.State,
@@ -18,7 +19,8 @@ internal static class InviteProjectionMapper
 			raw.InvitedBy,
 			raw.AcceptedAtUtc,
 			raw.RelatedAccountId,
-			TenantInviteRules.CanBeResent(raw.State, raw.ExpiresAtUtc, nowUtc),
+			raw.BlockFutureInvitesForTarget,
+			TenantInviteRules.CanBeResent(raw.State, raw.BlockFutureInvitesForTarget, raw.ExpiresAtUtc, nowUtc),
 			TenantInviteRules.CanBeRevoked(raw.State, raw.ExpiresAtUtc, nowUtc));
 	}
 
@@ -29,6 +31,7 @@ internal static class InviteProjectionMapper
 			raw.TenantId,
 			raw.InviteTargetValue,
 			raw.InviteChannel,
+			raw.InviteTargetKind,
 			raw.InviteTier,
 			raw.InviteRole,
 			raw.State,
@@ -38,7 +41,8 @@ internal static class InviteProjectionMapper
 			raw.SendTimesCount,
 			raw.AcceptedAtUtc,
 			raw.RelatedAccountId,
-			TenantInviteRules.CanBeResent(raw.State, raw.ExpiresAtUtc, nowUtc),
+			raw.BlockFutureInvitesForTarget,
+			TenantInviteRules.CanBeResent(raw.State, raw.BlockFutureInvitesForTarget, raw.ExpiresAtUtc, nowUtc),
 			TenantInviteRules.CanBeRevoked(raw.State, raw.ExpiresAtUtc, nowUtc));
 	}
 }

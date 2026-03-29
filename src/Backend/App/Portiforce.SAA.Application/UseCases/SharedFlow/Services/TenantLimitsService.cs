@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Application.Entitlements;
+using Portiforce.SAA.Application.Entitlements;
 using Portiforce.SAA.Application.Exceptions;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Models.Tenant;
@@ -7,6 +7,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Profile;
 using Portiforce.SAA.Application.Interfaces.Resolvers;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
+using Portiforce.SAA.Application.UseCases.Client.Tenant.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 
@@ -25,8 +26,8 @@ internal sealed class TenantLimitsService(
 			return Result.Fail(ResultError.Validation("Tenant Id:is not defined"));
 		}
 
-		var tenantSummary = await tenantReadRepository.GetSummaryByIdAsync(tenantId, ct);
-		if  (tenantSummary is null)
+		TenantSummary? tenantSummary = await tenantReadRepository.GetSummaryByIdAsync(tenantId, ct);
+		if (tenantSummary is null)
 		{
 			return Result.Fail(ResultError.Validation($"Tenant with Id: {tenantId} is not found"));
 		}
@@ -36,7 +37,7 @@ internal sealed class TenantLimitsService(
 			return Result.Fail(ResultError.Validation($"Tenant with Id: {tenantId} is not active"));
 		}
 
-		return await EnsureTenantInvitesAndAccountLimitsAsync(tenantSummary, ct);
+		return await this.EnsureTenantInvitesAndAccountLimitsAsync(tenantSummary, ct);
 	}
 
 	public async Task<Result> EnsureTenantInvitesAndAccountLimitsAsync(ITenantInfo tenantInfo, CancellationToken ct)
@@ -48,7 +49,9 @@ internal sealed class TenantLimitsService(
 
 		if (currentActiveUsers >= maxAllowedActiveUsers)
 		{
-			return Result.Fail(ResultError.Validation($"Tenant '{tenantInfo.Code}' has reached the maximum of {maxAllowedActiveUsers} active users. Please contact your admin to upgrade."));
+			return Result.Fail(
+				ResultError.Validation(
+					$"Tenant '{tenantInfo.Code}' has reached the maximum of {maxAllowedActiveUsers} active users. Please contact your admin to upgrade."));
 		}
 
 		int maxPendingInvites = tenantEntitlements.MaxPendingInvites;
@@ -56,7 +59,9 @@ internal sealed class TenantLimitsService(
 
 		if (currentPendingInvites >= maxPendingInvites)
 		{
-			return Result.Fail(ResultError.Validation($"Tenant '{tenantInfo.Code}' has reached the maximum of {maxPendingInvites} pending invites. Please contact your admin to upgrade."));
+			return Result.Fail(
+				ResultError.Validation(
+					$"Tenant '{tenantInfo.Code}' has reached the maximum of {maxPendingInvites} pending invites. Please contact your admin to upgrade."));
 		}
 
 		return Result.Ok();

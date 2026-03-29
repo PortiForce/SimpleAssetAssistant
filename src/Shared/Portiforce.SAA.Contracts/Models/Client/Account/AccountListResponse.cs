@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Contracts.Models.Client.Account;
+namespace Portiforce.SAA.Contracts.Models.Client.Account;
 
 public sealed record AccountListResponse(
 	IReadOnlyList<AccountListItemResponse> Items,

@@ -30,7 +30,9 @@ public sealed record IncomeActivity : ReasonedActivity
 	}
 
 	// Private Empty Constructor for EF Core
-	private IncomeActivity() : base() { }
+	private IncomeActivity()
+	{
+	}
 
 	public static IncomeActivity Create(
 		TenantId tenantId,

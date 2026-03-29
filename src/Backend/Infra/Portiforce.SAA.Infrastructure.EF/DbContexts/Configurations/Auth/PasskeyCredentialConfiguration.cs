@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Portiforce.SAA.Core.Identity.Models.Auth;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Infrastructure.EF.Configuration;
@@ -13,43 +14,43 @@ public sealed class PasskeyCredentialConfiguration : IEntityTypeConfiguration<Pa
 	public void Configure(EntityTypeBuilder<PasskeyCredential> builder)
 	{
 		// 1. Table Name
-		builder.ToTable(
+		_ = builder.ToTable(
 			DbConstants.Domain.Entities.AuthSchema.PasskeyCredentialsTableName,
-			schema: DbConstants.Domain.Entities.AuthSchema.SchemaName);
+			DbConstants.Domain.Entities.AuthSchema.SchemaName);
 
 		// 2. Primary Key
-		builder.HasKey(x => x.Id);
+		_ = builder.HasKey(x => x.Id);
 
-		builder.Property(x => x.Id)
+		_ = builder.Property(x => x.Id)
 			.ValueGeneratedNever()
 			.HasConversion(new StrongIdConverter<ExternalIdentityId>(x => x.Value, ExternalIdentityId.From));
 
 		// 3. Properties
 
 		// The ID given by the browser/authenticator. Used for lookup during login
-		builder.Property(x => x.CredentialId)
+		_ = builder.Property(x => x.CredentialId)
 			.IsRequired()
 			.HasMaxLength(500); // Base64URL strings can be long
 
 		// The public key verified against signatures
-		builder.Property(x => x.PublicKey)
+		_ = builder.Property(x => x.PublicKey)
 			.IsRequired()
 			.HasColumnType(DbConstants.CommonSettings.VarBinaryDataType);
 
-		builder.Property(x => x.SignatureCounter)
+		_ = builder.Property(x => x.SignatureCounter)
 			.IsRequired();
 
-		builder.Property(x => x.UserHandle)
+		_ = builder.Property(x => x.UserHandle)
 			.HasMaxLength(128);
 
 		// 4. Relationships
-		builder.Property(x => x.AccountId)
+		_ = builder.Property(x => x.AccountId)
 			.HasConversion(new StrongIdConverter<AccountId>(x => x.Value, AccountId.From))
 			.IsRequired();
 
 		// 5. Indexes
 		// Fast lookup during the "Login Finish" phase
-		builder.HasIndex(x => x.CredentialId)
+		_ = builder.HasIndex(x => x.CredentialId)
 			.IsUnique()
 			.HasDatabaseName("UX_PasskeyCredential_CredentialId");
 	}

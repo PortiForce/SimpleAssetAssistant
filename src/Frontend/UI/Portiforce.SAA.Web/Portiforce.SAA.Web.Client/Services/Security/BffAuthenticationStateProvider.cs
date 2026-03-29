@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using System.Security.Claims;
 
 using global::Portiforce.SAA.Contracts.Configuration;
@@ -19,7 +19,7 @@ public sealed class BffAuthenticationStateProvider(IHttpClientFactory httpClient
 		{
 			var http = httpClientFactory.CreateClient(WebClientConstants.NoAntiforgeryClientName);
 
-			var me = await http.GetFromJsonAsync<MeResponse>(ApiRoutes.Ptofile);
+			var me = await http.GetFromJsonAsync<MeResponse>(ApiRoutes.Profile);
 			if (me?.IsAuthenticated != true)
 			{
 				return Anonymous;

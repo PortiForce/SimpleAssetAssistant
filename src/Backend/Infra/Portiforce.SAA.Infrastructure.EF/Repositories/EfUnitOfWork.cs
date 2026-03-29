@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Exceptions;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;

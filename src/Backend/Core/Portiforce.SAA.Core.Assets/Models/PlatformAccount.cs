@@ -17,7 +17,8 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		string accountName,
 		PlatformAccountState state,
 		string? externalAccountId,
-		string? externalUserId): base(id)
+		string? externalUserId)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -43,6 +44,7 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 		{
 			throw new DomainValidationException("PlatformAccount Name is required.");
 		}
+
 		accountName = accountName.Trim();
 
 		if (accountName.Length > EntityConstraints.CommonSettings.NameMaxLength)
@@ -52,26 +54,33 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 				nameof(accountName));
 		}
 
-		TenantId = tenantId;
-		AccountId = accountId;
-		PlatformId = platformId;
-		AccountName = accountName;
-		State = state;
+		this.TenantId = tenantId;
+		this.AccountId = accountId;
+		this.PlatformId = platformId;
+		this.AccountName = accountName;
+		this.State = state;
 
-		ExternalAccountId = string.IsNullOrWhiteSpace(externalAccountId) ? null : externalAccountId.Trim();
-		ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
+		this.ExternalAccountId = string.IsNullOrWhiteSpace(externalAccountId) ? null : externalAccountId.Trim();
+		this.ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
 	}
 
 	// Private Empty Constructor for EF Core
-	private PlatformAccount() { }
+	private PlatformAccount()
+	{
+	}
 
 	public TenantId TenantId { get; init; }
+
 	public AccountId AccountId { get; init; }
+
 	public PlatformId PlatformId { get; init; }
+
 	public string AccountName { get; private set; }
+
 	public PlatformAccountState State { get; private set; }
 
 	public string? ExternalAccountId { get; private set; }
+
 	public string? ExternalUserId { get; private set; }
 
 	public static PlatformAccount Create(
@@ -95,7 +104,7 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 
 	public void Rename(string name)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
@@ -111,27 +120,29 @@ public sealed class PlatformAccount : Entity<PlatformAccountId>, IAggregateRoot
 				nameof(name));
 		}
 
-		AccountName = name;
+		this.AccountName = name;
 	}
 
 	public void ChangeState(PlatformAccountState state)
 	{
-		EnsureEditable();
-		State = state;
+		this.EnsureEditable();
+		this.State = state;
 	}
 
 	public void LinkExternal(string? externalAccountId, string? externalUserId)
 	{
-		EnsureEditable();
-		ExternalAccountId = string.IsNullOrWhiteSpace(externalAccountId) ? null : externalAccountId.Trim();
-		ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
+		this.EnsureEditable();
+		this.ExternalAccountId = string.IsNullOrWhiteSpace(externalAccountId) ? null : externalAccountId.Trim();
+		this.ExternalUserId = string.IsNullOrWhiteSpace(externalUserId) ? null : externalUserId.Trim();
 	}
 
 	private void EnsureEditable()
 	{
-		if (State is PlatformAccountState.ReadOnly or PlatformAccountState.PendingDeletion or PlatformAccountState.Deleted)
+		if (this.State is PlatformAccountState.ReadOnly or PlatformAccountState.PendingDeletion
+			or PlatformAccountState.Deleted)
 		{
-			throw new DomainValidationException($"It is not possible to update readonly entity, state: {State}, id: {Id}");
+			throw new DomainValidationException(
+				$"It is not possible to update readonly entity, state: {this.State}, id: {this.Id}");
 		}
 	}
 }

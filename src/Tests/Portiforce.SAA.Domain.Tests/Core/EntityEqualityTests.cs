@@ -5,114 +5,104 @@ namespace Portiforce.SAA.Domain.Tests.Core;
 
 public sealed class EntityEqualityTests
 {
-	private sealed class TestEntity : Entity<AssetId>
-	{
-		public TestEntity(AssetId id) : base(id) { }
-	}
-
-	private sealed class AnotherEntity : Entity<AssetId>
-	{
-		public AnotherEntity(AssetId id) : base(id) { }
-	}
-
 	[Fact]
 	public void Equals_WhenSameReference_ShouldBeTrue()
 	{
-		var entity = new TestEntity(AssetId.New());
+		TestEntity entity = new(AssetId.New());
 
-		entity.Equals(entity).Should().BeTrue();
-		entity.Equals((object)entity).Should().BeTrue();
-		(entity == entity).Should().BeTrue();
-		(entity != entity).Should().BeFalse();
+		_ = entity.Equals(entity).Should().BeTrue();
+		_ = entity.Equals((object) entity).Should().BeTrue();
+		_ = (entity == entity).Should().BeTrue();
+		_ = (entity != entity).Should().BeFalse();
 	}
 
 	[Fact]
 	public void Equals_WhenSameTransientReference_ShouldBeTrue()
 	{
-		var entity = new TestEntity(default);
+		TestEntity entity = new(default);
 
-		entity.Equals(entity).Should().BeTrue();
-		entity.Equals((object)entity).Should().BeTrue();
-		(entity == entity).Should().BeTrue();
-		(entity != entity).Should().BeFalse();
+		_ = entity.Equals(entity).Should().BeTrue();
+		_ = entity.Equals((object) entity).Should().BeTrue();
+		_ = (entity == entity).Should().BeTrue();
+		_ = (entity != entity).Should().BeFalse();
 	}
 
 	[Fact]
 	public void Equals_WhenSameTypeAndSameNonEmptyId_ShouldBeTrue()
 	{
-		var id = AssetId.New();
+		AssetId id = AssetId.New();
 
-		var a = new TestEntity(id);
-		var b = new TestEntity(id);
+		TestEntity a = new(id);
+		TestEntity b = new(id);
 
-		a.Equals(b).Should().BeTrue();
-		b.Equals(a).Should().BeTrue();
-		a.Equals((object)b).Should().BeTrue();
-		(a == b).Should().BeTrue();
-		(a != b).Should().BeFalse();
-		a.GetHashCode().Should().Be(b.GetHashCode());
+		_ = a.Equals(b).Should().BeTrue();
+		_ = b.Equals(a).Should().BeTrue();
+		_ = a.Equals((object) b).Should().BeTrue();
+		_ = (a == b).Should().BeTrue();
+		_ = (a != b).Should().BeFalse();
+		_ = a.GetHashCode().Should().Be(b.GetHashCode());
 	}
 
 	[Fact]
 	public void Equals_WhenSameTypeButDifferentIds_ShouldBeFalse()
 	{
-		var a = new TestEntity(AssetId.New());
-		var b = new TestEntity(AssetId.New());
+		TestEntity a = new(AssetId.New());
+		TestEntity b = new(AssetId.New());
 
-		a.Equals(b).Should().BeFalse();
-		b.Equals(a).Should().BeFalse();
-		a.Equals((object)b).Should().BeFalse();
-		(a == b).Should().BeFalse();
-		(a != b).Should().BeTrue();
+		_ = a.Equals(b).Should().BeFalse();
+		_ = b.Equals(a).Should().BeFalse();
+		_ = a.Equals((object) b).Should().BeFalse();
+		_ = (a == b).Should().BeFalse();
+		_ = (a != b).Should().BeTrue();
 	}
 
 	[Fact]
 	public void Equals_WhenDifferentTypesEvenWithSameId_ShouldBeFalse()
 	{
-		var id = AssetId.New();
+		AssetId id = AssetId.New();
 
 		Entity<AssetId> a = new TestEntity(id);
 		Entity<AssetId> b = new AnotherEntity(id);
 
-		a.Equals(b).Should().BeFalse();
-		b.Equals(a).Should().BeFalse();
-		a.Equals((object)b).Should().BeFalse();
-		(a == b).Should().BeFalse();
-		(a != b).Should().BeTrue();
-		a.GetHashCode().Should().NotBe(b.GetHashCode());
+		_ = a.Equals(b).Should().BeFalse();
+		_ = b.Equals(a).Should().BeFalse();
+		_ = a.Equals((object) b).Should().BeFalse();
+		_ = (a == b).Should().BeFalse();
+		_ = (a != b).Should().BeTrue();
+		_ = a.GetHashCode().Should().NotBe(b.GetHashCode());
 	}
 
 	[Fact]
 	public void Equals_WhenDefaultIdAndDifferentInstances_ShouldBeFalse()
 	{
-		var a = new TestEntity(default);
-		var b = new TestEntity(default);
+		TestEntity a = new(default);
+		TestEntity b = new(default);
 
-		a.Equals(b).Should().BeFalse();
-		b.Equals(a).Should().BeFalse();
-		(a == b).Should().BeFalse();
-		(a != b).Should().BeTrue();
+		_ = a.Equals(b).Should().BeFalse();
+		_ = b.Equals(a).Should().BeFalse();
+		_ = (a == b).Should().BeFalse();
+		_ = (a != b).Should().BeTrue();
 	}
 
 	[Fact]
 	public void Equals_WhenOneIdIsDefaultAndOtherIsNonDefault_ShouldBeFalse()
 	{
-		var a = new TestEntity(default);
-		var b = new TestEntity(AssetId.New());
+		TestEntity a = new(default);
+		TestEntity b = new(AssetId.New());
 
-		a.Equals(b).Should().BeFalse();
-		b.Equals(a).Should().BeFalse();
-		(a == b).Should().BeFalse();
-		(a != b).Should().BeTrue();
+		_ = a.Equals(b).Should().BeFalse();
+		_ = b.Equals(a).Should().BeFalse();
+		_ = (a == b).Should().BeFalse();
+		_ = (a != b).Should().BeTrue();
 	}
 
 	[Fact]
 	public void Equals_WhenOtherIsNull_ShouldBeFalse()
 	{
-		var a = new TestEntity(AssetId.New());
+		TestEntity? a = new(AssetId.New());
 
-		a.Equals((Entity<AssetId>?)null).Should().BeFalse();
-		a.Equals((object?)null).Should().BeFalse();
+		_ = a.Equals(null).Should().BeFalse();
+		_ = a.Equals((object?) null).Should().BeFalse();
 	}
 
 	[Fact]
@@ -121,10 +111,10 @@ public sealed class EntityEqualityTests
 		TestEntity a = new(AssetId.New());
 		TestEntity? nullEntity = null;
 
-		(a == nullEntity).Should().BeFalse();
-		(a != nullEntity).Should().BeTrue();
-		(nullEntity == a).Should().BeFalse();
-		(nullEntity != a).Should().BeTrue();
+		_ = (a == nullEntity).Should().BeFalse();
+		_ = (a != nullEntity).Should().BeTrue();
+		_ = (nullEntity == a).Should().BeFalse();
+		_ = (nullEntity != a).Should().BeTrue();
 	}
 
 	[Fact]
@@ -133,16 +123,30 @@ public sealed class EntityEqualityTests
 		TestEntity? a = null;
 		TestEntity? b = null;
 
-		(a == b).Should().BeTrue();
-		(a != b).Should().BeFalse();
+		_ = (a == b).Should().BeTrue();
+		_ = (a != b).Should().BeFalse();
 	}
 
 	[Fact]
 	public void Equals_WhenObjectIsDifferentType_ShouldBeFalse()
 	{
-		var entity = new TestEntity(AssetId.New());
+		TestEntity entity = new(AssetId.New());
 
-		entity.Equals(new object()).Should().BeFalse();
-		entity.Equals("test").Should().BeFalse();
+		_ = entity.Equals(new object()).Should().BeFalse();
+		_ = entity.Equals("test").Should().BeFalse();
+	}
+
+	private sealed class TestEntity : Entity<AssetId>
+	{
+		public TestEntity(AssetId id) : base(id)
+		{
+		}
+	}
+
+	private sealed class AnotherEntity : Entity<AssetId>
+	{
+		public AnotherEntity(AssetId id) : base(id)
+		{
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Contracts.Models.Client.Invite;
 
@@ -12,33 +12,33 @@ public sealed record GetInviteListQueryRequest(
 {
 	public IEnumerable<KeyValuePair<string, string>> ToQueryParameters()
 	{
-		if (!string.IsNullOrWhiteSpace(Search))
+		if (!string.IsNullOrWhiteSpace(this.Search))
 		{
-			yield return new KeyValuePair<string, string>("search", Search);
+			yield return new KeyValuePair<string, string>("search", this.Search);
 		}
 
-		if (Statuses is not null && Statuses.Any())
+		if (this.Statuses is not null && this.Statuses.Count != 0)
 		{
-			foreach (var status in Statuses)
+			foreach (InviteStatus status in this.Statuses)
 			{
 				yield return new KeyValuePair<string, string>("statuses", status.ToString());
 			}
 		}
 
-		if (Channels is not null && Channels.Any())
+		if (this.Channels is not null && this.Channels.Count != 0)
 		{
-			foreach (var channel in Channels)
+			foreach (InviteChannel channel in this.Channels)
 			{
 				yield return new KeyValuePair<string, string>("channels", channel.ToString());
 			}
 		}
 
-		if (HasAccount is not null)
+		if (this.HasAccount is not null)
 		{
-			yield return new KeyValuePair<string, string>("hasAccount", HasAccount.Value.ToString());
+			yield return new KeyValuePair<string, string>("hasAccount", this.HasAccount.Value.ToString());
 		}
 
-		yield return new KeyValuePair<string, string>("page", Page.ToString());
-		yield return new KeyValuePair<string, string>("pageSize", PageSize.ToString());
+		yield return new KeyValuePair<string, string>("page", this.Page.ToString());
+		yield return new KeyValuePair<string, string>("pageSize", this.PageSize.ToString());
 	}
 }

@@ -1,19 +1,20 @@
-﻿namespace Portiforce.SAA.Core.Primitives;
+using Portiforce.SAA.Core.StaticResources;
+
+namespace Portiforce.SAA.Core.Primitives;
 
 public sealed record PhoneNumber
 {
 	// Private Empty Constructor for EF Core
 	private PhoneNumber()
 	{
-
 	}
-
-	public string Value { get; init; } = null!;
 
 	private PhoneNumber(string value)
 	{
-		Value = value;
+		this.Value = value;
 	}
+
+	public string Value { get; init; } = null!;
 
 	public static bool TryCreate(string rawData, out PhoneNumber phoneNumber)
 	{
@@ -36,35 +37,31 @@ public sealed record PhoneNumber
 			throw new ArgumentException("Phone number cannot be empty", nameof(rawData));
 		}
 
-		var normalized = Normalize(rawData);
+		rawData = rawData.Trim();
 
-		if (!IsValid(normalized))
+		if (!rawData.StartsWith('+'))
+		{
+			throw new ArgumentException("Phone number must be in E.164 international format (+...).", nameof(rawData));
+		}
+
+		string digitsOnly = new(rawData.Skip(1).Where(char.IsDigit).ToArray());
+		rawData = "+" + digitsOnly;
+
+		if (!IsValid(rawData))
 		{
 			throw new ArgumentException("Invalid phone number format", nameof(rawData));
 		}
 
-		return new PhoneNumber(normalized);
+		return new PhoneNumber(rawData);
 	}
 
-	public override string ToString() => Value;
-
-	private static string Normalize(string input)
-	{
-		input = input.Trim();
-
-		if (!input.StartsWith('+'))
-		{
-			throw new ArgumentException("Phone number must be in E.164 international format (+...).", nameof(input));
-		}
-
-		string digitsOnly = new string(input.Skip(1).Where(char.IsDigit).ToArray());
-		return "+" + digitsOnly;
-	}
+	public override string ToString() => this.Value;
 
 	private static bool IsValid(string value)
 	{
 		// E.164: + and 8–15 digits
-		return value.Length is >= 9 and <= 16 &&
+		return value.Length is >= EntityConstraints.CommonSettings.PhoneNumberMinLength
+				   and <= EntityConstraints.CommonSettings.PhoneNumberMaxLength &&
 			   value[0] == '+' &&
 			   value.Skip(1).All(char.IsDigit);
 	}

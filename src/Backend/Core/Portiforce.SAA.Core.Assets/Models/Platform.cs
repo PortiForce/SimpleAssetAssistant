@@ -14,7 +14,8 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 		string name,
 		string code,
 		PlatformKind kind,
-		PlatformState state): base(id)
+		PlatformState state)
+		: base(id)
 	{
 		if (id.IsEmpty)
 		{
@@ -31,18 +32,23 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 			throw new DomainValidationException("Platform Code is required.");
 		}
 
-		Name = name.Trim();
-		Code = code.Trim();
-		Kind = kind;
-		State = state;
+		this.Name = name.Trim();
+		this.Code = code.Trim();
+		this.Kind = kind;
+		this.State = state;
 	}
 
 	// Private Empty Constructor for EF Core
-	private Platform() { }
+	private Platform()
+	{
+	}
 
 	public string Name { get; private set; }
+
 	public string Code { get; private set; }
+
 	public PlatformKind Kind { get; init; }
+
 	public PlatformState State { get; private set; }
 
 	public static Platform Create(
@@ -60,7 +66,7 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 
 	public void Rename(string name)
 	{
-		EnsureEditable();
+		this.EnsureEditable();
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
@@ -69,27 +75,28 @@ public sealed class Platform : Entity<PlatformId>, IAggregateRoot
 
 		if (name.Trim().Length > EntityConstraints.CommonSettings.NameMaxLength)
 		{
-			throw new ArgumentException($"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}", nameof(name));
+			throw new ArgumentException(
+				$"Name value exceeds max length of: {EntityConstraints.CommonSettings.NameMaxLength}",
+				nameof(name));
 		}
-		Name = name.Trim();
+
+		this.Name = name.Trim();
 	}
 
 	public void ChangeState(PlatformState state)
 	{
-		EnsureEditable();
-		State = state;
+		this.EnsureEditable();
+		this.State = state;
 	}
 
 	private void EnsureEditable()
 	{
-		if (IsReadonly())
+		if (this.IsReadonly())
 		{
-			throw new DomainValidationException($"It is not possible to update Readonly entity, state: {State}, id: {Id}");
+			throw new DomainValidationException(
+				$"It is not possible to update Readonly entity, state: {this.State}, id: {this.Id}");
 		}
 	}
 
-	private bool IsReadonly()
-	{
-		return State is PlatformState.ReadOnly or PlatformState.Deleted;
-	}
+	private bool IsReadonly() => this.State is PlatformState.ReadOnly or PlatformState.Deleted;
 }

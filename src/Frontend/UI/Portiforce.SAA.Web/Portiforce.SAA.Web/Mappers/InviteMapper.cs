@@ -1,12 +1,14 @@
-﻿using System.Xml.Linq;
-
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Summary;
 using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
+using Portiforce.SAA.Contracts.Models.Client.Invite.Summary;
 using Portiforce.SAA.Core.Identity.Enums;
 
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
+using InviteSummaryRange = Portiforce.SAA.Application.UseCases.Invite.Projections.Summary.InviteSummaryRange;
+using InviteTrendBucket = Portiforce.SAA.Application.UseCases.Invite.Projections.Summary.InviteTrendBucket;
 
 namespace Portiforce.SAA.Web.Mappers;
 
@@ -22,15 +24,16 @@ public static class InviteMapper
 
 	public static HashSet<AccountTier> ToBusinessSet(this InviteAccountTier[] presentationTiers)
 	{
-		var set = new HashSet<AccountTier>();
-		foreach (var inviteAccountTier in presentationTiers)
+		HashSet<AccountTier> set = [];
+		foreach (InviteAccountTier inviteAccountTier in presentationTiers)
 		{
-			var mappedValue = inviteAccountTier.ToBusiness();
+			AccountTier? mappedValue = inviteAccountTier.ToBusiness();
 			if (mappedValue != null)
 			{
-				set.Add(mappedValue.Value);
+				_ = set.Add(mappedValue.Value);
 			}
 		}
+
 		return set;
 	}
 
@@ -51,16 +54,16 @@ public static class InviteMapper
 
 	public static HashSet<Role> ToBusinessSet(this InviteTenantRole[] presentationRoles)
 	{
-		var set = new HashSet<Role>();
-		foreach (var inviteTenantRole in presentationRoles)
+		HashSet<Role> set = [];
+		foreach (InviteTenantRole inviteTenantRole in presentationRoles)
 		{
-			var mappedValue = inviteTenantRole.ToBusiness();
+			Role? mappedValue = inviteTenantRole.ToBusiness();
 			if (mappedValue != null)
 			{
-				set.Add(mappedValue.Value);
+				_ = set.Add(mappedValue.Value);
 			}
 		}
-		
+
 		return set;
 	}
 
@@ -71,36 +74,38 @@ public static class InviteMapper
 		_ => null
 	};
 
-	public static InviteChannel ToPresentation(this Core.Identity.Enums.InviteChannel domainChannel) => domainChannel switch
-	{
-		Core.Identity.Enums.InviteChannel.Email => InviteChannel.Email,
-		Core.Identity.Enums.InviteChannel.Telegram => InviteChannel.Telegram,
-		Core.Identity.Enums.InviteChannel.AppleId => InviteChannel.AppleId,
-		_ => InviteChannel.None
-	};
+	public static InviteChannel ToPresentation(this Core.Identity.Enums.InviteChannel domainChannel) =>
+		domainChannel switch
+		{
+			Core.Identity.Enums.InviteChannel.Email => InviteChannel.Email,
+			Core.Identity.Enums.InviteChannel.Telegram => InviteChannel.Telegram,
+			Core.Identity.Enums.InviteChannel.AppleAccount => InviteChannel.AppleAccount,
+			_ => InviteChannel.None
+		};
 
 	public static HashSet<Core.Identity.Enums.InviteChannel> ToBusinessSet(this InviteChannel[] presentationChannels)
 	{
-		var set = new HashSet<Core.Identity.Enums.InviteChannel>();
-		foreach (var presentationChannel in presentationChannels)
+		HashSet<Core.Identity.Enums.InviteChannel> set = [];
+		foreach (InviteChannel presentationChannel in presentationChannels)
 		{
-			var mappedValue = presentationChannel.ToBusiness();
+			Core.Identity.Enums.InviteChannel? mappedValue = presentationChannel.ToBusiness();
 			if (mappedValue != null)
 			{
-				set.Add(mappedValue.Value);
+				_ = set.Add(mappedValue.Value);
 			}
 		}
-		
+
 		return set;
 	}
 
-	public static Core.Identity.Enums.InviteChannel? ToBusiness(this InviteChannel presentationChannel) => presentationChannel switch
-	{
-		InviteChannel.Email => Core.Identity.Enums.InviteChannel.Email,
-		InviteChannel.Telegram => Core.Identity.Enums.InviteChannel.Telegram,
-		InviteChannel.AppleId => Core.Identity.Enums.InviteChannel.AppleId,
-		_ => null
-	};
+	public static Core.Identity.Enums.InviteChannel? ToBusiness(this InviteChannel presentationChannel) =>
+		presentationChannel switch
+		{
+			InviteChannel.Email => Core.Identity.Enums.InviteChannel.Email,
+			InviteChannel.Telegram => Core.Identity.Enums.InviteChannel.Telegram,
+			InviteChannel.AppleAccount => Core.Identity.Enums.InviteChannel.AppleAccount,
+			_ => null
+		};
 
 	public static InviteStatus ToPresentation(this InviteState domainState) => domainState switch
 	{
@@ -115,13 +120,13 @@ public static class InviteMapper
 
 	public static HashSet<InviteState> ToBusinessSet(this InviteStatus[] presentationStates)
 	{
-		var set = new HashSet<InviteState>();
-		foreach (var presentationState in presentationStates)
+		HashSet<InviteState> set = [];
+		foreach (InviteStatus presentationState in presentationStates)
 		{
-			var mappedValue = presentationState.ToBusiness();
+			InviteState? mappedValue = presentationState.ToBusiness();
 			if (mappedValue != null)
 			{
-				set.Add(mappedValue.Value);
+				_ = set.Add(mappedValue.Value);
 			}
 		}
 
@@ -159,7 +164,7 @@ public static class InviteMapper
 			model.TenantId.Value,
 			model.InviteTargetValue,
 			model.InviteChannel.ToPresentation(),
-			InviteMapper.ToPresentation(model.InviteTier),
+			ToPresentation(model.InviteTier),
 			model.InviteRole.ToPresentation(),
 			model.State.ToPresentation(),
 			model.CreatedAtUtc,
@@ -178,7 +183,7 @@ public static class InviteMapper
 			model.TenantId.Value,
 			model.InviteTargetValue,
 			model.InviteChannel.ToPresentation(),
-			InviteMapper.ToPresentation(model.InviteTier),
+			ToPresentation(model.InviteTier),
 			model.InviteRole.ToPresentation(),
 			model.State.ToPresentation(),
 			model.CreatedAtUtc,
@@ -189,5 +194,92 @@ public static class InviteMapper
 			model.RelatedAccountId?.Value,
 			model.CanResend,
 			model.CanRevoke);
+	}
+
+	public static InviteSummaryRange ToBusiness(this Contracts.Enums.InviteSummaryRange item) => item switch
+	{
+		Contracts.Enums.InviteSummaryRange.Today => InviteSummaryRange.Today,
+		Contracts.Enums.InviteSummaryRange.LastWeek => InviteSummaryRange.LastWeek,
+		Contracts.Enums.InviteSummaryRange.LastMonth => InviteSummaryRange.LastMonth,
+		Contracts.Enums.InviteSummaryRange.AllTime => InviteSummaryRange.AllTime,
+		_ => throw new ArgumentOutOfRangeException(nameof(item), $"Not expected range value: {item}")
+	};
+
+	public static InviteTrendBucket ToBusiness(this Contracts.Enums.InviteTrendBucket item) => item switch
+	{
+		Contracts.Enums.InviteTrendBucket.Hour => InviteTrendBucket.Hour,
+		Contracts.Enums.InviteTrendBucket.Day => InviteTrendBucket.Day,
+		Contracts.Enums.InviteTrendBucket.Week => InviteTrendBucket.Week,
+		Contracts.Enums.InviteTrendBucket.Month => InviteTrendBucket.Month,
+		_ => throw new ArgumentOutOfRangeException(nameof(item), $"Not expected trend bucket value: {item}")
+	};
+
+	public static Contracts.Enums.InviteSummaryRange ToPresentation(this InviteSummaryRange item) => item switch
+	{
+		InviteSummaryRange.Today => Contracts.Enums.InviteSummaryRange.Today,
+		InviteSummaryRange.LastWeek => Contracts.Enums.InviteSummaryRange.LastWeek,
+		InviteSummaryRange.LastMonth => Contracts.Enums.InviteSummaryRange.LastMonth,
+		InviteSummaryRange.AllTime => Contracts.Enums.InviteSummaryRange.AllTime,
+		_ => throw new ArgumentOutOfRangeException(nameof(item), $"Not expected range value: {item}")
+	};
+
+	public static Contracts.Enums.InviteTrendBucket ToPresentation(this InviteTrendBucket item) => item switch
+	{
+		InviteTrendBucket.Hour => Contracts.Enums.InviteTrendBucket.Hour,
+		InviteTrendBucket.Day => Contracts.Enums.InviteTrendBucket.Day,
+		InviteTrendBucket.Week => Contracts.Enums.InviteTrendBucket.Week,
+		InviteTrendBucket.Month => Contracts.Enums.InviteTrendBucket.Month,
+		_ => throw new ArgumentOutOfRangeException(nameof(item), $"Not expected trend bucket value: {item}")
+	};
+
+	public static InviteSummaryResponse MapToInviteSummary(this InviteSummary model)
+	{
+		InviteTierUsageResponse[] tierUsage = model.TierUsage
+			.Select(static item => new InviteTierUsageResponse(
+				item.TierCode,
+				item.Used,
+				item.Left,
+				item.TotalLimit,
+				item.UsedPercent,
+				item.LeftPercent))
+			.ToArray();
+
+		InviteTrendPointResponse[] trendPoints = model.Trend.Points
+			.Select(item => new InviteTrendPointResponse(
+				item.BucketStartUtc,
+				item.Sent,
+				item.Accepted,
+				item.Declined,
+				item.Failed,
+				item.Pending,
+				item.Expired,
+				item.Revoked))
+			.ToArray();
+
+		return new InviteSummaryResponse(
+			model.Range.ToPresentation(),
+			model.TrendBucket.ToPresentation(),
+			model.FromUtc,
+			model.ToUtc,
+			new InviteSummaryCardsResponse(
+				model.Cards.TotalSent,
+				model.Cards.Accepted,
+				model.Cards.Declined,
+				model.Cards.Failed,
+				model.Cards.Pending,
+				model.Cards.Expired,
+				model.Cards.Revoked,
+				model.Cards.AcceptanceRatePercent),
+			new InviteOutcomeBreakdownResponse(
+				model.OutcomeBreakdown.Accepted,
+				model.OutcomeBreakdown.Declined,
+				model.OutcomeBreakdown.Failed,
+				model.OutcomeBreakdown.Pending,
+				model.OutcomeBreakdown.Expired,
+				model.OutcomeBreakdown.Revoked),
+			tierUsage,
+			new InviteTrendResponse(
+				model.Trend.Bucket.ToPresentation(),
+				trendPoints));
 	}
 }
