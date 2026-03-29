@@ -1,13 +1,13 @@
 using Portiforce.SAA.Contracts.Configuration;
+using Portiforce.SAA.Contracts.Exceptions;
 using Portiforce.SAA.Contracts.Models.Client.Account;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
 using Portiforce.SAA.Contracts.Models.Client.Invite.Summary;
-using Portiforce.SAA.Web.Client.Services.ApiClients;
 using Portiforce.SAA.Web.Client.Services.Interfaces;
 
 using GetInviteListQueryRequest = Portiforce.SAA.Contracts.Models.Client.Invite.GetInviteListQueryRequest;
 
-namespace Portiforce.SAA.Web.Client.Services;
+namespace Portiforce.SAA.Web.Client.Services.ApiClients;
 
 public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpClient), IAdminApiClient
 {
@@ -15,6 +15,8 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 		GetInviteListQueryRequest request,
 		CancellationToken ct = default)
 	{
+		ArgumentNullException.ThrowIfNull(request);
+
 		string url = BuildUrl(ApiRoutes.Invites.Root, request.ToQueryParameters());
 		return await this.GetAsync<InviteListResponse>(url, ct);
 	}
@@ -23,6 +25,8 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 		GetInviteSummaryRequest request,
 		CancellationToken ct = default)
 	{
+		ArgumentNullException.ThrowIfNull(request);
+
 		string url = BuildUrl(ApiRoutes.Invites.Summary, request.ToQueryParameters());
 		return await this.GetAsync<InviteSummaryResponse>(url, ct);
 	}
@@ -31,7 +35,12 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 		Guid inviteId,
 		CancellationToken ct = default)
 	{
-		string url = $"{ApiRoutes.Invites.Details(inviteId)}";
+		if (inviteId == Guid.Empty)
+		{
+			throw new ArgumentException("InviteId is required.", nameof(inviteId));
+		}
+
+		string url = BuildUrl(ApiRoutes.Invites.Details(inviteId));
 		return await this.GetAsync<InviteDetailsResponse>(url, ct);
 	}
 
@@ -39,39 +48,53 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 		CreateInviteRequest request,
 		CancellationToken ct = default)
 	{
-		return await this.PostJsonAsync<CreateInviteRequest, CreateInviteResponse>(
-			ApiRoutes.Invites.New,
-			request,
-			ct);
+		ArgumentNullException.ThrowIfNull(request);
+
+		string url = BuildUrl(ApiRoutes.Invites.New);
+		return await this.PostJsonAsync<CreateInviteRequest, CreateInviteResponse>(url, request, ct);
 	}
 
-	public async Task<bool> RevokeInviteAsync(Guid inviteId, CancellationToken ct = default)
+	public async Task<bool> RevokeInviteAsync(
+		Guid inviteId,
+		CancellationToken ct = default)
 	{
-		string url = $"{ApiRoutes.Invites.InviteRevoke(inviteId)}";
+		if (inviteId == Guid.Empty)
+		{
+			throw new ArgumentException("InviteId is required.", nameof(inviteId));
+		}
+
+		string url = BuildUrl(ApiRoutes.Invites.InviteRevoke(inviteId));
 		try
 		{
 			await this.PostAsync(url, ct);
+			return true;
 		}
-		catch (Exception)
+		catch (PortiforceApiException)
 		{
-			// Log the exception if needed
 			return false;
 		}
-
-		return true;
 	}
 
 	public async Task<AccountListResponse> GetUsersAsync(
 		GetAccountListQueryRequest request,
 		CancellationToken ct = default)
 	{
+		ArgumentNullException.ThrowIfNull(request);
+
 		string url = BuildUrl(ApiRoutes.Accounts.Root, request.ToQueryParameters());
 		return await this.GetAsync<AccountListResponse>(url, ct);
 	}
 
-	public async Task<AccountDetailsResponse> GetUserDetailsAsync(Guid accountId, CancellationToken ct = default)
+	public async Task<AccountDetailsResponse> GetUserDetailsAsync(
+		Guid accountId,
+		CancellationToken ct = default)
 	{
-		string url = $"{ApiRoutes.Accounts.Details(accountId)}";
+		if (accountId == Guid.Empty)
+		{
+			throw new ArgumentException("AccountId is required.", nameof(accountId));
+		}
+
+		string url = BuildUrl(ApiRoutes.Accounts.Details(accountId));
 		return await this.GetAsync<AccountDetailsResponse>(url, ct);
 	}
 }

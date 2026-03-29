@@ -1,6 +1,8 @@
-﻿using System.Net.Http.Json;
-using global::Portiforce.SAA.Web.Client.Models;
+using System.Net.Http.Json;
+
 using Microsoft.AspNetCore.WebUtilities;
+
+using Portiforce.SAA.Web.Client.Models;
 
 namespace Portiforce.SAA.Web.Client.Services.ApiClients;
 
@@ -17,8 +19,8 @@ public abstract class ApiClientBase(HttpClient httpClient)
 			throw await CreateFriendlyExceptionAsync(response, ct);
 		}
 
-		return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: ct)
-			?? throw new InvalidOperationException("Failed to read the server response.");
+		return await response.Content.ReadFromJsonAsync<TResponse>(ct)
+			   ?? throw new InvalidOperationException("Failed to read the server response.");
 	}
 
 	protected async Task<TResponse> PostJsonAsync<TRequest, TResponse>(
@@ -33,15 +35,15 @@ public abstract class ApiClientBase(HttpClient httpClient)
 			throw await CreateFriendlyExceptionAsync(response, ct);
 		}
 
-		return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: ct)
-			?? throw new InvalidOperationException("Failed to read the server response.");
+		return await response.Content.ReadFromJsonAsync<TResponse>(ct)
+			   ?? throw new InvalidOperationException("Failed to read the server response.");
 	}
 
 	protected async Task PostAsync(
 		string url,
 		CancellationToken ct = default)
 	{
-		using HttpResponseMessage response = await httpClient.PostAsync(url, content: null, ct);
+		using HttpResponseMessage response = await httpClient.PostAsync(url, null, ct);
 
 		if (!response.IsSuccessStatusCode)
 		{
@@ -49,12 +51,27 @@ public abstract class ApiClientBase(HttpClient httpClient)
 		}
 	}
 
+	protected async Task<TResponse> PostAsync<TResponse>(
+		string url,
+		CancellationToken ct = default)
+	{
+		using HttpResponseMessage response = await httpClient.PostAsync(url, null, ct);
+
+		if (!response.IsSuccessStatusCode)
+		{
+			throw await CreateFriendlyExceptionAsync(response, ct);
+		}
+
+		return await response.Content.ReadFromJsonAsync<TResponse>(ct)
+			   ?? throw new InvalidOperationException("Failed to read the server response.");
+	}
+
+	protected static string BuildUrl(string path) => path;
+
 	protected static string BuildUrl(
 		string basePath,
-		IEnumerable<KeyValuePair<string, string>> query)
-	{
-		return QueryHelpers.AddQueryString(basePath, query);
-	}
+		IEnumerable<KeyValuePair<string, string>> query) =>
+		QueryHelpers.AddQueryString(basePath, query);
 
 	private static async Task<Exception> CreateFriendlyExceptionAsync(
 		HttpResponseMessage response,
@@ -65,7 +82,7 @@ public abstract class ApiClientBase(HttpClient httpClient)
 		try
 		{
 			ApiProblemDetails? problem = await response.Content
-				.ReadFromJsonAsync<ApiProblemDetails>(cancellationToken: ct);
+				.ReadFromJsonAsync<ApiProblemDetails>(ct);
 
 			if (problem?.Errors is not null && problem.Errors.Count > 0)
 			{

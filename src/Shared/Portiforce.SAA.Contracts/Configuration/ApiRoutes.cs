@@ -2,6 +2,8 @@ namespace Portiforce.SAA.Contracts.Configuration;
 
 public static class ApiRoutes
 {
+	public const string Public = "/public";
+
 	public const string Auth = "/auth";
 
 	public const string BffRoot = "/bff";
@@ -34,5 +36,10 @@ public static class ApiRoutes
 		public const string Root = "/bff/accouts";
 
 		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
+	}
+
+	public static class PublicRoutes
+	{
+		public static string DeclineInvite(string inviteToken) => $"/public/invites/{inviteToken}/decline";
 	}
 }
