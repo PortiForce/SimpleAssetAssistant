@@ -5,6 +5,6 @@ using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 
-public sealed record GetInviteDetailsQuery(
+public sealed record GetInviteOverviewQuery(
 	TenantId TenantId,
-	Guid InviteId) : IQuery<TypedResult<AdminInviteDetails>>;
+	string RawToken) : IQuery<TypedResult<OverviewInviteDetails>>;

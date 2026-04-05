@@ -9,7 +9,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
-using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;

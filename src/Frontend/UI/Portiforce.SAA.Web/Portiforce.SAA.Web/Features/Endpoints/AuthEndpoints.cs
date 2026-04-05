@@ -28,19 +28,28 @@ public sealed class AuthEndpoints : IEndpoint
 	{
 		RouteGroupBuilder group = app.MapGroup(ApiRoutes.Auth).WithTags("Authentication");
 
-		_ = group.MapPost("/login", LoginAsync)
-			.WithName("LocalLogin");
-
-		_ = group.MapGet("/login/google", TriggerGoogleLogin)
-			.WithName("GoogleLogin");
-
-		_ = group.MapGet("/google-callback", HandleGoogleCallbackAsync)
-			.WithName("GoogleCallback");
-
 		_ = group.MapGet("/access-denied", () => Results.Text("Access denied."));
 
+		_ = group.MapPost("/login", LoginAsync)
+			.WithName(AuthEndpointNames.LocalLogin);
+
+		_ = group.MapGet("/login/google", TriggerGoogleLogin)
+			.WithName(AuthEndpointNames.GoogleLogin);
+
+		_ = group.MapGet("/login/telegram", TriggerTelegramLogin)
+			.WithName(AuthEndpointNames.TelegramLogin);
+
+		_ = group.MapGet("/login/apple", TriggerAppleLogin)
+			.WithName(AuthEndpointNames.AppleLogin);
+
+		_ = group.MapGet("/login/apple-phone", TriggerApplePhoneLogin)
+			.WithName(AuthEndpointNames.ApplePhoneLogin);
+
+		_ = group.MapGet("/google-callback", HandleGoogleCallbackAsync)
+			.WithName(AuthEndpointNames.GoogleCallback);
+
 		_ = group.MapPost("/logout", LogoutAsync)
-			.WithName("LogoutPost");
+			.WithName(AuthEndpointNames.Logout);
 	}
 
 	private static async Task<IResult> LoginAsync(
@@ -84,6 +93,21 @@ public sealed class AuthEndpoints : IEndpoint
 			properties,
 			new[] { GoogleDefaults.AuthenticationScheme });
 	}
+
+	private static IResult TriggerTelegramLogin(
+		[FromServices] ITenantContext tenantContext,
+		[FromQuery] string? inviteToken) =>
+		throw new NotImplementedException("Telegram login is not yet implemented");
+
+	private static IResult TriggerAppleLogin(
+		[FromServices] ITenantContext tenantContext,
+		[FromQuery] string? inviteToken) =>
+		throw new NotImplementedException("Apple login is not yet implemented");
+
+	private static IResult TriggerApplePhoneLogin(
+		[FromServices] ITenantContext tenantContext,
+		[FromQuery] string? inviteToken) =>
+		throw new NotImplementedException("Apple hone login is not yet implemented");
 
 	private static async Task<IResult> HandleGoogleCallbackAsync(
 		HttpContext context,

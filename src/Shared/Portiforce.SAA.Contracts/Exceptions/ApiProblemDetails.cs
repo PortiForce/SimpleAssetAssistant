@@ -16,4 +16,10 @@ public class ApiProblemDetails
 
 	// Optional extension data like traceId, correlationId, etc.
 	[JsonExtensionData] public Dictionary<string, object?> Extensions { get; init; } = [];
+
+	public static ApiProblemDetails CreateProblem(
+		int status,
+		string title,
+		string detail) =>
+		new() { Status = status, Title = title, Detail = detail };
 }

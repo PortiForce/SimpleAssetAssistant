@@ -1,5 +1,6 @@
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Application.UseCases.Invite.Projections.Summary;
 using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
@@ -176,9 +177,9 @@ public static class InviteMapper
 			model.CanRevoke);
 	}
 
-	public static InviteDetailsResponse MapToInviteDetails(this InviteDetails model)
+	public static AdminInviteDetailsResponse MapToInviteDetails(this AdminInviteDetails model)
 	{
-		return new InviteDetailsResponse(
+		return new AdminInviteDetailsResponse(
 			model.Id,
 			model.TenantId.Value,
 			model.InviteTargetValue,
@@ -194,6 +195,25 @@ public static class InviteMapper
 			model.RelatedAccountId?.Value,
 			model.CanResend,
 			model.CanRevoke);
+	}
+
+	public static OverviewInviteDetailsResponse MapToOverviewInviteDetails(
+		this OverviewInviteDetails model,
+		string acceptUrl,
+		string declineUrl)
+	{
+		return new OverviewInviteDetailsResponse(
+			model.Id,
+			model.InviteTargetValue,
+			model.InviteChannel.ToPresentation(),
+			ToPresentation(model.InviteTier),
+			model.InviteRole.ToPresentation(),
+			model.State.ToPresentation(),
+			model.ExpiresAtUtc,
+			model.SendTimesCount,
+			model.AcceptedAtUtc,
+			acceptUrl,
+			declineUrl);
 	}
 
 	public static InviteSummaryRange ToBusiness(this Contracts.Enums.InviteSummaryRange item) => item switch

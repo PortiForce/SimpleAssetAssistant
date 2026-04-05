@@ -13,5 +13,5 @@ public sealed class ValidationApiException : PortiforceApiException
 		this.Errors = problemDetails.Errors;
 	}
 
-	public IReadOnlyDictionary<string, string[]> Errors { get; }
+	public IReadOnlyDictionary<string, string> Errors { get; }
 }

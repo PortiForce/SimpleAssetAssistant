@@ -16,13 +16,13 @@ public static class ApiRoutes
 
 	public const string Platform = "/bff/platform";
 
-	public static class Invites
+	public static class AdminInviteRoutes
 	{
-		public const string Root = "/bff/invites";
+		public const string Root = $"/{BffRoot}/admin-invite";
 
 		public const string Summary = $"{Root}/summary";
 
-		public const string New = "/bff/invites/new";
+		public const string New = $"{Root}/new";
 
 		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
 
@@ -31,15 +31,21 @@ public static class ApiRoutes
 		public static string InviteRevoke(Guid inviteId) => $"{Root}/{inviteId}/revoke";
 	}
 
-	public static class Accounts
+	public static class PublicInviteRoutes
 	{
-		public const string Root = "/bff/accouts";
+		public const string Root = $"/{BffRoot}/invite";
 
-		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
+		public static string OverviewInvite(string inviteToken) => $"/{Root}/{inviteToken}";
+
+		public static string DeclineInvite(string inviteToken) => $"/{Root}/{inviteToken}/decline";
+
+		public static string InitAcceptInvite(string inviteToken) => $"/{Root} /{inviteToken}/accept";
 	}
 
-	public static class PublicRoutes
+	public static class Accounts
 	{
-		public static string DeclineInvite(string inviteToken) => $"/public/invites/{inviteToken}/decline";
+		public const string Root = $"/{BffRoot}/accouts";
+
+		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
 	}
 }

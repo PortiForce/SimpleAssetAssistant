@@ -1,4 +1,4 @@
-﻿@page "/admin/invites/{InviteId:guid}"
+@page "/admin/invites/{InviteId:guid}"
 
 @using Portiforce.SAA.Contracts.Configuration
 @using Portiforce.SAA.Contracts.Models.Client.Invite
@@ -90,11 +90,11 @@ else
         <div class="card-actions">
             @if (invite.CanResend)
             {
-                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">@SharedActionL["ActionResend"]</a>
+                <a class="action-default" href="@ApiRoutes.AdminInviteRoutes.InviteResend(InviteId)">@SharedActionL["ActionResend"]</a>
             }
             @if (invite.CanRevoke)
             {
-                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">@SharedActionL["ActionRevoke"]</a>
+                <a class="action-caution" href="@ApiRoutes.AdminInviteRoutes.InviteRevoke(InviteId)">@SharedActionL["ActionRevoke"]</a>
             }
         </div>
     </div>
@@ -105,7 +105,7 @@ else
     [Parameter]
     public Guid InviteId { get; set; }
 
-    private InviteDetailsResponse? invite;
+    private AdminInviteDetailsResponse? invite;
     private bool isLoading = true;
     private string? error;
 

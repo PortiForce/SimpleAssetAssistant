@@ -16,7 +16,7 @@ public interface IAdminApiClient
 		GetInviteSummaryRequest request,
 		CancellationToken ct = default);
 
-	Task<InviteDetailsResponse> GetInviteDetailsAsync(
+	Task<AdminInviteDetailsResponse> GetInviteDetailsAsync(
 		Guid inviteId,
 		CancellationToken ct = default);
 

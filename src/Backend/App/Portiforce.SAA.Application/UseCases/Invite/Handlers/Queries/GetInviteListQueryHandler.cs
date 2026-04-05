@@ -9,36 +9,36 @@ using Portiforce.SAA.Application.UseCases.Invite.Projections;
 namespace Portiforce.SAA.Application.UseCases.Invite.Handlers.Queries;
 
 public sealed class GetInviteListQueryHandler(
-    IClock clock,
-    IInviteReadRepository inviteReadRepository) : IRequestHandler<GetInviteListQuery, PagedResult<InviteListItem>>
+	IClock clock,
+	IInviteReadRepository inviteReadRepository) : IRequestHandler<GetInviteListQuery, PagedResult<InviteListItem>>
 {
-    public async ValueTask<PagedResult<InviteListItem>> Handle(
-        GetInviteListQuery request,
-        CancellationToken ct)
-    {
-        string? normalizedSearch = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
+	public async ValueTask<PagedResult<InviteListItem>> Handle(
+		GetInviteListQuery request,
+		CancellationToken ct)
+	{
+		string? normalizedSearch = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
 
-        PagedResult<InviteListItemRaw> pagedInvitesRaw = await inviteReadRepository.GetListAsync(
-            request.TenantId,
-            request.Channels,
-            request.States,
-            normalizedSearch,
-            request.HasAccount,
-            request.PageRequest,
-            ct);
+		PagedResult<InviteListItemRaw> pagedInvitesRaw = await inviteReadRepository.GetListAsync(
+			request.TenantId,
+			request.Channels,
+			request.States,
+			normalizedSearch,
+			request.HasAccount,
+			request.PageRequest,
+			ct);
 
-        DateTimeOffset now = clock.UtcNow;
+		DateTimeOffset now = clock.UtcNow;
 
-        List<InviteListItem> pagedInvites = pagedInvitesRaw.Items
-            .Select(x => InviteProjectionMapper.ToListItem(x, now))
-            .ToList();
+		List<InviteListItem> pagedInvites = pagedInvitesRaw.Items
+			.Select(x => InviteProjectionMapper.ToListItem(x, now))
+			.ToList();
 
-        PagedResult<InviteListItem> result = new(
-            pagedInvites,
-            pagedInvitesRaw.TotalCount,
-            pagedInvitesRaw.PageNumber,
-            pagedInvitesRaw.PageSize);
+		PagedResult<InviteListItem> result = new(
+			pagedInvites,
+			pagedInvitesRaw.TotalCount,
+			pagedInvitesRaw.PageNumber,
+			pagedInvitesRaw.PageSize);
 
-        return result;
-    }
+		return result;
+	}
 }

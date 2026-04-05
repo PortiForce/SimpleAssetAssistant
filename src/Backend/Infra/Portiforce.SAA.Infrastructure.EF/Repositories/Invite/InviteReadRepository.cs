@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;

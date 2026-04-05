@@ -1,5 +1,6 @@
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -14,12 +15,12 @@ public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 		HashSet<InviteState>? states,
 		string? search,
 		bool? hasAccount,
-		PageRequest requestPageRequest,
+		PageRequest pageRequest,
 		CancellationToken ct);
 
 	Task<InviteDetailsRaw?> GetByInviteTargetAndTenantAsync(
 		InviteTarget inviteTarget,
-		TenantId requestTenantId,
+		TenantId tenantId,
 		CancellationToken ct);
 
 	/// <summary>
@@ -31,7 +32,7 @@ public interface IInviteReadRepository : IReadRepository<InviteDetailsRaw, Guid>
 	Task<List<InviteListItemRaw>> GetByInviteTargetAsync(InviteTarget inviteTarget, CancellationToken ct);
 
 	Task<TenantInvite?> GetByTenantAndTokenHashAsync(
-		TenantId requestTenantId,
+		TenantId tenantId,
 		byte[] tokenHash,
 		CancellationToken ct);
 

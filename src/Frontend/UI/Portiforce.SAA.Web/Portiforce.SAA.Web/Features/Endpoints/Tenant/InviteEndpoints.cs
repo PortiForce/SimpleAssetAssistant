@@ -9,6 +9,7 @@ using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Application.UseCases.Invite.Projections.Summary;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Contracts.Configuration;
@@ -32,20 +33,20 @@ namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 public sealed class InviteEndpoints : IEndpoint
 {
 	/*
-        GET    /bff/invites
-        GET    /bff/invites/summary
-        GET    /bff/invites/{inviteId:guid}
-        GET    /bff/invites/template
-        POST   /bff/invites
-        POST   /bff/invites/{inviteId:guid}/resend
-        POST   /bff/invites/{inviteId:guid}/revoke
+        GET    /bff/admin-invite
+        GET    /bff/admin-invite/summary
+        GET    /bff/admin-invite/{inviteId:guid}
+        GET    /bff/admin-invite/template
+        POST   /bff/admin-invite
+        POST   /bff/admin-invite/{inviteId:guid}/resend
+        POST   /bff/admin-invite/{inviteId:guid}/revoke
      */
 
 	private const int DefaultInviteLifetimeHours = 48;
 
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		RouteGroupBuilder group = app.MapGroup(ApiRoutes.Invites.Root)
+		RouteGroupBuilder group = app.MapGroup(ApiRoutes.AdminInviteRoutes.Root)
 			.WithTags("Tenant Invites")
 			.RequireAuthorization(UiPolicies.TenantAdmin)
 			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
@@ -56,7 +57,7 @@ public sealed class InviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden);
 
-		_ = group.MapGet(ApiRoutes.Invites.Summary, GetInviteSummaryAsync)
+		_ = group.MapGet("/summary", GetInviteSummaryAsync)
 			.WithName("GetTenantInviteSummary")
 			.Produces<InviteSummaryResponse>()
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
@@ -64,7 +65,7 @@ public sealed class InviteEndpoints : IEndpoint
 
 		_ = group.MapGet("/{inviteId:guid}", GetInviteDetailsAsync)
 			.WithName("GetTenantInviteDetails")
-			.Produces<InviteDetailsResponse>()
+			.Produces<AdminInviteDetailsResponse>()
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden)
 			.ProducesProblem(StatusCodes.Status404NotFound);
@@ -171,7 +172,8 @@ public sealed class InviteEndpoints : IEndpoint
 		return TypedResults.Ok(response);
 	}
 
-	private static async Task<Results<Ok<InviteDetailsResponse>, UnauthorizedHttpResult, ForbidHttpResult, NotFound>>
+	private static async
+		Task<Results<Ok<AdminInviteDetailsResponse>, UnauthorizedHttpResult, ForbidHttpResult, NotFound>>
 		GetInviteDetailsAsync(
 			Guid inviteId,
 			[FromServices] IMediator mediator,
@@ -184,14 +186,14 @@ public sealed class InviteEndpoints : IEndpoint
 		}
 
 		GetInviteDetailsQuery getDetailsCommand = new(currentUser.TenantId, inviteId);
-		TypedResult<InviteDetails> result = await mediator.Send(getDetailsCommand, ct);
+		TypedResult<AdminInviteDetails> result = await mediator.Send(getDetailsCommand, ct);
 
 		if (!result.IsSuccess || result.Value == null)
 		{
 			return TypedResults.NotFound();
 		}
 
-		InviteDetailsResponse inviteDetailsResponse = result.Value.MapToInviteDetails();
+		AdminInviteDetailsResponse inviteDetailsResponse = result.Value.MapToInviteDetails();
 		return TypedResults.Ok(inviteDetailsResponse);
 	}
 

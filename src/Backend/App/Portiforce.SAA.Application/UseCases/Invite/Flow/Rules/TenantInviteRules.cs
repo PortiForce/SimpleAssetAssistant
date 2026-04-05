@@ -15,16 +15,32 @@ internal static class TenantInviteRules
 			return false;
 		}
 
-		return state is InviteState.Created or InviteState.Sent
-			   && expirationTime > utcNow;
+		return IsManageable(state, expirationTime, utcNow);
 	}
 
 	public static bool CanBeRevoked(
 		InviteState state,
 		DateTimeOffset expirationTime,
-		DateTimeOffset utcNow)
-	{
-		return state is InviteState.Created or InviteState.Sent
-			   && expirationTime > utcNow;
-	}
+		DateTimeOffset utcNow) =>
+		IsManageable(state, expirationTime, utcNow);
+
+	public static bool CanBeAccepted(
+		InviteState state,
+		bool? blockFutureInvitesForTarget,
+		DateTimeOffset expirationTime,
+		DateTimeOffset utcNow) =>
+		IsManageable(state, expirationTime, utcNow);
+
+	public static bool CanBeDeclined(
+		InviteState state,
+		DateTimeOffset expirationTime,
+		DateTimeOffset utcNow) =>
+		IsManageable(state, expirationTime, utcNow);
+
+	private static bool IsManageable(
+		InviteState state,
+		DateTimeOffset expirationTime,
+		DateTimeOffset utcNow) =>
+		state is InviteState.Created or InviteState.Sent
+		&& expirationTime > utcNow;
 }

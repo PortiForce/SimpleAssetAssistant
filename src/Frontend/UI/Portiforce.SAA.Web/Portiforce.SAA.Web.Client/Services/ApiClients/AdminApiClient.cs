@@ -17,7 +17,7 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 	{
 		ArgumentNullException.ThrowIfNull(request);
 
-		string url = BuildUrl(ApiRoutes.Invites.Root, request.ToQueryParameters());
+		string url = BuildUrl(ApiRoutes.AdminInviteRoutes.Root, request.ToQueryParameters());
 		return await this.GetAsync<InviteListResponse>(url, ct);
 	}
 
@@ -27,11 +27,11 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 	{
 		ArgumentNullException.ThrowIfNull(request);
 
-		string url = BuildUrl(ApiRoutes.Invites.Summary, request.ToQueryParameters());
+		string url = BuildUrl(ApiRoutes.AdminInviteRoutes.Summary, request.ToQueryParameters());
 		return await this.GetAsync<InviteSummaryResponse>(url, ct);
 	}
 
-	public async Task<InviteDetailsResponse> GetInviteDetailsAsync(
+	public async Task<AdminInviteDetailsResponse> GetInviteDetailsAsync(
 		Guid inviteId,
 		CancellationToken ct = default)
 	{
@@ -40,8 +40,8 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 			throw new ArgumentException("InviteId is required.", nameof(inviteId));
 		}
 
-		string url = BuildUrl(ApiRoutes.Invites.Details(inviteId));
-		return await this.GetAsync<InviteDetailsResponse>(url, ct);
+		string url = BuildUrl(ApiRoutes.AdminInviteRoutes.Details(inviteId));
+		return await this.GetAsync<AdminInviteDetailsResponse>(url, ct);
 	}
 
 	public async Task<CreateInviteResponse> InviteUserAsync(
@@ -50,7 +50,7 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 	{
 		ArgumentNullException.ThrowIfNull(request);
 
-		string url = BuildUrl(ApiRoutes.Invites.New);
+		string url = BuildUrl(ApiRoutes.AdminInviteRoutes.New);
 		return await this.PostJsonAsync<CreateInviteRequest, CreateInviteResponse>(url, request, ct);
 	}
 
@@ -63,7 +63,7 @@ public sealed class AdminApiClient(HttpClient httpClient) : ApiClientBase(httpCl
 			throw new ArgumentException("InviteId is required.", nameof(inviteId));
 		}
 
-		string url = BuildUrl(ApiRoutes.Invites.InviteRevoke(inviteId));
+		string url = BuildUrl(ApiRoutes.AdminInviteRoutes.InviteRevoke(inviteId));
 		try
 		{
 			await this.PostAsync(url, ct);
