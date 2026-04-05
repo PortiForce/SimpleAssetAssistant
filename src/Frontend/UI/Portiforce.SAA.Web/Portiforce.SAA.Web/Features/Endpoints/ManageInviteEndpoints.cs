@@ -22,9 +22,9 @@ namespace Portiforce.SAA.Web.Features.Endpoints;
 public sealed class ManageInviteEndpoints : IEndpoint
 {
 	/*
-        GET    /bff/invite/{inviteId:guid}
-        POST   /bff/invite/{inviteId:guid}/resend
-        POST   /bff/invite/{inviteId:guid}/revoke
+        GET    /bff/invite/{inviteToken}
+        POST   /bff/invite/{inviteToken}/decline
+        POST   /bff/invite/{inviteToken}/accept
      */
 
 	public const string GetPublicInviteOverviewEndpointName = "GetPublicInviteOverview";
@@ -53,8 +53,6 @@ public sealed class ManageInviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status409Conflict)
 			.ProducesProblem(StatusCodes.Status410Gone);
 
-		// You said you already have an accept endpoint.
-		// Give it a stable name and generate links to it.
 		_ = group.MapPost("/{inviteToken}/accept", StartAcceptInviteAsync)
 			.WithName(AcceptPublicInviteEndpointName)
 			.Produces(StatusCodes.Status204NoContent)
