@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.StaticResources;
+using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Core.Primitives;
 
@@ -7,15 +7,14 @@ public sealed record AssetCode
 	// Private Empty Constructor for EF Core
 	private AssetCode()
 	{
-
 	}
-
-	public string Value { get; init; } = null!;
 
 	private AssetCode(string value)
 	{
-		Value = value;
+		this.Value = value;
 	}
+
+	public string Value { get; init; } = null!;
 
 	public static AssetCode Create(string rawData)
 	{
@@ -24,7 +23,7 @@ public sealed record AssetCode
 			throw new ArgumentException("Asset code cannot be empty.", nameof(rawData));
 		}
 
-		var normalized = Normalize(rawData);
+		string normalized = Normalize(rawData);
 
 		if (!IsValid(normalized))
 		{
@@ -34,7 +33,7 @@ public sealed record AssetCode
 		return new AssetCode(normalized);
 	}
 
-	public override string ToString() => Value;
+	public override string ToString() => this.Value;
 
 	private static string Normalize(string input)
 		=> input.Trim().ToUpperInvariant();
@@ -44,14 +43,23 @@ public sealed record AssetCode
 		// Pragmatic rules:
 		// - 2–16 chars covers BTC, ETH, USDT, VUSA, BRK.B, etc.
 		// - Allow letters, digits, dot, dash
-		if (code.Length is < EntityConstraints.Domain.Asset.CodeMinLength or > EntityConstraints.Domain.Asset.CodeMaxLength)
+		if (code.Length is < EntityConstraints.Domain.Asset.CodeMinLength
+			or > EntityConstraints.Domain.Asset.CodeMaxLength)
 		{
 			return false;
 		}
 
-		foreach (var c in code)
+		if (!code.Any(char.IsLetterOrDigit))
 		{
-			if (!char.IsLetterOrDigit(c) && c != '.' && c != '-')
+			return false;
+		}
+
+		foreach (char c in code)
+		{
+			bool isAsciiLetter = c is >= 'A' and <= 'Z';
+			bool isDigit = c is >= '0' and <= '9';
+
+			if (!isAsciiLetter && !isDigit && c != '.' && c != '-')
 			{
 				return false;
 			}

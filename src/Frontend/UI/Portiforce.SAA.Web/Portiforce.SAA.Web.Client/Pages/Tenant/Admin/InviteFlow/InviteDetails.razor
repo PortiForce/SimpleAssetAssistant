@@ -1,17 +1,17 @@
-﻿@page "/admin/invites/{InviteId:guid}"
+@page "/admin/invites/{InviteId:guid}"
 
+@using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.Configuration
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Contracts.UiSetup
+@using Portiforce.SAA.Web.Client.Extensions
 @using Portiforce.SAA.Web.Client.Services.Interfaces
 
 @attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
-@inject IAdminApiClient ApiClient
-
-@using Microsoft.Extensions.Localization
-@using Portiforce.SAA.Web.Client.Extensions
+@inject IAdminApiClient AdminApiClient
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<InviteDetails> L
 @inject IStringLocalizer<SharedActionResources> SharedActionL
 @inject IStringLocalizer<SharedEnumResources> SharedEnumL
@@ -22,8 +22,15 @@
         <div class="text-muted small">@L["LabelId"]: @InviteId</div>
     </div>
 
-    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">@L["ActionTextBackToInvites"]</a>
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">
+        @L["ActionTextBackToInvites"]
+    </a>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+    <div class="alert alert-success">@successMessage</div>
+}
 
 @if (isLoading)
 {
@@ -60,7 +67,7 @@ else
                     </div>
                 </div>
 
-                <span class="badge @invite.State.ToCssBadgeClass())">
+                <span class="badge @invite.State.ToCssBadgeClass()">
                     @invite.State.ToDisplayName(SharedEnumL)
                 </span>
             </div>
@@ -68,10 +75,10 @@ else
             <hr />
 
             <dl class="row mb-0">
-                <dt class="col-sm-3">@L["LabelCreated"]</dt>
+                <dt class="col-sm-3">@L["LabelCreatedAt"]</dt>
                 <dd class="col-sm-9">@invite.CreatedAtUtc.ToUiDateTime()</dd>
 
-                <dt class="col-sm-3">@L["LabelExpires"]</dt>
+                <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
                 <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
 
                 <dt class="col-sm-3">@L["LabelInvitedBy"]</dt>
@@ -80,34 +87,46 @@ else
                 <dt class="col-sm-3">@L["LabelSendCount"]</dt>
                 <dd class="col-sm-9">@invite.SendTimesCount</dd>
 
-                <dt class="col-sm-3">@L["LabelAccepted"]</dt>
+                <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
                 <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
 
                 <dt class="col-sm-3">@L["LabelRelatedAccountId"]</dt>
                 <dd class="col-sm-9">@(invite.RelatedAccountId?.ToString() ?? L["EmptyValue"])</dd>
             </dl>
         </div>
-        <div class="card-actions">
+
+        <div class="d-flex justify-content-end gap-2 mt-4 p-3 pt-0">
             @if (invite.CanResend)
             {
-                <a class="action-default" href="@ApiRoutes.Invites.InviteResend(InviteId)">@SharedActionL["ActionResend"]</a>
+                <a class="btn btn-sm btn-outline-primary @(isRevoking ? "disabled" : null)"
+                       href="@(isRevoking ? null : ApiRoutes.AdminInviteRoutes.InviteResend(InviteId))"
+                       aria-disabled="@isRevoking">
+                    @SharedActionL["ActionResend"]
+                </a>
             }
+
             @if (invite.CanRevoke)
             {
-                <a class="action-caution" href="@ApiRoutes.Invites.InviteRevoke(InviteId)">@SharedActionL["ActionRevoke"]</a>
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        disabled="@isRevoking"
+                        @onclick="RevokeInviteAsync">
+                    @(isRevoking? L["ActionRevokeInProgress"] : SharedActionL["ActionRevoke"])
+                </button>
             }
         </div>
     </div>
-    
 }
 
 @code {
     [Parameter]
     public Guid InviteId { get; set; }
 
-    private InviteDetailsResponse? invite;
+    private AdminInviteDetailsResponse? invite;
     private bool isLoading = true;
+    private bool isRevoking;
     private string? error;
+    private string? successMessage;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -121,16 +140,54 @@ else
             isLoading = true;
             error = null;
 
-            invite = await ApiClient.GetInviteDetailsAsync(InviteId);
+            invite = await AdminApiClient.GetInviteDetailsAsync(InviteId);
         }
-        catch (Exception ex)
+        catch
         {
             invite = null;
-            error = string.Format(L["MessageErrorCouldNotLoadInviteDetails"], ex.Message);
+            error = L["MessageErrorCouldNotLoadInviteDetails"];
         }
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task RevokeInviteAsync()
+    {
+        if (isRevoking || invite is null || !invite.CanRevoke)
+        {
+            return;
+        }
+
+        bool confirmed = await JSRuntime.InvokeAsync<bool>(
+            "confirm",
+            L["ConfirmMessage_RevokeInvite"]);
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            isRevoking = true;
+            error = null;
+            successMessage = null;
+
+            await AdminApiClient.RevokeInviteAsync(InviteId);
+
+            await LoadAsync();
+
+            successMessage = L["InfoInviteRevoked"];
+        }
+        catch
+        {
+            error = L["InfoCouldNotRevokeInvite"];
+        }
+        finally
+        {
+            isRevoking = false;
         }
     }
 }

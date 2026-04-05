@@ -15,21 +15,21 @@ public abstract record AssetActivityBase : Fact<ActivityId>, IAggregateRoot
 		AssetActivityKind kind,
 		DateTimeOffset occuredAt,
 		ExternalMetadata externalMetadata,
-		IReadOnlyList<AssetMovementLeg> legs
-		) : base(id)
+		IReadOnlyList<AssetMovementLeg> legs)
+		: base(id)
 	{
-		TenantId = tenantId;
-		PlatformAccountId = platformAccountId;
-		Kind = kind;
-		OccurredAt = occuredAt;
-		ExternalMetadata = externalMetadata;
-		Legs = legs;
+		this.TenantId = tenantId;
+		this.PlatformAccountId = platformAccountId;
+		this.Kind = kind;
+		this.OccurredAt = occuredAt;
+		this.ExternalMetadata = externalMetadata;
+		this.Legs = legs;
 	}
 
 	// Private Empty Constructor for EF Core
 	protected AssetActivityBase()
 	{
-		Legs = new List<AssetMovementLeg>();
+		this.Legs = [];
 	}
 
 	public TenantId TenantId { get; private set; }

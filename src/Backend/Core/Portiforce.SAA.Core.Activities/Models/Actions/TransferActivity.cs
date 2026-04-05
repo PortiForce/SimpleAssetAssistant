@@ -24,23 +24,28 @@ public sealed record TransferActivity : AssetActivityBase
 			id,
 			tenantId,
 			platformAccountId,
-			kind, occuredAt,
+			kind,
+			occuredAt,
 			externalMetadata,
 			legs)
 	{
-		TransferKind = transferKind;
-		Direction = direction;
-		Reference = reference;
-		Counterparty = counterparty;
+		this.TransferKind = transferKind;
+		this.Direction = direction;
+		this.Reference = reference;
+		this.Counterparty = counterparty;
 	}
 
 	// Private Empty Constructor for EF Core
-	private TransferActivity() : base() { }
+	private TransferActivity()
+	{
+	}
 
 	public TransferKind TransferKind { get; init; }
+
 	public TransferDirection Direction { get; init; }
 
 	public string? Reference { get; init; }
+
 	public string? Counterparty { get; init; }
 
 	public static TransferActivity Create(

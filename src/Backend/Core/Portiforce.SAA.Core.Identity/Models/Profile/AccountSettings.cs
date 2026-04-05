@@ -9,12 +9,12 @@ public sealed record AccountSettings
 	public string Locale { get; init; } = "en-GB";
 
 	/// <summary>
-	/// Time zone id (as string for now).
+	///     Time zone id (as string for now).
 	/// </summary>
 	public string TimeZoneId { get; init; } = "UTC";
 
 	/// <summary>
-	/// User preference; enforcement is a tenant policy.
+	///     User preference; enforcement is a tenant policy.
 	/// </summary>
 	public bool TwoFactorPreferred { get; init; } = true;
 

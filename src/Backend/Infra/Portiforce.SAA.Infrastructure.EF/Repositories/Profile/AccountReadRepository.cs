@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -25,12 +25,10 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 			x.Contact.Email.Value,
 			x.Tier,
 			x.Role,
-			x.State
-		);
+			x.State);
 
 	private static Expression<Func<Account, AccountDetails>> DetailsSelector =>
-	x => new AccountDetails(
-
+		x => new AccountDetails(
 			x.TenantId,
 			x.Id,
 			x.Alias,
@@ -43,7 +41,7 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 	public async Task<AccountDetails?> GetByIdAsync(AccountId id, CancellationToken ct)
 	{
 		// using anonymous projection to fetch only needed columns before hydrating the heavy Domain DTO.
-		var data = await db.Accounts
+		AccountDetails? data = await db.Accounts
 			.AsNoTracking()
 			.Where(x => x.Id == id)
 			.Select(DetailsSelector)
@@ -94,10 +92,12 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 		{
 			query = query.Where(x => x.Alias.Contains(requestSearch));
 		}
+
 		if (requestRole is not null)
 		{
 			query = query.Where(x => x.Role == requestRole);
 		}
+
 		if (requestState is not null)
 		{
 			query = query.Where(x => x.State == requestState);
@@ -130,7 +130,7 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 		TenantId requestTenantId,
 		CancellationToken ct)
 	{
-		var data = await db.Accounts
+		AccountDetails? data = await db.Accounts
 			.AsNoTracking()
 			.Where(x =>
 				x.Contact.Email == email &&
@@ -140,7 +140,6 @@ internal sealed class AccountReadRepository(AssetAssistantDbContext db) : IAccou
 
 		return data;
 	}
-
 
 	public async Task<List<AccountListItem>> GetByEmailAsync(Email email, CancellationToken ct)
 	{

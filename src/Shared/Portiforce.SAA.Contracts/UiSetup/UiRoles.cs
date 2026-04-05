@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Contracts.UiSetup;
+namespace Portiforce.SAA.Contracts.UiSetup;
 
 public static class UiRoles
 {

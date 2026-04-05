@@ -5,7 +5,7 @@ using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Core.Activities.Models.Actions;
 
-public sealed record BurnActivity: ReasonedActivity
+public sealed record BurnActivity : ReasonedActivity
 {
 	// not public, init only via factory
 	private BurnActivity(
@@ -26,11 +26,12 @@ public sealed record BurnActivity: ReasonedActivity
 			legs,
 			reason)
 	{
-		
 	}
 
 	// Private Empty Constructor for EF Core
-	private BurnActivity() : base() { }
+	private BurnActivity()
+	{
+	}
 
 	public static BurnActivity Create(
 		TenantId tenantId,

@@ -1,0 +1,329 @@
+@page "/admin/invites/summary"
+
+@using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Configuration
+@using Portiforce.SAA.Contracts.Enums
+@using Portiforce.SAA.Contracts.Models.Client.Invite.Summary
+@using Portiforce.SAA.Contracts.UiSetup
+@using Portiforce.SAA.Web.Client.Configuration
+@using Portiforce.SAA.Web.Client.Extensions
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+@using Portiforce.SAA.Web.Client.Shared
+
+@attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@inject IAdminApiClient ApiClient
+
+@inject IStringLocalizer<Summary> L
+@inject IStringLocalizer<SharedActionResources> SharedActionL
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
+
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="mb-0">@L["PageTitle"]</h3>
+        <p class="text-muted mb-0">@L["PageDescription"]</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="@UiRoutes.AdminRoutes.Invites.List">
+        @L["ActionTextBackToInvites"]
+    </a>
+</div>
+
+<div class="container card p-4 shadow-sm">
+    <form @onsubmit="ApplyFiltersAsync" class="row g-2 mb-3 data-manipulation-area align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelTimeframe"]</label>
+            <select class="form-select" @bind="SelectedRangeString">
+                <option value="@InviteSummaryRange.Today.ToString()">@SharedEnumL["SummaryRangeToday"]</option>
+                <option value="@InviteSummaryRange.LastWeek.ToString()">@SharedEnumL["SummaryRangeLastWeek"]</option>
+                <option value="@InviteSummaryRange.LastMonth.ToString()">@SharedEnumL["SummaryRangeLastMonth"]</option>
+                <option value="@InviteSummaryRange.AllTime.ToString()">@SharedEnumL["SummaryRangeAllTime"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelChannels"]</label>
+            <DropdownCheckboxList TItem="InviteChannel"
+                                  Items="InviteFilterOptions.Channels"
+                                  SelectedValues="selectedChannels"
+                                  SelectedValuesChanged="OnSelectedChannelsChanged"
+                                  ButtonText="@SharedEnumL["ChannelAll"]"
+                                  ItemTextSelector="@(c => c.ToDisplayName(SharedEnumL))" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelStatuses"]</label>
+            <DropdownCheckboxList TItem="InviteStatus"
+                                  Items="InviteFilterOptions.Statuses"
+                                  SelectedValues="selectedStatuses"
+                                  SelectedValuesChanged="OnSelectedStatusesChanged"
+                                  ButtonText="@SharedEnumL["StatusAll"]"
+                                  ItemTextSelector="@(s => s.ToDisplayName(SharedEnumL))" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelAccountFilter"]</label>
+            <select class="form-select" @bind="SearchHasAccountString">
+                <option value="">@L["SelectAccountAny"]</option>
+                <option value="true">@L["SelectAccountWith"]</option>
+                <option value="false">@L["SelectAccountWithout"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">@L["LabelRevokedFilter"]</label>
+            <select class="form-select" @bind="SearchIncludeRevokedString">
+                <option value="">@L["SelectRevokedDefault"]</option>
+                <option value="true">@L["SelectRevokedInclude"]</option>
+                <option value="false">@L["SelectRevokedExclude"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-auto ms-auto d-flex gap-2 justify-content-end">
+            <button type="submit" class="btn btn-outline-primary" disabled="@isBusy">
+                @SharedActionL["ButtonSearch"]
+            </button>
+            <button type="button" class="btn btn-outline-secondary" @onclick="ClearFiltersAsync" disabled="@isBusy">
+                @SharedActionL["ButtonClear"]
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="position-relative">
+        @if (isBusy)
+        {
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                 style="background: rgba(255,255,255,0.7); z-index: 10;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">@SharedActionL["MessageInfoStatusLoading"]</span>
+                </div>
+            </div>
+        }
+
+        @if (summary is not null)
+        {
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card h-100 p-3">
+                        <div class="text-muted small">@L["CardTotalSent"]</div>
+                        <div class="fs-4 fw-semibold">@summary.Cards.TotalSent</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card h-100 p-3">
+                        <div class="text-muted small">@L["CardAcceptanceRate"]</div>
+                        <div class="fs-4 fw-semibold">@summary.Cards.AcceptanceRatePercent.ToString("0.##")%</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card h-100 p-3">
+                        <div class="text-muted small">@L["CardPending"]</div>
+                        <div class="fs-4 fw-semibold">@summary.Cards.Pending</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card h-100 p-3">
+                        <div class="text-muted small">@L["CardFailed"]</div>
+                        <div class="fs-4 fw-semibold">@summary.Cards.Failed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card h-100 p-3">
+                        <h5>@L["SectionOutcomeBreakdown"]</h5>
+                        <div class="text-muted small mb-2">@L["SectionOutcomeBreakdownDescription"]</div>
+                        <div>Chart placeholder</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card h-100 p-3">
+                        <h5>@L["SectionTierUsage"]</h5>
+                        <div class="text-muted small mb-2">@L["SectionTierUsageDescription"]</div>
+                        <div>Chart placeholder</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card p-3">
+                        <h5>@L["SectionTrend"]</h5>
+                        <div class="text-muted small mb-2">@GetTrendDescription()</div>
+                        <div>Chart placeholder</div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (!isBusy && string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-info">@L["MessageInfoNoSummaryData"]</div>
+        }
+    </div>
+</div>
+
+@code {
+    // UI input bindings
+    private InviteSummaryRange selectedRange = InviteSummaryRange.Today;
+    private HashSet<InviteChannel> selectedChannels = [];
+    private HashSet<InviteStatus> selectedStatuses = [];
+    private bool? searchHasAccount = null;
+    private bool? searchIncludeRevoked = null;
+
+    // Applied filters
+    private InviteSummaryRange appliedRange = InviteSummaryRange.Today;
+    private HashSet<InviteChannel> appliedChannels = [];
+    private HashSet<InviteStatus> appliedStatuses = [];
+    private bool? appliedHasAccount = null;
+    private bool? appliedIncludeRevoked = null;
+
+    private InviteSummaryResponse? summary;
+    private bool isBusy;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSummaryAsync();
+    }
+
+    private string SelectedRangeString
+    {
+        get => selectedRange.ToString();
+        set
+        {
+            if (Enum.TryParse(value, out InviteSummaryRange parsed))
+            {
+                selectedRange = parsed;
+            }
+        }
+    }
+
+    private string SearchHasAccountString
+    {
+        get => searchHasAccount switch
+        {
+            true => "true",
+            false => "false",
+            _ => string.Empty
+        };
+        set => searchHasAccount = value switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null
+        };
+    }
+
+    private string SearchIncludeRevokedString
+    {
+        get => searchIncludeRevoked switch
+        {
+            true => "true",
+            false => "false",
+            _ => string.Empty
+        };
+        set => searchIncludeRevoked = value switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null
+        };
+    }
+
+    private Task OnSelectedChannelsChanged(HashSet<InviteChannel> values)
+    {
+        selectedChannels = values;
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedStatusesChanged(HashSet<InviteStatus> values)
+    {
+        selectedStatuses = values;
+        return Task.CompletedTask;
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        appliedRange = selectedRange;
+        appliedChannels = [.. selectedChannels];
+        appliedStatuses = [.. selectedStatuses];
+        appliedHasAccount = searchHasAccount;
+        appliedIncludeRevoked = searchIncludeRevoked;
+
+        await LoadSummaryAsync();
+    }
+
+    private async Task ClearFiltersAsync()
+    {
+        selectedRange = InviteSummaryRange.Today;
+        selectedChannels.Clear();
+        selectedStatuses.Clear();
+        searchHasAccount = null;
+        searchIncludeRevoked = null;
+
+        appliedRange = InviteSummaryRange.Today;
+        appliedChannels.Clear();
+        appliedStatuses.Clear();
+        appliedHasAccount = null;
+        appliedIncludeRevoked = null;
+
+        await LoadSummaryAsync();
+    }
+
+    private async Task LoadSummaryAsync()
+    {
+        try
+        {
+            isBusy = true;
+            error = null;
+
+            var apiRequest = new GetInviteSummaryRequest(
+                Statuses: appliedStatuses.Count > 0 ? appliedStatuses : null,
+                Channels: appliedChannels.Count > 0 ? appliedChannels : null,
+                HasAccount: appliedHasAccount,
+                IncludeRevoked: appliedIncludeRevoked,
+                Range: appliedRange);
+
+            summary = await ApiClient.GetInviteSummaryAsync(apiRequest, CancellationToken.None);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            summary = null;
+            error = L["MessageErrorLoadSummary", ex.Message];
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private string GetTrendDescription()
+    {
+        if (summary is null)
+        {
+            return L["SectionTrendDescriptionDefault"];
+        }
+
+        return summary.Trend.Bucket switch
+        {
+            InviteTrendBucket.Hour => L["SectionTrendDescriptionHour"],
+            InviteTrendBucket.Day => L["SectionTrendDescriptionDay"],
+            InviteTrendBucket.Week => L["SectionTrendDescriptionWeek"],
+            InviteTrendBucket.Month => L["SectionTrendDescriptionMonth"],
+            _ => L["SectionTrendDescriptionDefault"]
+        };
+    }
+}

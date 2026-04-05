@@ -13,7 +13,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 namespace Portiforce.SAA.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260301141239_InitialCreate")]
+    [Migration("20260405181122_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,12 +22,12 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("pf")
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -44,7 +44,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "ExternalMetadata", "Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase.ExternalMetadata#ExternalMetadata", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "ExternalMetadata", "Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase.ExternalMetadata#ExternalMetadata", b1 =>
                         {
                             b1.IsRequired();
 
@@ -255,6 +255,42 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .HasDatabaseName("UX_PlatformAccount_Tenant_Account_Platform");
 
                     b.ToTable("PlatformAccounts", "core");
+                });
+
+            modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Auth.AccountIdentifier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<byte>("Kind")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("TenantId", "Kind", "Value")
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountIdentifier_Tenant_Kind_Value");
+
+                    b.ToTable("AccountIdentifiers", "auth");
                 });
 
             modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Auth.AuthSessionToken", b =>
@@ -553,8 +589,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.Property<Guid?>("AcceptedAccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("AcceptedAtUtc")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<bool?>("BlockFutureInvites")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("datetimeoffset");
@@ -570,9 +606,6 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                     b.Property<Guid>("InvitedByAccountId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("RevokedAtUtc")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid?>("RevokedByAccountId")
                         .HasColumnType("uniqueidentifier");
@@ -600,13 +633,20 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .HasColumnType("varbinary(32)")
                         .IsFixedLength();
 
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "InviteTarget", "Portiforce.SAA.Core.Identity.Models.Invite.TenantInvite.InviteTarget#InviteTarget", b1 =>
                         {
                             b1.IsRequired();
 
-                            b1.Property<int>("Type")
-                                .HasColumnType("int")
-                                .HasColumnName("InviteTargetType");
+                            b1.Property<byte>("Channel")
+                                .HasColumnType("tinyint")
+                                .HasColumnName("InviteTargetChannel");
+
+                            b1.Property<byte>("Kind")
+                                .HasColumnType("tinyint")
+                                .HasColumnName("InviteTargetKind");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
@@ -640,8 +680,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                     b.Property<string>("Alias")
                         .IsRequired()
-                        .HasMaxLength(105)
-                        .HasColumnType("nvarchar(105)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<byte>("Role")
                         .HasColumnType("tinyint");
@@ -664,20 +704,14 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<string>("BackupEmail")
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
-                                .HasColumnName("ContactBackupEmail");
-
                             b1.Property<string>("Email")
-                                .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
                                 .HasColumnName("ContactEmail");
 
                             b1.Property<string>("Phone")
-                                .HasMaxLength(15)
-                                .HasColumnType("nvarchar(15)")
+                                .HasMaxLength(16)
+                                .HasColumnType("nvarchar(16)")
                                 .HasColumnName("ContactPhone");
                         });
 
@@ -719,9 +753,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.ToTable("Accounts", "core");
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.BurnActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.BurnActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("Reason")
                         .ValueGeneratedOnUpdateSometimes()
@@ -730,9 +764,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)5);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.ExchangeActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.ExchangeActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("CompletionType")
                         .ValueGeneratedOnUpdateSometimes()
@@ -748,9 +782,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)2);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.IncomeActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.IncomeActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("Reason")
                         .ValueGeneratedOnUpdateSometimes()
@@ -759,9 +793,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)4);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.ServiceActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.ServiceActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("Reason")
                         .ValueGeneratedOnUpdateSometimes()
@@ -773,9 +807,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)6);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.TradeActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.TradeActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("CompletionType")
                         .ValueGeneratedOnUpdateSometimes()
@@ -794,9 +828,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)1);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.TransferActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.TransferActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<string>("Counterparty")
                         .HasMaxLength(256)
@@ -815,9 +849,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)3);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.UserCorrectionActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.UserCorrectionActivity", b =>
                 {
-                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase");
+                    b.HasBaseType("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase");
 
                     b.Property<byte>("Reason")
                         .ValueGeneratedOnUpdateSometimes()
@@ -826,7 +860,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.HasDiscriminator().HasValue((byte)7);
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", b =>
                 {
                     b.HasOne("Portiforce.SAA.Core.Assets.Models.PlatformAccount", null)
                         .WithMany()
@@ -837,7 +871,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
             modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Legs.AssetMovementLeg", b =>
                 {
-                    b.HasOne("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase", null)
+                    b.HasOne("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", null)
                         .WithMany("Legs")
                         .HasForeignKey("ActivityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -868,6 +902,21 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Portiforce.SAA.Core.Identity.Models.Auth.AccountIdentifier", b =>
+                {
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Profile.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Client.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -957,7 +1006,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.TradeActivity", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.TradeActivity", b =>
                 {
                     b.OwnsOne("Portiforce.SAA.Core.Activities.Models.Futures.FuturesDescriptor", "Futures", b1 =>
                         {
@@ -999,7 +1048,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.Navigation("Futures");
                 });
 
-            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Activities.AssetActivityBase", b =>
+            modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", b =>
                 {
                     b.Navigation("Legs");
                 });

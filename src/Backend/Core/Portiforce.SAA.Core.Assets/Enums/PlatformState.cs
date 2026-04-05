@@ -3,27 +3,27 @@
 public enum PlatformState : byte
 {
 	/// <summary>
-	/// Draft (pre-operation) state
+	///     Draft (pre-operation) state
 	/// </summary>
 	Draft = 0,
 
 	/// <summary>
-	/// Fully operational
+	///     Fully operational
 	/// </summary>
 	Active = 1,
 
 	/// <summary>
-	/// Historical data only
+	///     Historical data only
 	/// </summary>
 	ReadOnly = 2,
 
 	/// <summary>
-	/// No longer supported (kept for history)
+	///     No longer supported (kept for history)
 	/// </summary>
 	Deprecated = 3,
 
 	/// <summary>
-	/// Soft deleted
+	///     Soft deleted
 	/// </summary>
 	Deleted = 4
 }

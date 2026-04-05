@@ -1,6 +1,7 @@
+using System.Globalization;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
-using System.Globalization;
 
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
@@ -12,6 +13,7 @@ using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.Services.Time;
 using Portiforce.SAA.Web.Client.Services;
+using Portiforce.SAA.Web.Client.Services.ApiClients;
 using Portiforce.SAA.Web.Client.Services.Interfaces;
 using Portiforce.SAA.Web.Components;
 using Portiforce.SAA.Web.Infrastructure;
@@ -19,54 +21,67 @@ using Portiforce.SAA.Web.Middleware;
 using Portiforce.SAA.Web.Security;
 using Portiforce.SAA.Web.Services;
 
+using _Imports = Portiforce.SAA.Web.Client._Imports;
+
 namespace Portiforce.SAA.Web;
 
 public class Program
 {
 	public static void Main(string[] args)
 	{
-		var builder = WebApplication.CreateBuilder(args);
+		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-		builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+		_ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 		if (builder.Environment.IsDevelopment())
 		{
-			builder.Configuration.AddUserSecrets<Program>(optional: true);
+			_ = builder.Configuration.AddUserSecrets<Program>(true);
 		}
 
 		// Tenancy
-		builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
-		builder.Services.AddScoped<TenantContext>();
-		builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
+		_ = builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
+		_ = builder.Services.AddScoped<TenantContext>();
+		_ = builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
 
-		builder.Services.AddHttpContextAccessor();
+		_ = builder.Services.AddHttpContextAccessor();
 
 		// todo alex: check this setup here (should it be rewritten/optimized)?
-		builder.Services.AddHttpClient<TenantApiClient>((sp, http) =>
+		_ = builder.Services.AddHttpClient<TenantApiClient>((sp, http) =>
 		{
 			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			                          ?? throw new InvalidOperationException("TenantApiClient requires an active HttpContext.");
+									  ?? throw new InvalidOperationException(
+										  "TenantApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
 		});
 
-		builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
+		_ = builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
 		{
 			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
-			                          ?? throw new InvalidOperationException("AdminApiClient requires an active HttpContext.");
+									  ?? throw new InvalidOperationException(
+										  "AdminApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
 		});
-		
-		builder.Services.AddMemoryCache();
 
-		builder.Services.AddScoped<ITenantResolver, TenantResolver>();
-		builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
+		_ = builder.Services.AddHttpClient<IManageInviteApiClient, ManageInviteApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+									  ?? throw new InvalidOperationException(
+										  "ManageInvitesApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+
+		_ = builder.Services.AddMemoryCache();
+
+		_ = builder.Services.AddScoped<ITenantResolver, TenantResolver>();
+		_ = builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
 
 		// Scan and Register all Endpoints
-		builder.Services.AddEndpoints(typeof(Program).Assembly);
+		_ = builder.Services.AddEndpoints(typeof(Program).Assembly);
 
-		builder.Services.AddAuthentication(options =>
+		_ = builder.Services.AddAuthentication(options =>
 			{
 				// main way of tracking users is via Cookies
 				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -134,52 +149,58 @@ public class Program
 				};
 			});
 
-		builder.Services.AddAuthorization(options =>
+		_ = builder.Services.AddAuthorization(options =>
 		{
 			// Role policies (coarse)
 			options.AddPolicy(UiPolicies.PlatformOwner, p => p.RequireRole(UiRoles.PlatformOwner));
-			options.AddPolicy(UiPolicies.PlatformAdmin, p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-			options.AddPolicy(UiPolicies.TenantAdmin, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-			options.AddPolicy(UiPolicies.TenantUser, p => p.RequireRole(UiRoles.TenantUser, UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-			
+			options.AddPolicy(
+				UiPolicies.PlatformAdmin,
+				p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.TenantAdmin,
+				p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.TenantUser,
+				p => p.RequireRole(
+					UiRoles.TenantUser,
+					UiRoles.TenantAdmin,
+					UiRoles.PlatformAdmin,
+					UiRoles.PlatformOwner));
+
 			// Granular (start small)
-			options.AddPolicy(UiPolicies.InviteUsers, p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.InviteUsers,
+				p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
 		});
 
 		// -----------------------------
 		// Blazor Web App
 		// -----------------------------
-		builder.Services.AddRazorComponents()
+		_ = builder.Services.AddRazorComponents()
 			.AddInteractiveServerComponents()
 			.AddInteractiveWebAssemblyComponents();
 
-		builder.Services.AddApplication();
-		builder.Services.AddCoreIdentity();
-		builder.Services.AddInfrastructure(builder.Configuration);
-		builder.Services.AddEfInfrastructure(builder.Configuration);
+		_ = builder.Services.AddApplication();
+		_ = builder.Services.AddCoreIdentity();
+		_ = builder.Services.AddInfrastructure(builder.Configuration);
+		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
 
-		builder.Services.AddSingleton<IClock, SystemClock>();
+		_ = builder.Services.AddSingleton<IClock, SystemClock>();
 
-		builder.Services.AddAntiforgery(options =>
+		_ = builder.Services.AddAntiforgery(options => { options.HeaderName = "RequestVerificationToken"; });
+
+		_ = builder.Services.AddProblemDetails();
+
+		_ = builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+		WebApplication app = builder.Build();
+
+		CultureInfo[] supportedCultures = new[]
 		{
-			options.HeaderName = "RequestVerificationToken";
-		});
-
-		builder.Services.AddProblemDetails();
-
-		builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
-		var app = builder.Build();
-
-		var supportedCultures = new[]
-		{
-			new CultureInfo("en"),
-			new CultureInfo("en-US"),
-			new CultureInfo("uk"),
-			new CultureInfo("uk-UA")
+			new CultureInfo("en"), new CultureInfo("en-US"), new CultureInfo("uk"), new CultureInfo("uk-UA")
 		};
 
-		var localizationOptions = new RequestLocalizationOptions
+		RequestLocalizationOptions localizationOptions = new()
 		{
 			DefaultRequestCulture = new RequestCulture("en-US"),
 			SupportedCultures = supportedCultures,
@@ -190,7 +211,7 @@ public class Program
 			]
 		};
 
-		app.UseRequestLocalization(localizationOptions);
+		_ = app.UseRequestLocalization(localizationOptions);
 
 		if (app.Environment.IsDevelopment())
 		{
@@ -198,34 +219,34 @@ public class Program
 		}
 		else
 		{
-			app.UseExceptionHandler("/Error");
-			app.UseHsts();
+			_ = app.UseExceptionHandler("/Error");
+			_ = app.UseHsts();
 		}
 
-		app.UseHttpsRedirection();
-		app.UseStaticFiles();
-		app.UseRouting();
+		_ = app.UseHttpsRedirection();
+		_ = app.UseStaticFiles();
+		_ = app.UseRouting();
 
 		// Tenant must run early
-		app.UseMiddleware<TenantResolutionMiddleware>();
+		_ = app.UseMiddleware<TenantResolutionMiddleware>();
 
 		// Auth must be before endpoints
-		app.UseAuthentication();
-		app.UseAuthorization();
+		_ = app.UseAuthentication();
+		_ = app.UseAuthorization();
 
 		// allow to the flow define`.DisableAntiforgery()` metadata on your endpoint!
-		app.UseAntiforgery();
+		_ = app.UseAntiforgery();
 
 		// This line automatically discovers InviteEndpoints, AuthEndpoints, etc.
-		app.MapEndpoints();
+		_ = app.MapEndpoints();
 
 		//
 		// Blazor endpoints
 		//
-		app.MapRazorComponents<App>()
+		_ = app.MapRazorComponents<App>()
 			.AddInteractiveServerRenderMode()
 			.AddInteractiveWebAssemblyRenderMode()
-			.AddAdditionalAssemblies(typeof(Portiforce.SAA.Web.Client._Imports).Assembly);
+			.AddAdditionalAssemblies(typeof(_Imports).Assembly);
 
 		app.Run();
 	}

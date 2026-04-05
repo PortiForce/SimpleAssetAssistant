@@ -1,8 +1,8 @@
-﻿using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Contracts.Models.Client.Invite;
 
-public sealed record InviteDetailsResponse(
+public sealed record AdminInviteDetailsResponse(
 	Guid Id,
 	Guid TenantId,
 	string InviteTargetValue,

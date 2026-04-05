@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Core.Identity.Models.Auth;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
@@ -14,8 +15,6 @@ internal sealed class AuthSessionReadRepository(AssetAssistantDbContext db) : IA
 			.SingleOrDefaultAsync(x => x.TokenHash == tokenHash, ct);
 	}
 
-	public Task<List<AuthSessionToken>> GetBySessionIdAsync(Guid sessionId, CancellationToken ct)
-	{
+	public Task<List<AuthSessionToken>> GetBySessionIdAsync(Guid sessionId, CancellationToken ct) =>
 		throw new NotImplementedException();
-	}
 }

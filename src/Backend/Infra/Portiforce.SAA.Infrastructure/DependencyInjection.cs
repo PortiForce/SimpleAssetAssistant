@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Infrastructure.Auth;
@@ -12,19 +13,19 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddHttpContextAccessor();
+		_ = services.AddHttpContextAccessor();
 
-		services.AddScoped<IGoogleAuthProvider, GoogleAuthProvider>();
-		services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
-		services.AddScoped<ICurrentUser, CurrentUser>();
+		_ = services.AddScoped<IGoogleAuthProvider, GoogleAuthProvider>();
+		_ = services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+		_ = services.AddScoped<ICurrentUser, CurrentUser>();
 
 		// infrastructure settings
-		services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-		services.Configure<GoogleClientSettings>(configuration.GetSection("GoogleClientSettings"));
-		services.Configure<TokenHashingOptions>(configuration.GetSection("TokenHashingOptions"));
+		_ = services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+		_ = services.Configure<GoogleClientSettings>(configuration.GetSection("GoogleClientSettings"));
+		_ = services.Configure<TokenHashingOptions>(configuration.GetSection("TokenHashingOptions"));
 
 		// data operation settings
-		services.Configure<PlatformUsers>(configuration.GetSection("PlatformUsers"));
+		_ = services.Configure<PlatformUsers>(configuration.GetSection("PlatformUsers"));
 
 		return services;
 	}

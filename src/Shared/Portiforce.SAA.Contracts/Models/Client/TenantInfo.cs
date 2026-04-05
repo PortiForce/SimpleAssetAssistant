@@ -1,7 +1,8 @@
-﻿namespace Portiforce.SAA.Contracts.Models.Client;
+namespace Portiforce.SAA.Contracts.Models.Client;
 
 public sealed class TenantInfo
 {
 	public string? Prefix { get; set; }
+
 	public bool IsLanding { get; set; }
 }

@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.StaticResources;
 
@@ -11,10 +12,10 @@ public sealed class TransferActivityConfiguration : IEntityTypeConfiguration<Tra
 	{
 		// EF Core knows this is derived from AssetActivityBase, no need to call ToTable() again.
 
-		builder.Property(x => x.Reference)
+		_ = builder.Property(x => x.Reference)
 			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
 
-		builder.Property(x => x.Counterparty)
+		_ = builder.Property(x => x.Counterparty)
 			.HasMaxLength(EntityConstraints.CommonSettings.ExternalIdMaxLength);
 	}
 }

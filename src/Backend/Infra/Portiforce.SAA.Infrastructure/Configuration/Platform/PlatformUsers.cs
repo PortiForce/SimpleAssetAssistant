@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Infrastructure.Configuration.Platform;
+namespace Portiforce.SAA.Infrastructure.Configuration.Platform;
 
 public sealed class PlatformUsers
 {
@@ -9,4 +9,8 @@ public sealed class PlatformUsers
 	public PlatformUser PlatformAdmin { get; set; }
 
 	public PlatformUser PlatformBackground { get; set; }
+
+	public PlatformUser DemoBackground { get; set; }
+
+	public PlatformUser DemoAdmin { get; set; }
 }

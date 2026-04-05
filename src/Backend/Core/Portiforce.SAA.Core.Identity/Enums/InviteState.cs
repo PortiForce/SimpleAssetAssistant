@@ -5,32 +5,32 @@ public enum InviteState : byte
 	Created = 0,
 
 	/// <summary>
-	/// Invite were processed by Notification system
+	///     Invite were processed by Notification system
 	/// </summary>
 	Sent = 1,
 
 	/// <summary>
-	/// invite successfully accepted
+	///     invite successfully accepted
 	/// </summary>
 	Accepted = 2,
 
 	/// <summary>
-	/// Invite were revoked by Tenant
+	///     Invite were revoked by Tenant
 	/// </summary>
 	RevokedByTenant = 3,
 
 	/// <summary>
-	/// Invite were declined by User (aka no longer disturb option)
+	///     Invite were declined by User (aka no longer disturb option)
 	/// </summary>
 	DeclinedByUser = 4,
 
 	/// <summary>
-	/// Edge case : invite were failed (unsuccessful during an accept attempt)
+	///     Edge case : invite were failed (unsuccessful during an accept attempt)
 	/// </summary>
 	AcceptAttemptFailed = 5,
 
 	/// <summary>
-	/// link has expired already
+	///     link has expired already
 	/// </summary>
 	Expired = 6
 }
