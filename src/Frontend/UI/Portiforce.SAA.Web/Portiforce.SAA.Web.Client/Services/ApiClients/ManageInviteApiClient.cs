@@ -34,6 +34,8 @@ public sealed class ManageInviteApiClient(HttpClient httpClient) : ApiClientBase
 
 		string url = ApiRoutes.PublicInviteRoutes.InitAcceptInvite(Uri.EscapeDataString(inviteToken));
 
-		return await this.PostAsync<string>(url, ct);
+		StartAcceptInviteResponse startAcceptInviteResponse = await this.PostAsync<StartAcceptInviteResponse>(url, ct);
+
+		return startAcceptInviteResponse.AcceptInviteEndpoint;
 	}
 }

@@ -42,6 +42,13 @@ public sealed class InviteEndpoints : IEndpoint
         POST   /bff/admin-invite/{inviteId:guid}/revoke
      */
 
+	private const string ListTenantInvitesEndpointName = "ListTenantInvites";
+	private const string GetTenantInviteSummaryEndpointName = "GetTenantInviteSummary";
+	private const string GetTenantInviteDetailsEndpointName = "GetTenantInviteDetails";
+	private const string CreateTenantInviteEndpointName = "CreateTenantInvite";
+	private const string ResendTenantInviteEndpointName = "ResendTenantInvite";
+	private const string RevokeTenantInviteEndpointName = "RevokeTenantInvite";
+
 	private const int DefaultInviteLifetimeHours = 48;
 
 	public void MapEndpoint(IEndpointRouteBuilder app)
@@ -52,26 +59,26 @@ public sealed class InviteEndpoints : IEndpoint
 			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
 
 		_ = group.MapGet(string.Empty, ListInvitesAsync)
-			.WithName("ListTenantInvites")
+			.WithName(ListTenantInvitesEndpointName)
 			.Produces<InviteListResponse>()
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden);
 
 		_ = group.MapGet("/summary", GetInviteSummaryAsync)
-			.WithName("GetTenantInviteSummary")
+			.WithName(GetTenantInviteSummaryEndpointName)
 			.Produces<InviteSummaryResponse>()
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden);
 
 		_ = group.MapGet("/{inviteId:guid}", GetInviteDetailsAsync)
-			.WithName("GetTenantInviteDetails")
+			.WithName(GetTenantInviteDetailsEndpointName)
 			.Produces<AdminInviteDetailsResponse>()
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden)
 			.ProducesProblem(StatusCodes.Status404NotFound);
 
 		_ = group.MapPost("/new", CreateInviteAsync)
-			.WithName("CreateTenantInvite")
+			.WithName(CreateTenantInviteEndpointName)
 			.Produces<CreateInviteResponse>(StatusCodes.Status201Created)
 			.ProducesValidationProblem()
 			.ProducesProblem(StatusCodes.Status400BadRequest)
@@ -81,7 +88,7 @@ public sealed class InviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status422UnprocessableEntity);
 
 		_ = group.MapPost("/{inviteId:guid}/resend", ResendInviteAsync)
-			.WithName("ResendTenantInvite")
+			.WithName(ResendTenantInviteEndpointName)
 			.Produces(StatusCodes.Status204NoContent)
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden)
@@ -89,7 +96,7 @@ public sealed class InviteEndpoints : IEndpoint
 			.ProducesProblem(StatusCodes.Status409Conflict);
 
 		_ = group.MapPost("/{inviteId:guid}/revoke", RevokeInviteAsync)
-			.WithName("RevokeTenantInvite")
+			.WithName(RevokeTenantInviteEndpointName)
 			.Produces(StatusCodes.Status204NoContent)
 			.ProducesProblem(StatusCodes.Status401Unauthorized)
 			.ProducesProblem(StatusCodes.Status403Forbidden)

@@ -14,8 +14,11 @@ public class ApiProblemDetails
 
 	[JsonPropertyName("instance")] public string? Instance { get; init; }
 
-	// Optional extension data like traceId, correlationId, etc.
-	[JsonExtensionData] public Dictionary<string, object?> Extensions { get; init; } = [];
+	/// <summary>
+	///     Optional extension data like traceId, correlationId, etc.
+	/// </summary>
+	[JsonExtensionData]
+	public Dictionary<string, object?> Extensions { get; init; } = [];
 
 	public static ApiProblemDetails CreateProblem(
 		int status,
