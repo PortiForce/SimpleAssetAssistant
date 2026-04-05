@@ -16,97 +16,105 @@ namespace Portiforce.SAA.Web.Client;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
-    {
-        WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
+	private static async Task Main(string[] args)
+	{
+		WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-        builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+		_ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+		_ = builder.Services.AddScoped(sp =>
+			new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-        // AuthZ for WASM components (<AuthorizeView>, <AuthorizeRouteView>, [Authorize])
-        // should be the same as in server part
-        builder.Services.AddAuthorizationCore(options =>
-        {
-            // Role policies (coarse)
-            options.AddPolicy(UiPolicies.PlatformOwner, p => p.RequireRole(UiRoles.PlatformOwner));
-            options.AddPolicy(
-                UiPolicies.PlatformAdmin,
-                p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-            options.AddPolicy(
-                UiPolicies.TenantAdmin,
-                p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-            options.AddPolicy(
-                UiPolicies.TenantUser,
-                p => p.RequireRole(
-                    UiRoles.TenantUser,
-                    UiRoles.TenantAdmin,
-                    UiRoles.PlatformAdmin,
-                    UiRoles.PlatformOwner));
+		// AuthZ for WASM components (<AuthorizeView>, <AuthorizeRouteView>, [Authorize])
+		// should be the same as in server part
+		_ = builder.Services.AddAuthorizationCore(options =>
+		{
+			// Role policies (coarse)
+			options.AddPolicy(UiPolicies.PlatformOwner, p => p.RequireRole(UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.PlatformAdmin,
+				p => p.RequireRole(UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.TenantAdmin,
+				p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+			options.AddPolicy(
+				UiPolicies.TenantUser,
+				p => p.RequireRole(
+					UiRoles.TenantUser,
+					UiRoles.TenantAdmin,
+					UiRoles.PlatformAdmin,
+					UiRoles.PlatformOwner));
 
-            // Granular
-            options.AddPolicy(
-                UiPolicies.InviteUsers,
-                p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
-        });
+			// Granular
+			options.AddPolicy(
+				UiPolicies.InviteUsers,
+				p => p.RequireRole(UiRoles.TenantAdmin, UiRoles.PlatformAdmin, UiRoles.PlatformOwner));
+		});
 
-        // Authentication state source for <CascadingAuthenticationState>
-        builder.Services.AddScoped<AuthenticationStateProvider, BffAuthenticationStateProvider>();
+		// Authentication state source for <CascadingAuthenticationState>
+		_ = builder.Services.AddScoped<AuthenticationStateProvider, BffAuthenticationStateProvider>();
 
-        builder.Services.AddScoped<BrowserCredentialsHandler>();
-        builder.Services.AddScoped<AntiforgeryTokenStore>();
-        builder.Services.AddScoped<AntiforgeryHandler>();
+		_ = builder.Services.AddScoped<BrowserCredentialsHandler>();
+		_ = builder.Services.AddScoped<AntiforgeryTokenStore>();
+		_ = builder.Services.AddScoped<AntiforgeryHandler>();
 
-        builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
+		_ = builder.Services.AddScoped<ITenantUrlContext, TenantUrlContext>();
 
-        builder.Services.AddHttpClient(
-                WebClientConstants.NoAntiforgeryClientName,
-                client => { client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress); })
-            .AddHttpMessageHandler<BrowserCredentialsHandler>();
+		_ = builder.Services.AddHttpClient(
+				WebClientConstants.NoAntiforgeryClientName,
+				client => { client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress); })
+			.AddHttpMessageHandler<BrowserCredentialsHandler>();
 
-        builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>(client =>
-            {
-                client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-            })
-            .AddHttpMessageHandler<BrowserCredentialsHandler>()
-            .AddHttpMessageHandler<AntiforgeryHandler>();
+		_ = builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>(client =>
+			{
+				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+			})
+			.AddHttpMessageHandler<BrowserCredentialsHandler>()
+			.AddHttpMessageHandler<AntiforgeryHandler>();
 
-        builder.Services.AddScoped<TenantApiClient>();
+		_ = builder.Services.AddHttpClient<IManageInviteApiClient, ManageInviteApiClient>(client =>
+			{
+				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+			})
+			.AddHttpMessageHandler<BrowserCredentialsHandler>()
+			.AddHttpMessageHandler<AntiforgeryHandler>();
 
-        WebAssemblyHost host = builder.Build();
+		_ = builder.Services.AddScoped<TenantApiClient>();
 
-        IJSRuntime js = host.Services.GetRequiredService<IJSRuntime>();
-        string browserCulture = await js.InvokeAsync<string>("portiforce.getBrowserCulture");
+		WebAssemblyHost host = builder.Build();
 
-        string cultureMame = NormalizeCulture(browserCulture);
-        CultureInfo culture = new(cultureMame);
+		IJSRuntime js = host.Services.GetRequiredService<IJSRuntime>();
+		string browserCulture = await js.InvokeAsync<string>("portiforce.getBrowserCulture");
 
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
+		string cultureMame = NormalizeCulture(browserCulture);
+		CultureInfo culture = new(cultureMame);
 
-        await host.RunAsync();
-    }
+		CultureInfo.DefaultThreadCurrentCulture = culture;
+		CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-    private static string NormalizeCulture(string? browserCulture)
-    {
-        if (string.IsNullOrWhiteSpace(browserCulture))
-        {
-            return "en-US";
-        }
+		await host.RunAsync();
+	}
 
-        browserCulture = browserCulture.Trim();
+	private static string NormalizeCulture(string? browserCulture)
+	{
+		if (string.IsNullOrWhiteSpace(browserCulture))
+		{
+			return "en-US";
+		}
 
-        if (browserCulture.StartsWith("uk", StringComparison.OrdinalIgnoreCase))
-        {
-            return "uk-UA";
-        }
+		browserCulture = browserCulture.Trim();
 
-        if (browserCulture.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-        {
-            return "en-US";
-        }
+		if (browserCulture.StartsWith("uk", StringComparison.OrdinalIgnoreCase))
+		{
+			return "uk-UA";
+		}
 
-        // fallback to en-US if unsupported culture is detected
-        return "en-US";
-    }
+		if (browserCulture.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+		{
+			return "en-US";
+		}
+
+		// fallback to en-US if unsupported culture is detected
+		return "en-US";
+	}
 }

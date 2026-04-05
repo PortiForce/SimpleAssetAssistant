@@ -36,6 +36,7 @@ public sealed class GetInviteOverviewQueryHandler(
 
 		TenantInvite? tenantInvite =
 			await inviteReadRepository.GetByTenantAndTokenHashAsync(request.TenantId, tokenHash, ct);
+
 		if (tenantInvite is null)
 		{
 			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite not found.", request.RawToken));
@@ -64,6 +65,7 @@ public sealed class GetInviteOverviewQueryHandler(
 
 		FlowResult.Result limitChecksResult =
 			await tenantLimitsService.EnsureTenantCanInviteOrActivateAccountAsync(request.TenantId, ct);
+
 		if (!limitChecksResult.IsSuccess)
 		{
 			return TypedResult<OverviewInviteDetails>.Fail(

@@ -18,7 +18,7 @@ public static class ApiRoutes
 
 	public static class AdminInviteRoutes
 	{
-		public const string Root = $"/{BffRoot}/admin/invites";
+		public const string Root = $"{BffRoot}/admin/invites";
 
 		public const string Summary = $"{Root}/summary";
 
@@ -33,18 +33,18 @@ public static class ApiRoutes
 
 	public static class PublicInviteRoutes
 	{
-		public const string Root = $"/{BffRoot}/invite";
+		public const string Root = $"{BffRoot}/invite";
 
-		public static string OverviewInvite(string inviteToken) => $"/{Root}/{inviteToken}";
+		public static string OverviewInvite(string inviteToken) => $"{Root}/{inviteToken}";
 
-		public static string DeclineInvite(string inviteToken) => $"/{Root}/{inviteToken}/decline";
+		public static string DeclineInvite(string inviteToken) => $"{Root}/{inviteToken}/decline";
 
-		public static string InitAcceptInvite(string inviteToken) => $"/{Root} /{inviteToken}/accept";
+		public static string InitAcceptInvite(string inviteToken) => $"{Root} /{inviteToken}/accept";
 	}
 
 	public static class Accounts
 	{
-		public const string Root = $"/{BffRoot}/accouts";
+		public const string Root = $"{BffRoot}/accouts";
 
 		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
 	}
