@@ -33,13 +33,13 @@ namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 public sealed class InviteEndpoints : IEndpoint
 {
 	/*
-        GET    /bff/admin-invite
-        GET    /bff/admin-invite/summary
-        GET    /bff/admin-invite/{inviteId:guid}
-        GET    /bff/admin-invite/template
-        POST   /bff/admin-invite
-        POST   /bff/admin-invite/{inviteId:guid}/resend
-        POST   /bff/admin-invite/{inviteId:guid}/revoke
+        GET    /bff/admin/invites
+        GET    /bff/admin/invites/summary
+        GET    /bff/admin/invites/{inviteId:guid}
+        GET    /bff/admin/invites/template
+        POST   /bff/admin/invites
+        POST   /bff/admin/invites/{inviteId:guid}/resend
+        POST   /bff/admin/invites/{inviteId:guid}/revoke
      */
 
 	private const string ListTenantInvitesEndpointName = "ListTenantInvites";

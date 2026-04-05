@@ -18,7 +18,7 @@ public static class ApiRoutes
 
 	public static class AdminInviteRoutes
 	{
-		public const string Root = $"/{BffRoot}/admin-invite";
+		public const string Root = $"/{BffRoot}/admin/invites";
 
 		public const string Summary = $"{Root}/summary";
 

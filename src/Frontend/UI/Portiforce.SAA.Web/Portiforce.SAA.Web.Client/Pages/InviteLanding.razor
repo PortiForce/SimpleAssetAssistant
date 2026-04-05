@@ -1,7 +1,194 @@
-@page "/inviteLanding/?inviteToken={inviteToken}"
+@page "/invite/{InviteToken}"
 
-<h3>Invite Landing</h3>
+@using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Models.Client.Invite
+@using Portiforce.SAA.Web.Client.Extensions
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@inject IManageInviteApiClient ApiClient
+@inject NavigationManager Navigation
+@inject IStringLocalizer<InviteLanding> L
+@inject IStringLocalizer<SharedEnumResources> SharedEnumL
+
+<div class="container py-4">
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<div>
+			<h3 class="mb-0">@L["InviteLandingTitle"]</h3>
+			<div class="text-muted small">@L["InviteTokenLabel"]: @InviteToken</div>
+		</div>
+	</div>
+
+	@if (isLoading)
+	{
+		<div class="text-muted">@L["InviteLoadingMessage"]</div>
+	}
+	else if (!string.IsNullOrWhiteSpace(error))
+	{
+		<div class="alert alert-danger">@error</div>
+	}
+	else if (!string.IsNullOrWhiteSpace(successMessage))
+	{
+		<div class="alert alert-success">@successMessage</div>
+	}
+
+	@if (!isLoading && invite is null && string.IsNullOrWhiteSpace(error))
+	{
+		<div class="alert alert-warning">@L["InviteNotFoundMessage"]</div>
+	}
+	else if (invite is not null)
+	{
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-start">
+					<div>
+						<div class="h5 mb-1">@invite.InviteTargetValue</div>
+						<div class="text-muted">
+							<div>
+								<span>@L["InviteChannelLabel"]:</span>
+								@invite.InviteChannel.ToDisplayName(SharedEnumL)
+							</div>
+							<div>
+								<span>@L["InviteRoleLabel"]:</span>
+								@invite.InviteRole.ToDisplayName(SharedEnumL)
+							</div>
+							<div>
+								<span>@L["InviteTierLabel"]:</span>
+								@invite.InviteTier.ToDisplayName(SharedEnumL)
+							</div>
+						</div>
+					</div>
+
+					<span class="badge @invite.State.ToCssBadgeClass()">
+						@invite.State.ToDisplayName(SharedEnumL)
+					</span>
+				</div>
+
+				<hr />
+
+				<dl class="row mb-0">
+					<dt class="col-sm-3">@L["InviteExpiresLabel"]</dt>
+					<dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
+
+					<dt class="col-sm-3">@L["InviteSendCountLabel"]</dt>
+					<dd class="col-sm-9">@invite.SendTimesCount</dd>
+
+					<dt class="col-sm-3">@L["InviteAcceptedAtLabel"]</dt>
+					<dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+				</dl>
+			</div>
+
+			<div class="card-footer d-flex justify-content-end gap-2">
+				@if (!string.IsNullOrWhiteSpace(invite.DeclineUrl))
+				{
+					<button class="btn btn-outline-danger"
+							disabled="@isSubmitting"
+							@onclick="DeclineAsync">
+						@(isSubmitting ? L["InviteDeclineInProgress"] : L["InviteDeclineAction"])
+					</button>
+				}
+
+				@if (!string.IsNullOrWhiteSpace(invite.AcceptUrl))
+				{
+					<button class="btn btn-primary"
+							disabled="@isSubmitting"
+							@onclick="AcceptAsync">
+						@(isSubmitting ? L["InviteAcceptInProgress"] : L["InviteAcceptAction"])
+					</button>
+				}
+			</div>
+		</div>
+	}
+</div>
 
 @code {
+	[Parameter]
+	public string InviteToken { get; set; } = string.Empty;
 
+	private OverviewInviteDetailsResponse? invite;
+	private bool isLoading = true;
+	private bool isSubmitting;
+	private string? error;
+	private string? successMessage;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await this.LoadAsync();
+	}
+
+	private async Task LoadAsync()
+	{
+		try
+		{
+			this.isLoading = true;
+			this.error = null;
+			this.successMessage = null;
+
+			this.invite = await this.ApiClient.GetInviteOverviewAsync(this.InviteToken);
+		}
+		catch (Exception ex)
+		{
+			this.invite = null;
+			this.error = string.Format(L["InviteLoadError"], ex.Message);
+		}
+		finally
+		{
+			this.isLoading = false;
+		}
+	}
+
+	private async Task AcceptAsync()
+	{
+		if (this.invite is null || string.IsNullOrWhiteSpace(this.invite.AcceptUrl))
+		{
+			return;
+		}
+
+		try
+		{
+			this.isSubmitting = true;
+			this.error = null;
+			this.successMessage = null;
+
+			string acceptEndpoint = await this.ApiClient.InitAcceptInviteAsync(this.InviteToken);
+
+			this.Navigation.NavigateTo(acceptEndpoint, forceLoad: true);
+		}
+		catch (Exception ex)
+		{
+			this.error = string.Format(L["InviteAcceptError"], ex.Message);
+		}
+		finally
+		{
+			this.isSubmitting = false;
+		}
+	}
+
+	private async Task DeclineAsync()
+	{
+		if (this.invite is null || string.IsNullOrWhiteSpace(this.invite.DeclineUrl))
+		{
+			return;
+		}
+
+		try
+		{
+			this.isSubmitting = true;
+			this.error = null;
+
+			_ = await this.ApiClient.DeclineInviteAsync(this.InviteToken);
+
+			this.successMessage = L["InviteDeclineSuccess"];
+			await this.LoadAsync();
+		}
+		catch (Exception ex)
+		{
+			this.error = string.Format(L["InviteDeclineError"], ex.Message);
+		}
+		finally
+		{
+			this.isSubmitting = false;
+		}
+	}
 }
