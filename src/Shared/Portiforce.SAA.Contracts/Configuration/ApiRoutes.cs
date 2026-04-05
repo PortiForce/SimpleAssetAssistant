@@ -39,7 +39,7 @@ public static class ApiRoutes
 
 		public static string DeclineInvite(string inviteToken) => $"{Root}/{inviteToken}/decline";
 
-		public static string InitAcceptInvite(string inviteToken) => $"{Root} /{inviteToken}/accept";
+		public static string InitAcceptInvite(string inviteToken) => $"{Root}/{inviteToken}/accept";
 	}
 
 	public static class Accounts

@@ -199,8 +199,8 @@ public static class InviteMapper
 
 	public static OverviewInviteDetailsResponse MapToOverviewInviteDetails(
 		this OverviewInviteDetails model,
-		string acceptUrl,
-		string declineUrl)
+		bool canAccept,
+		bool canDecline)
 	{
 		return new OverviewInviteDetailsResponse(
 			model.Id,
@@ -212,8 +212,8 @@ public static class InviteMapper
 			model.ExpiresAtUtc,
 			model.SendTimesCount,
 			model.AcceptedAtUtc,
-			acceptUrl,
-			declineUrl);
+			canAccept,
+			canDecline);
 	}
 
 	public static InviteSummaryRange ToBusiness(this Contracts.Enums.InviteSummaryRange item) => item switch

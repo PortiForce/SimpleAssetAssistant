@@ -126,16 +126,16 @@
   <data name="InviteProcessInfo" xml:space="preserve">
     <value>To accept this invitation, select Accept invite and complete the required sign-in or verification step. If you do not want to join, select Decline invite.</value>
   </data>
-  <data name="LabelInviteChannel" xml:space="preserve">
+  <data name="LabelChannel" xml:space="preserve">
     <value>Channel</value>
   </data>
-  <data name="LabelInviteExpiresAt" xml:space="preserve">
+  <data name="LabelExpiresAt" xml:space="preserve">
     <value>Expires</value>
   </data>
-  <data name="LabelInviteRole" xml:space="preserve">
+  <data name="LabelRole" xml:space="preserve">
     <value>Role</value>
   </data>
-  <data name="LabelInviteTier" xml:space="preserve">
+  <data name="LabelTier" xml:space="preserve">
     <value>Tier</value>
   </data>
   <data name="MessageInviteAcceptInProgress" xml:space="preserve">

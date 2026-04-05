@@ -126,16 +126,16 @@
   <data name="InviteProcessInfo" xml:space="preserve">
     <value>Щоб прийняти це запрошення, натисніть «Прийняти запрошення» і виконайте потрібний крок входу або підтвердження. Якщо ви не хочете приєднуватися, натисніть «Відхилити запрошення».</value>
   </data>
-  <data name="LabelInviteChannel" xml:space="preserve">
+  <data name="LabelChannel" xml:space="preserve">
     <value>Канал</value>
   </data>
-  <data name="LabelInviteExpiresAt" xml:space="preserve">
+  <data name="LabelExpiresAt" xml:space="preserve">
     <value>Діє до</value>
   </data>
-  <data name="LabelInviteRole" xml:space="preserve">
+  <data name="LabelRole" xml:space="preserve">
     <value>Роль</value>
   </data>
-  <data name="LabelInviteTier" xml:space="preserve">
+  <data name="LabelTier" xml:space="preserve">
     <value>Рівень</value>
   </data>
   <data name="MessageInviteAcceptInProgress" xml:space="preserve">

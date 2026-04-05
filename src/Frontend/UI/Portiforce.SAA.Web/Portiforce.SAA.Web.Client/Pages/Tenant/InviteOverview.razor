@@ -7,7 +7,7 @@
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
-@inject IManageInviteApiClient ApiClient
+@inject IManageInviteApiClient ManageInviteApiClient
 @inject NavigationManager Navigation
 @inject IStringLocalizer<InviteOverview> L
 @inject IStringLocalizer<SharedEnumResources> SharedEnumL
@@ -49,19 +49,19 @@
                         <div class="h5 mb-1">@invite.InviteTargetValue</div>
                         <div class="text-muted">
                             <div>
-                                <span>@L["LabelInviteChannel"]:</span>
+                                <span>@L["LabelChannel"]:</span>
                                 @invite.InviteChannel.ToDisplayName(SharedEnumL)
                             </div>
                             <div>
-                                <span>@L["LabelInviteRole"]:</span>
+                                <span>@L["LabelRole"]:</span>
                                 @invite.InviteRole.ToDisplayName(SharedEnumL)
                             </div>
                             <div>
-                                <span>@L["LabelInviteTier"]:</span>
+                                <span>@L["LabelTier"]:</span>
                                 @invite.InviteTier.ToDisplayName(SharedEnumL)
                             </div>
                             <div>
-                                <dt class="col-sm-3">@L["LabelInviteExpiresAt"]</dt>
+                                <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
                                 <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
                             </div>
                         </div>
@@ -76,21 +76,20 @@
             </div>
 
             <div class="card-footer d-flex justify-content-end gap-2">
-                @if (!string.IsNullOrWhiteSpace(invite.DeclineUrl))
+                @if (invite.CanAccept)
                 {
-                    <button class="btn btn-outline-danger"
+                    <button type="button" class="btn btn-primary"
+                            disabled="@isSubmitting"
+                            @onclick="AcceptAsync">
+                        @(isSubmitting? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
+                    </button>
+                }
+                @if (invite.CanDecline)
+                {
+                    <button type="button" class="btn btn-outline-danger"
                             disabled="@isSubmitting"
                             @onclick="DeclineAsync">
                         @(isSubmitting ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
-                    </button>
-                }
-
-                @if (!string.IsNullOrWhiteSpace(invite.AcceptUrl))
-                {
-                    <button class="btn btn-primary"
-                            disabled="@isSubmitting"
-                            @onclick="AcceptAsync">
-                        @(isSubmitting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
                     </button>
                 }
             </div>
@@ -121,7 +120,7 @@
 			this.error = null;
 			this.successMessage = null;
 
-			this.invite = await this.ApiClient.GetInviteOverviewAsync(this.InviteToken);
+            this.invite = await this.ManageInviteApiClient.GetInviteOverviewAsync(this.InviteToken);
 		}
 		catch (Exception ex)
 		{
@@ -134,57 +133,83 @@
 		}
 	}
 
-	private async Task AcceptAsync()
-	{
-		if (this.invite is null || string.IsNullOrWhiteSpace(this.invite.AcceptUrl))
-		{
-			return;
-		}
+    private async Task AcceptAsync()
+    {
+        if (this.invite is null || !this.invite.CanAccept)
+        {
+            return;
+        }
 
-		try
-		{
-			this.isSubmitting = true;
-			this.error = null;
-			this.successMessage = null;
+        try
+        {
+            this.isSubmitting = true;
+            this.error = null;
+            this.successMessage = null;
 
-			string acceptEndpoint = await this.ApiClient.InitAcceptInviteAsync(this.InviteToken);
+            string response = await this.ManageInviteApiClient.InitAcceptInviteAsync(this.InviteToken);
 
-			this.Navigation.NavigateTo(acceptEndpoint, forceLoad: true);
-		}
-		catch (Exception ex)
-		{
-			this.error = string.Format(L["MessageUnableAcceptInvite"], ex.Message);
-		}
-		finally
-		{
-			this.isSubmitting = false;
-		}
-	}
+            if (string.IsNullOrWhiteSpace(response))
+            {
+                this.error = L["MessageUnableAcceptInvite"];
+                return;
+            }
 
-	private async Task DeclineAsync()
-	{
-		if (this.invite is null || string.IsNullOrWhiteSpace(this.invite.DeclineUrl))
-		{
-			return;
-		}
+            this.Navigation.NavigateTo(response, forceLoad: true);
+        }
+        catch (Exception)
+        {
+            this.error = L["MessageUnableAcceptInvite"];
+        }
+        finally
+        {
+            this.isSubmitting = false;
+        }
+    }
 
-		try
-		{
-			this.isSubmitting = true;
-			this.error = null;
+    private async Task DeclineAsync()
+    {
+        if (this.invite is null || !this.invite.CanDecline)
+        {
+            return;
+        }
 
-			_ = await this.ApiClient.DeclineInviteAsync(this.InviteToken);
+        try
+        {
+            this.isSubmitting = true;
+            this.error = null;
 
-			this.successMessage = L["MessageInviteDeclineSuccess"];
-			await this.LoadAsync();
-		}
-		catch (Exception ex)
-		{
-			this.error = string.Format(L["MessageUnableDeclineInvite"], ex.Message);
-		}
-		finally
-		{
-			this.isSubmitting = false;
-		}
-	}
+            await this.ManageInviteApiClient.DeclineInviteAsync(this.InviteToken);
+
+            await this.ReloadInviteWithoutClearingSuccessAsync();
+            this.successMessage = L["MessageInviteDeclineSuccess"];
+        }
+        catch (Exception ex)
+        {
+            this.error = string.Format(L["MessageUnableDeclineInvite"], ex.Message);
+        }
+        finally
+        {
+            this.isSubmitting = false;
+        }
+    }
+
+    private async Task ReloadInviteWithoutClearingSuccessAsync()
+    {
+        try
+        {
+            this.isLoading = true;
+            this.error = null;
+
+            this.invite = await this.ManageInviteApiClient.GetInviteOverviewAsync(this.InviteToken);
+        }
+        catch (Exception ex)
+        {
+            this.invite = null;
+            this.error = string.Format(L["MessageUnableLoadInviteInfo"], ex.Message);
+        }
+        finally
+        {
+            this.isLoading = false;
+        }
+    }
 }

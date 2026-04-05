@@ -104,17 +104,9 @@ public sealed class ManageInviteEndpoints : IEndpoint
 			return TypedResults.NotFound();
 		}
 
-		string? acceptEndpoint = result.Value.CanAccept
-			? GetAcceptEndpoint(linkGenerator, httpContext, inviteToken)
-			: null;
-
-		string? declineEndpoint = result.Value.CanDecline
-			? GetDeclineEndpoint(linkGenerator, httpContext, inviteToken)
-			: null;
-
 		OverviewInviteDetailsResponse response = result.Value.MapToOverviewInviteDetails(
-			acceptEndpoint,
-			declineEndpoint);
+			result.Value.CanAccept,
+			result.Value.CanDecline);
 
 		return TypedResults.Ok(response);
 	}

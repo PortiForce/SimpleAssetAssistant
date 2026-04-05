@@ -12,5 +12,5 @@ public sealed record OverviewInviteDetailsResponse(
 	DateTimeOffset ExpiresAtUtc,
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
-	string AcceptUrl,
-	string DeclineUrl);
+	bool CanAccept,
+	bool CanDecline);
