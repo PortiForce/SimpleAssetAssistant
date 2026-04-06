@@ -65,6 +65,10 @@ else
                             @invite.InviteTier.ToDisplayName(SharedEnumL)
                         </div>
                     </div>
+                    <div>
+                        <span>@L["LabelAlias"]:</span>
+                        @invite.Alias
+                    </div>
                 </div>
 
                 <span class="badge @invite.State.ToCssBadgeClass()">

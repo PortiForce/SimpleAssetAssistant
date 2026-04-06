@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -158,5 +158,14 @@
   </data>
   <data name="LabelDefaultValue" xml:space="preserve">
     <value>Значення</value>
+  </data>
+  <data name="LabelAlias" xml:space="preserve">
+    <value>Псевдонім</value>
+  </data>
+  <data name="PlaceholderAlias" xml:space="preserve">
+    <value>Псевдонім користувача</value>
+  </data>
+  <data name="HelpTextAlias" xml:space="preserve">
+    <value>Встановіть псевдонім користувача, щоб ви могли пізніше перевірити та посилатися на різні канали</value>
   </data>
 </root>

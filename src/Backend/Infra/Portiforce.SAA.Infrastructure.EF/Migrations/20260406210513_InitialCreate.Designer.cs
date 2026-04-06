@@ -13,7 +13,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 namespace Portiforce.SAA.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AssetAssistantDbContext))]
-    [Migration("20260405181122_InitialCreate")]
+    [Migration("20260406210513_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -588,6 +588,11 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 
                     b.Property<Guid?>("AcceptedAccountId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool?>("BlockFutureInvites")
                         .HasColumnType("bit");

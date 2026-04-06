@@ -62,6 +62,10 @@ public sealed class TenantInviteConfiguration : IEntityTypeConfiguration<TenantI
 					.HasConversion<byte>();
 			});
 
+		_ = builder.Property(x => x.Alias)
+			.HasMaxLength(EntityConstraints.Domain.Invite.AliasMaxLength)
+			.IsRequired();
+
 		_ = builder.Property(x => x.IntendedRole)
 			.HasConversion<int>()
 			.IsRequired();

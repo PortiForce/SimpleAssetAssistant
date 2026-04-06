@@ -239,6 +239,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 					UpdatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
 					AcceptedAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
 					RevokedByAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+					Alias = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
 					BlockFutureInvites = table.Column<bool>(type: "bit", nullable: true),
 					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
 					InviteTargetChannel = table.Column<byte>(type: "tinyint", nullable: false),

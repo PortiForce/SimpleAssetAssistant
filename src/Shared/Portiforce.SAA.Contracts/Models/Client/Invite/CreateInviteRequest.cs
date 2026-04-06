@@ -8,6 +8,7 @@ public sealed record CreateInviteRequest : IValidatableObject
 {
 	[Required] public InviteChannel Channel { get; set; } = InviteChannel.Email;
 
+	// todo : consider usage of croscutting values
 	[Required]
 	[StringLength(256, MinimumLength = 2)]
 	public string TargetValue { get; set; } = string.Empty;
@@ -17,6 +18,8 @@ public sealed record CreateInviteRequest : IValidatableObject
 	[Required] public InviteTenantRole IntendedRole { get; set; } = InviteTenantRole.TenantUser;
 
 	[Required] public InviteAccountTier IntendedTier { get; set; } = InviteAccountTier.Investor;
+
+	[StringLength(100, MinimumLength = 3)] public string Alias { get; set; } = string.Empty;
 
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{

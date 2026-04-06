@@ -79,6 +79,15 @@
                     </InputSelect>
                     <ValidationMessage For="@(() => inviteModel.IntendedTier)" />
                 </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">@L["LabelAlias"]</label>
+                    <InputText @bind-Value="inviteModel.Alias"
+                               class="form-control"
+                               placeholder="@L["PlaceholderAlias"]" />
+                    <div class="form-text">@L["HelpTextAlias"]</div>
+                    <ValidationMessage For="@(() => inviteModel.Alias)" />
+                </div>
 
             </div>
 
@@ -105,7 +114,8 @@
         TargetKind = InviteTargetKind.Email,
         IntendedRole = InviteTenantRole.TenantUser,
         IntendedTier = InviteAccountTier.Investor,
-        TargetValue = string.Empty
+        TargetValue = string.Empty,
+        Alias = string.Empty
     };
 
     private bool isSubmitting;

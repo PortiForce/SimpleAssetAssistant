@@ -119,6 +119,7 @@ public sealed class CreateInviteCommandHandler(
 			request.TenantId,
 			request.InviteTarget,
 			request.InvitedByAccountId,
+			request.Alias,
 			request.IntendedRole,
 			request.IntendedTier,
 			tokenHash,

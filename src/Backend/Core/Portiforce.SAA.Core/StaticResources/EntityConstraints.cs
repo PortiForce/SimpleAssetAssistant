@@ -59,6 +59,12 @@ public static class EntityConstraints
 			public const int MaxFileSizeMb = 5;
 		}
 
+		public static class Invite
+		{
+			public const int AliasMinLength = 3;
+			public const int AliasMaxLength = 100;
+		}
+
 		public static class Account
 		{
 			public const int AliasMinLength = 3;

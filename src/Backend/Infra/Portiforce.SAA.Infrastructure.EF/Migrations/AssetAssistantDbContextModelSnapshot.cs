@@ -586,6 +586,11 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                     b.Property<Guid?>("AcceptedAccountId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool?>("BlockFutureInvites")
                         .HasColumnType("bit");
 

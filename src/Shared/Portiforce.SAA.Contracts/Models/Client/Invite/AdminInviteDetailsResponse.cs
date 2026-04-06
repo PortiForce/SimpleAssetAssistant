@@ -10,6 +10,7 @@ public sealed record AdminInviteDetailsResponse(
 	InviteAccountTier InviteTier,
 	InviteTenantRole InviteRole,
 	InviteStatus State,
+	string Alias,
 	DateTimeOffset CreatedAtUtc,
 	DateTimeOffset ExpiresAtUtc,
 	Guid InvitedBy,

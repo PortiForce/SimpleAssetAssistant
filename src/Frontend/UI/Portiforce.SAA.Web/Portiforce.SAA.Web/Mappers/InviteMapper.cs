@@ -187,6 +187,7 @@ public static class InviteMapper
 			ToPresentation(model.InviteTier),
 			model.InviteRole.ToPresentation(),
 			model.State.ToPresentation(),
+			model.Alias,
 			model.CreatedAtUtc,
 			model.ExpiresAtUtc,
 			model.InvitedBy.Value,

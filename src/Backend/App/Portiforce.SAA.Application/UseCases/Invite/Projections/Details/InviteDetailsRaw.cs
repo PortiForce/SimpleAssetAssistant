@@ -13,6 +13,7 @@ public sealed record InviteDetailsRaw(
 	AccountTier InviteTier,
 	Role InviteRole,
 	InviteState State,
+	string Alias,
 	DateTimeOffset CreatedAtUtc,
 	DateTimeOffset ExpiresAtUtc,
 	AccountId InvitedBy,
