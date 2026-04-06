@@ -17,13 +17,17 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
-		<PackageReference Include="Scalar.AspNetCore" Version="2.13.13" />
+		<PackageReference Include="Scalar.AspNetCore" Version="2.13.20" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
 		<ProjectReference Include="..\..\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj" />
 		<ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Roslynator.Analyzers" Version="4.15.0" />
 	</ItemGroup>
 
 </Project>

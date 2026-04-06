@@ -15,7 +15,7 @@ public abstract record ExecutableActivity : ReasonedActivity
 		ExternalMetadata externalMetadata,
 		IReadOnlyList<AssetMovementLeg> legs,
 		AssetActivityReason reason,
-		CompletionType completionType) 
+		CompletionType completionType)
 		: base(
 			id,
 			tenantId,
@@ -23,14 +23,16 @@ public abstract record ExecutableActivity : ReasonedActivity
 			kind,
 			occuredAt,
 			externalMetadata,
-			legs, 
+			legs,
 			reason)
 	{
-		CompletionType = completionType;
+		this.CompletionType = completionType;
 	}
 
 	// Private Empty Constructor for EF Core
-	protected ExecutableActivity(): base() { }
+	protected ExecutableActivity()
+	{
+	}
 
 	public CompletionType CompletionType { get; init; }
 }

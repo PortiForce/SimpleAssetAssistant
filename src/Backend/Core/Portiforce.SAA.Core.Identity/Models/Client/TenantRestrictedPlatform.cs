@@ -17,17 +17,16 @@ public sealed class TenantRestrictedPlatform
 			throw new DomainValidationException(nameof(platformId));
 		}
 
-		TenantId = tenantId;
-		PlatformId = platformId;
+		this.TenantId = tenantId;
+		this.PlatformId = platformId;
 	}
-
 
 	// Private Empty Constructor for EF Core
 	private TenantRestrictedPlatform()
 	{
-
 	}
 
 	public TenantId TenantId { get; init; }
+
 	public PlatformId PlatformId { get; init; }
 }

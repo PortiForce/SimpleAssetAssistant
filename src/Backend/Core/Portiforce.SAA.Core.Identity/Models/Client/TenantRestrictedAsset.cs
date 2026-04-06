@@ -17,16 +17,16 @@ public sealed class TenantRestrictedAsset
 			throw new DomainValidationException(nameof(assetId));
 		}
 
-		TenantId = tenantId;
-		AssetId = assetId;
+		this.TenantId = tenantId;
+		this.AssetId = assetId;
 	}
 
 	// Private Empty Constructor for EF Core
 	private TenantRestrictedAsset()
 	{
-
 	}
 
 	public TenantId TenantId { get; init; }
+
 	public AssetId AssetId { get; init; }
 }

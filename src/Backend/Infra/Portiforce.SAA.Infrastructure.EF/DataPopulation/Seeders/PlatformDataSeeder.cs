@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Assets.Enums;
+using Portiforce.SAA.Core.Assets.Enums;
 using Portiforce.SAA.Core.Assets.Models;
 
 namespace Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
@@ -7,13 +7,13 @@ public static class PlatformDataSeeder
 {
 	public static List<Platform> BuildPlatforms()
 	{
-		var platforms = new List<Platform>();
+		List<Platform> platforms = [];
 
 		// ---------------------------------------------------------
 		// 1. CRYPTO EXCHANGES (Top 25)
 		// ---------------------------------------------------------
-		var exchanges = new List<(string Code, string Name)>
-		{
+		List<(string Code, string Name)> exchanges =
+		[
 			("BINANCE", "Binance"),
 			("COINBASE", "Coinbase"),
 			("KRAKEN", "Kraken"),
@@ -42,23 +42,22 @@ public static class PlatformDataSeeder
 			("WHITEBIT", "WhiteBit"),
 			("CEXIO", "Cex.IO"),
 			("CEXPLUS", "Cex Plus")
-		};
+		];
 
-		foreach (var ex in exchanges)
+		foreach ((string Code, string Name) ex in exchanges)
 		{
-			platforms.Add(Platform.Create(
-				ex.Name,
-				ex.Code,
-				PlatformKind.Exchange,
-				PlatformState.Active
-			));
+			platforms.Add(
+				Platform.Create(
+					ex.Name,
+					ex.Code,
+					PlatformKind.Exchange));
 		}
 
 		// ---------------------------------------------------------
 		// 2. WALLETS (Top 10)
 		// ---------------------------------------------------------
-		var wallets = new List<(string Code, string Name)>
-		{
+		List<(string Code, string Name)> wallets =
+		[
 			("METAMASK", "MetaMask"),
 			("TRUST", "Trust Wallet"),
 			("LEDGER", "Ledger"),
@@ -69,39 +68,36 @@ public static class PlatformDataSeeder
 			("ATOMIC", "Atomic Wallet"),
 			("MEW", "MyEtherWallet"),
 			("ELECTRUM", "Electrum")
-		};
+		];
 
-		foreach (var w in wallets)
+		foreach ((string Code, string Name) w in wallets)
 		{
-			platforms.Add(Platform.Create(
-				w.Name,
-				w.Code,
-				PlatformKind.Wallet,
-				PlatformState.Active
-			));
+			platforms.Add(
+				Platform.Create(
+					w.Name,
+					w.Code,
+					PlatformKind.Wallet));
 		}
 
 		// ---------------------------------------------------------
 		// 3. TRADING PLATFORMS (Top 5 Stocks/Mixed)
 		// ---------------------------------------------------------
-		var brokers = new List<(string Code, string Name)>
-		{
+		List<(string Code, string Name)> brokers =
+		[
 			("ROBINHOOD", "Robinhood"),
 			("T212", "Trading 212"),
 			("IBKR", "Interactive Brokers"),
 			("ETORO", "eToro"),
 			("FIDELITY", "Fidelity")
-		};
+		];
 
-		foreach (var b in brokers)
+		foreach ((string Code, string Name) b in brokers)
 		{
 			platforms.Add(
 				Platform.Create(
 					b.Name,
 					b.Code,
-					PlatformKind.Broker, 
-					PlatformState.Active
-			));
+					PlatformKind.Broker));
 		}
 
 		return platforms;

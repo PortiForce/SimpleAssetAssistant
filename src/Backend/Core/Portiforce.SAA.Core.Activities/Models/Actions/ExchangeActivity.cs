@@ -15,7 +15,7 @@ public sealed record ExchangeActivity : ExecutableActivity
 		DateTimeOffset occurredAt,
 		AssetActivityReason reason,
 		IReadOnlyList<AssetMovementLeg> legs,
-		ExternalMetadata externalMetadata, 
+		ExternalMetadata externalMetadata,
 		CompletionType completionType,
 		ExchangeType exchangeType)
 		: base(
@@ -29,11 +29,13 @@ public sealed record ExchangeActivity : ExecutableActivity
 			reason,
 			completionType)
 	{
-		ExchangeType = exchangeType;
+		this.ExchangeType = exchangeType;
 	}
 
 	// Private Empty Constructor for EF Core
-	private ExchangeActivity(): base() { }
+	private ExchangeActivity()
+	{
+	}
 
 	public ExchangeType ExchangeType { get; init; }
 

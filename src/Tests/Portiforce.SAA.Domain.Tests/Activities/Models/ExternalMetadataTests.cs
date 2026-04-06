@@ -8,32 +8,32 @@ public sealed class ExternalMetadataTests
 	[Fact]
 	public void Ctor_WhenSourceMissing_ShouldThrow()
 	{
-		var act = () => new ExternalMetadata(source: "", externalId: "1");
-		act.Should().Throw<DomainValidationException>();
+		Func<ExternalMetadata> act = () => new ExternalMetadata("", "1");
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void Ctor_WhenBothExternalIdAndFingerprintMissing_ShouldThrow()
 	{
-		var act = () => new ExternalMetadata(source: "tests", externalId: null, fingerprint: null);
-		act.Should().Throw<DomainValidationException>();
+		Func<ExternalMetadata> act = () => new ExternalMetadata("tests");
+		_ = act.Should().Throw<DomainValidationException>();
 	}
 
 	[Fact]
 	public void GetPrimaryId_ShouldPreferExternalId()
 	{
-		var m = new ExternalMetadata(source: "tests", externalId: "E1", fingerprint: "F1");
+		ExternalMetadata m = new("tests", "E1", "F1");
 
-		m.IsExternalIdDriven().Should().BeTrue();
-		m.GetPrimaryId().Should().Be("E1");
+		_ = m.IsExternalIdDriven().Should().BeTrue();
+		_ = m.GetPrimaryId().Should().Be("E1");
 	}
 
 	[Fact]
 	public void GetPrimaryId_WhenOnlyFingerprint_ShouldReturnFingerprint()
 	{
-		var m = new ExternalMetadata(source: "tests", externalId: null, fingerprint: "F1");
+		ExternalMetadata m = new("tests", null, "F1");
 
-		m.IsExternalIdDriven().Should().BeFalse();
-		m.GetPrimaryId().Should().Be("F1");
+		_ = m.IsExternalIdDriven().Should().BeFalse();
+		_ = m.GetPrimaryId().Should().Be("F1");
 	}
 }

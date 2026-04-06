@@ -1,5 +1,3 @@
-﻿using System;
-
 using Microsoft.EntityFrameworkCore.Migrations;
 
 using Portiforce.SAA.Infrastructure.EF.Configuration;
@@ -14,19 +12,19 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 		/// <inheritdoc />
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
-			migrationBuilder.EnsureSchema(
-				name: "core");
-
-			migrationBuilder.EnsureSchema(
-				name: "ledger");
-
-			migrationBuilder.EnsureSchema(
+			_ = migrationBuilder.EnsureSchema(
 				name: "auth");
 
-			migrationBuilder.EnsureSchema(
+			_ = migrationBuilder.EnsureSchema(
+				name: "core");
+
+			_ = migrationBuilder.EnsureSchema(
+				name: "ledger");
+
+			_ = migrationBuilder.EnsureSchema(
 				name: "pf");
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Assets",
 				schema: "core",
 				columns: table => new
@@ -41,10 +39,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Assets", x => x.Id);
+					_ = table.PrimaryKey("PK_Assets", x => x.Id);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Platforms",
 				schema: "core",
 				columns: table => new
@@ -58,10 +56,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Platforms", x => x.Id);
+					_ = table.PrimaryKey("PK_Platforms", x => x.Id);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Tenants",
 				schema: "core",
 				columns: table => new
@@ -85,24 +83,23 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Tenants", x => x.Id);
+					_ = table.PrimaryKey("PK_Tenants", x => x.Id);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Accounts",
 				schema: "core",
 				columns: table => new
 				{
 					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
 					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Alias = table.Column<string>(type: "nvarchar(105)", maxLength: 105, nullable: false),
+					Alias = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
 					Role = table.Column<byte>(type: "tinyint", nullable: false),
 					State = table.Column<byte>(type: "tinyint", nullable: false),
 					Tier = table.Column<byte>(type: "tinyint", nullable: false),
 					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
-					ContactBackupEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-					ContactEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-					ContactPhone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
+					ContactEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+					ContactPhone = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),
 					Settings_DefaultFiatCurrency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
 					Settings_Locale = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
 					Settings_TimeZone = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
@@ -110,8 +107,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Accounts", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_Accounts", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_Accounts_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -120,7 +117,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Restrict);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "TenantRestrictedAssets",
 				schema: "core",
 				columns: table => new
@@ -130,8 +127,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_TenantRestrictedAssets", x => new { x.TenantId, x.AssetId });
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_TenantRestrictedAssets", x => new { x.TenantId, x.AssetId });
+					_ = table.ForeignKey(
 						name: "FK_TenantRestrictedAssets_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -140,7 +137,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Cascade);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "TenantRestrictedPlatforms",
 				schema: "core",
 				columns: table => new
@@ -150,8 +147,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_TenantRestrictedPlatforms", x => new { x.TenantId, x.PlatformId });
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_TenantRestrictedPlatforms", x => new { x.TenantId, x.PlatformId });
+					_ = table.ForeignKey(
 						name: "FK_TenantRestrictedPlatforms_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -160,7 +157,39 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Cascade);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
+				name: "AccountIdentifiers",
+				schema: "auth",
+				columns: table => new
+				{
+					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					Kind = table.Column<byte>(type: "tinyint", nullable: false),
+					Value = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+					IsVerified = table.Column<bool>(type: "bit", nullable: false),
+					IsPrimary = table.Column<bool>(type: "bit", nullable: false)
+				},
+				constraints: table =>
+				{
+					_ = table.PrimaryKey("PK_AccountIdentifiers", x => x.Id);
+					_ = table.ForeignKey(
+						name: "FK_AccountIdentifiers_Accounts_AccountId",
+						column: x => x.AccountId,
+						principalSchema: "core",
+						principalTable: "Accounts",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
+					_ = table.ForeignKey(
+						name: "FK_AccountIdentifiers_Tenants_TenantId",
+						column: x => x.TenantId,
+						principalSchema: "core",
+						principalTable: "Tenants",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
+				});
+
+			_ = migrationBuilder.CreateTable(
 				name: "ExternalIdentities",
 				schema: "auth",
 				columns: table => new
@@ -174,15 +203,15 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_ExternalIdentities", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_ExternalIdentities", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_ExternalIdentities_Accounts_AccountId",
 						column: x => x.AccountId,
 						principalSchema: "core",
 						principalTable: "Accounts",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_ExternalIdentities_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -191,7 +220,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Cascade);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Invites",
 				schema: "pf",
 				columns: table => new
@@ -207,32 +236,34 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 					ExpiresAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
 					SentAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
 					SendCount = table.Column<int>(type: "int", nullable: false),
-					AcceptedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					UpdatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
 					AcceptedAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-					RevokedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
 					RevokedByAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+					Alias = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+					BlockFutureInvites = table.Column<bool>(type: "bit", nullable: true),
 					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
-					InviteTargetType = table.Column<int>(type: "int", nullable: false),
+					InviteTargetChannel = table.Column<byte>(type: "tinyint", nullable: false),
+					InviteTargetKind = table.Column<byte>(type: "tinyint", nullable: false),
 					InviteTargetValue = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Invites", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_Invites", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_Invites_Accounts_AcceptedAccountId",
 						column: x => x.AcceptedAccountId,
 						principalSchema: "core",
 						principalTable: "Accounts",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_Invites_Accounts_InvitedByAccountId",
 						column: x => x.InvitedByAccountId,
 						principalSchema: "core",
 						principalTable: "Accounts",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_Invites_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -241,7 +272,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Restrict);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "PassKeyCredentials",
 				schema: "auth",
 				columns: table => new
@@ -257,8 +288,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_PassKeyCredentials", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_PassKeyCredentials", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_PassKeyCredentials_Accounts_AccountId",
 						column: x => x.AccountId,
 						principalSchema: "core",
@@ -267,7 +298,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Cascade);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "PlatformAccounts",
 				schema: "core",
 				columns: table => new
@@ -284,22 +315,22 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_PlatformAccounts", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_PlatformAccounts", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_PlatformAccounts_Accounts_AccountId",
 						column: x => x.AccountId,
 						principalSchema: "core",
 						principalTable: "Accounts",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_PlatformAccounts_Platforms_PlatformId",
 						column: x => x.PlatformId,
 						principalSchema: "core",
 						principalTable: "Platforms",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Restrict);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_PlatformAccounts_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -308,7 +339,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Restrict);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "SessionTokens",
 				schema: "auth",
 				columns: table => new
@@ -330,15 +361,15 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_SessionTokens", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_SessionTokens", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_SessionTokens_Accounts_AccountId",
 						column: x => x.AccountId,
 						principalSchema: "core",
 						principalTable: "Accounts",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_SessionTokens_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
@@ -347,7 +378,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Cascade);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "Activities",
 				schema: "ledger",
 				columns: table => new
@@ -379,8 +410,8 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_Activities", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_Activities", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_Activities_PlatformAccounts_PlatformAccountId",
 						column: x => x.PlatformAccountId,
 						principalSchema: "core",
@@ -389,7 +420,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Restrict);
 				});
 
-			migrationBuilder.CreateTable(
+			_ = migrationBuilder.CreateTable(
 				name: "ActivityLegs",
 				schema: "ledger",
 				columns: table => new
@@ -405,15 +436,15 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				},
 				constraints: table =>
 				{
-					table.PrimaryKey("PK_ActivityLegs", x => x.Id);
-					table.ForeignKey(
+					_ = table.PrimaryKey("PK_ActivityLegs", x => x.Id);
+					_ = table.ForeignKey(
 						name: "FK_ActivityLegs_Activities_ActivityId",
 						column: x => x.ActivityId,
 						principalSchema: "ledger",
 						principalTable: "Activities",
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
-					table.ForeignKey(
+					_ = table.ForeignKey(
 						name: "FK_ActivityLegs_Assets_AssetId",
 						column: x => x.AssetId,
 						principalSchema: "core",
@@ -422,213 +453,226 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 						onDelete: ReferentialAction.Restrict);
 				});
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
+				name: "IX_AccountIdentifiers_AccountId",
+				schema: "auth",
+				table: "AccountIdentifiers",
+				column: "AccountId");
+
+			_ = migrationBuilder.CreateIndex(
+				name: "UX_AccountIdentifier_Tenant_Kind_Value",
+				schema: "auth",
+				table: "AccountIdentifiers",
+				columns: new[] { "TenantId", "Kind", "Value" },
+				unique: true);
+
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Account_State",
 				schema: "core",
 				table: "Accounts",
 				column: "State");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Account_TenantId",
 				schema: "core",
 				table: "Accounts",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Activity_PlatformAccount_OccurredAt_Id",
 				schema: "ledger",
 				table: "Activities",
 				columns: new[] { "PlatformAccountId", "OccurredAt", "Id" });
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Leg_ActivityId",
 				schema: "ledger",
 				table: "ActivityLegs",
 				column: "ActivityId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Leg_AssetId",
 				schema: "ledger",
 				table: "ActivityLegs",
 				column: "AssetId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Asset_State",
 				schema: "core",
 				table: "Assets",
 				column: "State");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Asset_Code_Kind",
 				schema: "core",
 				table: "Assets",
 				columns: new[] { "Code", "Kind" },
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_ExternalIdentities_AccountId",
 				schema: "auth",
 				table: "ExternalIdentities",
 				column: "AccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_ExternalIdentities_TenantId",
 				schema: "auth",
 				table: "ExternalIdentities",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_ExternalIdentity_Provider_ExternalId",
 				schema: "auth",
 				table: "ExternalIdentities",
 				columns: new[] { "Provider", "ProviderSubject" },
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invite_State",
 				schema: "pf",
 				table: "Invites",
 				column: "State");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invite_TenantId",
 				schema: "pf",
 				table: "Invites",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invite_TenantId_State_ExpiresAt",
 				schema: "pf",
 				table: "Invites",
 				columns: new[] { "TenantId", "State", "ExpiresAtUtc" });
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invites_AcceptedAccountId",
 				schema: "pf",
 				table: "Invites",
 				column: "AcceptedAccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invites_InvitedByAccountId",
 				schema: "pf",
 				table: "Invites",
 				column: "InvitedByAccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PassKeyCredentials_AccountId",
 				schema: "auth",
 				table: "PassKeyCredentials",
 				column: "AccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_PasskeyCredential_CredentialId",
 				schema: "auth",
 				table: "PassKeyCredentials",
 				column: "CredentialId",
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_Tenant_Account",
 				schema: "core",
 				table: "PlatformAccounts",
 				columns: new[] { "TenantId", "AccountId" });
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccount_Tenant_Platform",
 				schema: "core",
 				table: "PlatformAccounts",
 				columns: new[] { "TenantId", "PlatformId" });
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccounts_AccountId",
 				schema: "core",
 				table: "PlatformAccounts",
 				column: "AccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PlatformAccounts_PlatformId",
 				schema: "core",
 				table: "PlatformAccounts",
 				column: "PlatformId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_PlatformAccount_Tenant_Account_Platform",
 				schema: "core",
 				table: "PlatformAccounts",
 				columns: new[] { "TenantId", "AccountId", "PlatformId" },
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Platform_State",
 				schema: "core",
 				table: "Platforms",
 				column: "State");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Platform_Code",
 				schema: "core",
 				table: "Platforms",
 				column: "Code",
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Platform_Name",
 				schema: "core",
 				table: "Platforms",
 				column: "Name",
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_SessionTokens_AccountId",
 				schema: "auth",
 				table: "SessionTokens",
 				column: "AccountId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_SessionTokens_SessionId",
 				schema: "auth",
 				table: "SessionTokens",
 				column: "SessionId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_SessionTokens_TenantId",
 				schema: "auth",
 				table: "SessionTokens",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_SessionTokens_TokenHash",
 				schema: "auth",
 				table: "SessionTokens",
 				column: "TokenHash",
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_TenantRestrictedAsset_TenantId",
 				schema: "core",
 				table: "TenantRestrictedAssets",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_TenantRestrictedPlatform_TenantId",
 				schema: "core",
 				table: "TenantRestrictedPlatforms",
 				column: "TenantId");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Tenant_State",
 				schema: "core",
 				table: "Tenants",
 				column: "State");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Tenant_Code",
 				schema: "core",
 				table: "Tenants",
 				column: "Code",
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Tenant_DomainPrefix",
 				schema: "core",
 				table: "Tenants",
@@ -636,21 +680,21 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				unique: true,
 				filter: "[DomainPrefix] IS NOT NULL");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Account_Tenant_ContactEmail",
 				schema: DbConstants.Domain.Entities.CoreSchema.SchemaName,
 				table: DbConstants.Domain.Entities.CoreSchema.AccountTableName,
 				columns: new[] { "TenantId", "ContactEmail" },
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Invite_Tenant_InviteTarger",
 				schema: DbConstants.Domain.Entities.DefaultSchema.SchemaName,
 				table: DbConstants.Domain.Entities.DefaultSchema.InviteTableName,
 				columns: new[] { "TenantId", "InviteTargetValue" },
 				unique: true);
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Activity_ExternalId",
 				schema: DbConstants.Domain.Entities.LedgerSchema.SchemaName,
 				table: DbConstants.Domain.Entities.LedgerSchema.ActivityTableName,
@@ -658,7 +702,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				unique: true,
 				filter: "[ExternalId] IS NOT NULL");
 
-			migrationBuilder.CreateIndex(
+			_ = migrationBuilder.CreateIndex(
 				name: "UX_Activity_Fingerprint",
 				schema: DbConstants.Domain.Entities.LedgerSchema.SchemaName,
 				table: DbConstants.Domain.Entities.LedgerSchema.ActivityTableName,
@@ -671,55 +715,59 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 		/// <inheritdoc />
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
+				name: "AccountIdentifiers",
+				schema: "auth");
+
+			_ = migrationBuilder.DropTable(
 				name: "ActivityLegs",
 				schema: "ledger");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "ExternalIdentities",
 				schema: "auth");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Invites",
 				schema: "pf");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "PassKeyCredentials",
 				schema: "auth");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "SessionTokens",
 				schema: "auth");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "TenantRestrictedAssets",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "TenantRestrictedPlatforms",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Activities",
 				schema: "ledger");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Assets",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "PlatformAccounts",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Accounts",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Platforms",
 				schema: "core");
 
-			migrationBuilder.DropTable(
+			_ = migrationBuilder.DropTable(
 				name: "Tenants",
 				schema: "core");
 		}

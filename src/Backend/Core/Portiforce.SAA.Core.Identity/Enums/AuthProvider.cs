@@ -1,8 +1,12 @@
-﻿namespace Portiforce.SAA.Core.Identity.Enums;
+namespace Portiforce.SAA.Core.Identity.Enums;
 
-public enum AuthProvider
+public enum AuthProvider : byte
 {
 	Google = 1,
-	Apple = 2,
-	Passkey = 2
+
+	Telegram = 2,
+
+	Apple = 3,
+
+	Passkey = 4
 }

@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.UseCases.Auth.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
 namespace Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
@@ -15,16 +17,29 @@ internal sealed class ExternalIdentityReadRepository(AssetAssistantDbContext db)
 		return await db.ExternalIdentities
 			.AsNoTracking()
 			.Where(x =>
-					x.Provider == AuthProvider.Google &&
-					x.ProviderSubject == googleUserExternalId
-			)
+				x.Provider == AuthProvider.Google &&
+				x.ProviderSubject == googleUserExternalId)
 			.Select(x => new ExternalIdentityDetails(
 				x.Id,
 				x.TenantId,
 				x.AccountId,
 				x.Provider,
-				x.IsPrimary
-			))
+				x.IsPrimary))
 			.SingleOrDefaultAsync(ct);
+	}
+
+	public async Task<bool> ExistsAsync(
+		TenantId tenantId,
+		AuthProvider provider,
+		string providerSubject,
+		CancellationToken ct)
+	{
+		return await db.ExternalIdentities
+			.AsNoTracking()
+			.AnyAsync(
+				x => x.TenantId == tenantId &&
+					 x.Provider == provider &&
+					 x.ProviderSubject == providerSubject,
+				ct);
 	}
 }

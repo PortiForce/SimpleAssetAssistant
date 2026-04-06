@@ -7,7 +7,8 @@ public sealed class NullableStrongIdConverter<TStrongId> : ValueConverter<TStron
 {
 	public NullableStrongIdConverter(Func<TStrongId, Guid> toGuid, Func<Guid, TStrongId> fromGuid)
 		: base(
-			id => id.HasValue ? toGuid(id.Value) : (Guid?)null,
-			guid => guid.HasValue ? fromGuid(guid.Value) : (TStrongId?)null)
-	{ }
+			id => id.HasValue ? toGuid(id.Value) : null,
+			guid => guid.HasValue ? fromGuid(guid.Value) : null)
+	{
+	}
 }

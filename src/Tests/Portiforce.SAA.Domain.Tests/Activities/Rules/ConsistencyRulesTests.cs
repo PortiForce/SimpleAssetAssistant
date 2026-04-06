@@ -8,15 +8,15 @@ public sealed class ConsistencyRulesTests
 	[Fact]
 	public void EnsureScaleDoesNotExceed_WhenWithinScale_ShouldNotThrow()
 	{
-		var act = () => ConsistencyRules.EnsureScaleDoesNotExceed(1.12m, maxDecimals: 2, paramName: "amount");
-		act.Should().NotThrow();
+		Action act = () => ConsistencyRules.EnsureScaleDoesNotExceed(1.12m, 2, "amount");
+		_ = act.Should().NotThrow();
 	}
 
 	[Fact]
 	public void EnsureScaleDoesNotExceed_WhenExceedsScale_ShouldThrow()
 	{
-		var act = () => ConsistencyRules.EnsureScaleDoesNotExceed(1.123m, maxDecimals: 2, paramName: "amount");
-		act.Should().Throw<DomainValidationException>()
+		Action act = () => ConsistencyRules.EnsureScaleDoesNotExceed(1.123m, 2, "amount");
+		_ = act.Should().Throw<DomainValidationException>()
 			.WithMessage("*max allowed is 2*");
 	}
 }

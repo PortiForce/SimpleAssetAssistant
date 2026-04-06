@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+
 using Portiforce.SAA.Api.Configuration;
 using Portiforce.SAA.Api.ErrorHandling;
 using Portiforce.SAA.Api.Interfaces;
@@ -14,6 +15,7 @@ using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation;
 using Portiforce.SAA.Infrastructure.Services.Security;
 using Portiforce.SAA.Infrastructure.Services.Time;
+
 using Scalar.AspNetCore;
 
 namespace Portiforce.SAA.Api;
@@ -22,18 +24,18 @@ public class Program
 {
 	public static async Task Main(string[] args)
 	{
-		var builder = WebApplication.CreateBuilder(args);
+		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 		// an ability to use user secrets for local runs
 		if (builder.Environment.IsDevelopment())
 		{
-			builder.Configuration.AddUserSecrets<Program>(optional: true);
+			_ = builder.Configuration.AddUserSecrets<Program>(true);
 		}
 
-		builder.Services.AddControllers();
+		_ = builder.Services.AddControllers();
 
 		// RFC 7807 ProblemDetails support
-		builder.Services.AddProblemDetails(options =>
+		_ = builder.Services.AddProblemDetails(options =>
 		{
 			// attach trace id for correlation
 			options.CustomizeProblemDetails = ctx =>
@@ -43,18 +45,19 @@ public class Program
 		});
 
 		// Central exception handling via IExceptionHandler
-		builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+		_ = builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
-		builder.Services.AddOpenApi();
-		
-		//  current user / correlation / multi-tenancy access outside controllers
-		builder.Services.AddHttpContextAccessor();
+		_ = builder.Services.AddOpenApi();
+
+		// use case: current user / correlation / multi-tenancy access outside controllers
+		_ = builder.Services.AddHttpContextAccessor();
 
 		// Bind + validate JWT settings early (fail fast)
-		builder.Services
+		_ = builder.Services
 			.AddOptions<JwtSettings>()
 			.Bind(builder.Configuration.GetSection("JwtSettings"))
-			.Validate(s =>
+			.Validate(
+				s =>
 					!string.IsNullOrWhiteSpace(s.Issuer) &&
 					!string.IsNullOrWhiteSpace(s.Audience) &&
 					!string.IsNullOrWhiteSpace(s.Secret) &&
@@ -62,52 +65,49 @@ public class Program
 				"JwtSettings are invalid. Issuer/Audience/Secret are required; Secret should be >= 32 chars.")
 			.ValidateOnStart();
 
-		builder.Services.AddOptions<TokenHashingOptions>()
+		_ = builder.Services.AddOptions<TokenHashingOptions>()
 			.BindConfiguration("TokenHashingOptions")
 			.Validate(o => !string.IsNullOrWhiteSpace(o.Pepper), "TokenHashing:Pepper is required")
 			.ValidateOnStart();
 
-		builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
-		builder.Services.AddSingleton<IClock, SystemClock>();
-		builder.Services.AddSingleton<IHashingService, TokenHashingService>();
+		_ = builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+		_ = builder.Services.AddSingleton<IClock, SystemClock>();
+		_ = builder.Services.AddSingleton<IHashingService, TokenHashingService>();
 
-		builder.Services
+		_ = builder.Services
 			.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			.AddJwtBearer();
 
-		builder.Services.AddAuthorization();
+		_ = builder.Services.AddAuthorization();
 
 		// internal dependencies
 		RegisterServices(builder);
 
 		// registration of related flows
-		builder.Services.AddApplication();
-		builder.Services.AddCoreIdentity();
-		builder.Services.AddInfrastructure(builder.Configuration);
-		builder.Services.AddEfInfrastructure(builder.Configuration);
+		_ = builder.Services.AddApplication();
+		_ = builder.Services.AddCoreIdentity();
+		_ = builder.Services.AddInfrastructure(builder.Configuration);
+		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
 
-		var app = builder.Build();
+		WebApplication app = builder.Build();
 
 		if (app.Environment.IsDevelopment())
 		{
-			app.MapOpenApi();
-			app.MapScalarApiReference(options =>
-			{
-				options.Title = "SimpleAssetAssistant API";
-			});
+			_ = app.MapOpenApi();
+			_ = app.MapScalarApiReference(options => { options.Title = "SimpleAssetAssistant API"; });
 		}
 		else
 		{
-			app.UseHsts();
+			_ = app.UseHsts();
 		}
 
-		app.UseExceptionHandler();
-		app.UseHttpsRedirection();
+		_ = app.UseExceptionHandler();
+		_ = app.UseHttpsRedirection();
 
-		app.UseAuthentication();
-		app.UseAuthorization();
+		_ = app.UseAuthentication();
+		_ = app.UseAuthorization();
 
-		app.MapControllers();
+		_ = app.MapControllers();
 
 		// run data seeding - do NOT use sa accounts for database flows, only for schema migrations
 		if (app.Environment.IsDevelopment())
@@ -119,8 +119,6 @@ public class Program
 		await app.RunAsync();
 	}
 
-	private static void RegisterServices(WebApplicationBuilder builder)
-	{
-		builder.Services.AddScoped<ITenantIdServiceResolver, TenantIdServiceResolver>();
-	}
+	private static void RegisterServices(WebApplicationBuilder builder) =>
+		_ = builder.Services.AddScoped<ITenantIdServiceResolver, TenantIdServiceResolver>();
 }

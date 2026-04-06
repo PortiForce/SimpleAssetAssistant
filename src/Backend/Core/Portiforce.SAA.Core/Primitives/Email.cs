@@ -1,16 +1,22 @@
-﻿namespace Portiforce.SAA.Core.Primitives;
+using System.Net.Mail;
+
+using Portiforce.SAA.Core.StaticResources;
+
+namespace Portiforce.SAA.Core.Primitives;
 
 public sealed record Email
 {
 	// Private Empty Constructor for EF Core
 	private Email()
 	{
+	}
 
+	private Email(string value)
+	{
+		this.Value = value;
 	}
 
 	public string Value { get; init; } = null!;
-
-	private Email(string value) => Value = value;
 
 	public static bool TryCreate(string rawData, out Email email)
 	{
@@ -20,7 +26,7 @@ public sealed record Email
 			email = Create(rawData);
 			return true;
 		}
-		catch
+		catch (ArgumentException)
 		{
 			return false;
 		}
@@ -35,9 +41,11 @@ public sealed record Email
 
 		string normalized = rawData.Trim().ToLowerInvariant();
 
-		if (normalized.Length > 255)
+		if (normalized.Length > EntityConstraints.CommonSettings.EmailAddressMaxLength)
 		{
-			throw new ArgumentException("Email is too long (max 255).", nameof(rawData));
+			throw new ArgumentException(
+				$"Email is too long (max {EntityConstraints.CommonSettings.EmailAddressMaxLength}).",
+				nameof(rawData));
 		}
 
 		if (!IsValid(normalized))
@@ -48,17 +56,28 @@ public sealed record Email
 		return new Email(normalized);
 	}
 
-	public override string ToString() => Value;
+	public override string ToString() => this.Value;
 
 	private static bool IsValid(string email)
 	{
 		try
 		{
-			var addr = new System.Net.Mail.MailAddress(email);
+			MailAddress addr = new(email);
 
-			// This prevents some edge cases where MailAddress accepts but normalizes unexpectedly.
-			// It also ensures we don't accept values with display names etc.
-			return string.Equals(addr.Address, email, StringComparison.OrdinalIgnoreCase);
+			if (!string.Equals(addr.Address, email, StringComparison.OrdinalIgnoreCase))
+			{
+				return false;
+			}
+
+			int atIndex = email.LastIndexOf('@');
+			if (atIndex <= 0 || atIndex == email.Length - 1)
+			{
+				return false;
+			}
+
+			string domain = email[(atIndex + 1)..];
+
+			return domain.Contains('.');
 		}
 		catch
 		{

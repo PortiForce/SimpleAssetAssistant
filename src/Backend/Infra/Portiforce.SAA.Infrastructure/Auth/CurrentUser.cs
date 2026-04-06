@@ -1,5 +1,7 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
+
 using Microsoft.AspNetCore.Http;
+
 using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Core.Identity.Enums;
@@ -13,7 +15,7 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	{
 		get
 		{
-			var idClaim = GetClaim(ClaimTypes.NameIdentifier) ?? GetClaim(CustomClaimTypes.UserId);
+			string? idClaim = this.GetClaim(ClaimTypes.NameIdentifier) ?? this.GetClaim(CustomClaimTypes.UserId);
 			return !string.IsNullOrWhiteSpace(idClaim)
 				? new AccountId(Guid.Parse(idClaim))
 				: AccountId.Empty;
@@ -24,7 +26,7 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	{
 		get
 		{
-			var tenantClaim = GetClaim(CustomClaimTypes.TenantId) ?? GetClaim(CustomClaimTypes.TenantId);
+			string? tenantClaim = this.GetClaim(CustomClaimTypes.TenantId) ?? this.GetClaim(CustomClaimTypes.TenantId);
 			return !string.IsNullOrWhiteSpace(tenantClaim)
 				? new TenantId(Guid.Parse(tenantClaim))
 				: TenantId.Empty;
@@ -35,9 +37,10 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	{
 		get
 		{
-			var roleClaim = GetClaim(ClaimTypes.Role) ?? GetClaim(CustomClaimTypes.RoleId) ?? GetClaim(CustomClaimTypes.RoleId);
+			string? roleClaim = this.GetClaim(ClaimTypes.Role) ??
+								this.GetClaim(CustomClaimTypes.RoleId) ?? this.GetClaim(CustomClaimTypes.RoleId);
 
-			return !string.IsNullOrWhiteSpace(roleClaim) && Enum.TryParse<Role>(roleClaim, out var role)
+			return !string.IsNullOrWhiteSpace(roleClaim) && Enum.TryParse(roleClaim, out Role role)
 				? role
 				: Role.None;
 		}
@@ -47,8 +50,9 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	{
 		get
 		{
-			var stateClaim = GetClaim(CustomClaimTypes.State);
-			return !string.IsNullOrWhiteSpace(stateClaim) && Enum.TryParse<AccountState>(stateClaim, out var state)
+			string? stateClaim = this.GetClaim(CustomClaimTypes.State);
+			return !string.IsNullOrWhiteSpace(stateClaim) &&
+				   Enum.TryParse(stateClaim, out AccountState state)
 				? state
 				: AccountState.Unknown;
 		}
@@ -57,8 +61,5 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	public bool IsAuthenticated =>
 		httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
-	private string? GetClaim(string claimType)
-	{
-		return httpContextAccessor.HttpContext?.User?.FindFirstValue(claimType);
-	}
+	private string? GetClaim(string claimType) => httpContextAccessor.HttpContext?.User?.FindFirstValue(claimType);
 }

@@ -24,11 +24,13 @@ public abstract record ReasonedActivity : AssetActivityBase
 			externalMetadata,
 			legs)
 	{
-		Reason = reason;
+		this.Reason = reason;
 	}
 
 	// Private Empty Constructor for EF Core
-	protected ReasonedActivity():base() { }
+	protected ReasonedActivity()
+	{
+	}
 
 	public AssetActivityReason Reason { get; init; }
 }

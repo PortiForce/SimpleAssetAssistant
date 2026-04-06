@@ -1,0 +1,12 @@
+prompts/
+	add-api-client.md
+	add-bff-endpoint.md
+	add-command-handler.md
+	add-contract-dto.md
+	add-domain-type.md
+	add-ef-repository.md
+	add-invite-flow.md
+	add-mapper.md
+	add-query-handler.md
+	add-blazor-page.md
+	add-tests.md

@@ -30,7 +30,9 @@ public sealed record UserCorrectionActivity : ReasonedActivity
 	}
 
 	// Private Empty Constructor for EF Core
-	private UserCorrectionActivity() : base() { }
+	private UserCorrectionActivity()
+	{
+	}
 
 	public static UserCorrectionActivity Create(
 		TenantId tenantId,

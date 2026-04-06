@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
+
 using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Interfaces.Persistence.Client;
 using Portiforce.SAA.Application.UseCases.Client.Tenant.Projections;
 using Portiforce.SAA.Core.Primitives.Ids;
@@ -26,8 +28,12 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 				x.DomainPrefix,
 				x.Plan,
 				x.State,
-				RestrictedAssets = x.RestrictedAssets.Select(r => r.AssetId).ToList(),
-				RestrictedPlatforms = x.RestrictedPlatforms.Select(r => r.PlatformId).ToList()
+				RestrictedAssets = x.RestrictedAssets
+					.Select(r => r.AssetId)
+					.ToList(),
+				RestrictedPlatforms = x.RestrictedPlatforms
+					.Select(r => r.PlatformId)
+					.ToList()
 			})
 			.SingleOrDefaultAsync(ct);
 
@@ -38,16 +44,15 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 
 		// Mapping logic remains here because 'ReadOnlySet' is complex to construct inside LINQ
 		return new TenantDetails(
-			Id: tenantData.Id,
-			Name: tenantData.Name,
-			Code: tenantData.Code,
-			BrandName: tenantData.BrandName,
-			DomainPrefix: tenantData.DomainPrefix,
-			Plan: tenantData.Plan,
-			State: tenantData.State,
-			RestrictedAssets: new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenantData.RestrictedAssets)),
-			RestrictedPlatforms: new ReadOnlySet<PlatformId>(new HashSet<PlatformId>(tenantData.RestrictedPlatforms))
-		);
+			tenantData.Id,
+			tenantData.Name,
+			tenantData.Code,
+			tenantData.BrandName,
+			tenantData.DomainPrefix,
+			tenantData.Plan,
+			tenantData.State,
+			new ReadOnlySet<AssetId>(new HashSet<AssetId>(tenantData.RestrictedAssets)),
+			new ReadOnlySet<PlatformId>(new HashSet<PlatformId>(tenantData.RestrictedPlatforms)));
 	}
 
 	public async Task<TenantSummary?> GetSummaryByIdAsync(TenantId id, CancellationToken ct)
@@ -62,8 +67,7 @@ internal sealed class TenantReadRepository(AssetAssistantDbContext db) : ITenant
 				x.Code,
 				x.DomainPrefix,
 				x.Plan,
-				x.State
-			))
+				x.State))
 			.SingleOrDefaultAsync(ct);
 	}
 }
