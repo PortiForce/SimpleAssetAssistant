@@ -44,8 +44,8 @@ public static class ApiRoutes
 
 	public static class Accounts
 	{
-		public const string Root = $"{BffRoot}/accouts";
+		public const string Root = $"{BffRoot}/accounts";
 
-		public static string Details(Guid inviteId) => $"{Root}/{inviteId}";
+		public static string Details(Guid accountId) => $"{Root}/{accountId}";
 	}
 }
