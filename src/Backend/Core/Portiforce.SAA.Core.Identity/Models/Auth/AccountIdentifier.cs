@@ -91,6 +91,11 @@ public sealed class AccountIdentifier : Entity<AccountIdentifierId>
 
 	private static string Normalize(AccountIdentifierKind kind, string value)
 	{
+		if (string.IsNullOrEmpty(value))
+		{
+			return value;
+		}
+
 		value = value.Trim();
 
 		return kind switch
