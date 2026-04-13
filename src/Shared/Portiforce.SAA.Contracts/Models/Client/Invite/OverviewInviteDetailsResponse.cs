@@ -13,4 +13,7 @@ public sealed record OverviewInviteDetailsResponse(
 	int SendTimesCount,
 	DateTimeOffset? AcceptedAtUtc,
 	bool CanAccept,
-	bool CanDecline);
+	bool CanDecline,
+	InviteOverviewViewMode ViewMode,
+	bool HasActiveSession,
+	string? ActiveSessionDisplayName);

@@ -10,6 +10,7 @@ using Portiforce.SAA.Application.UseCases.Invite.Flow.Mappers;
 using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
+using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.UseCases.Invite.Handlers.Queries;
 
@@ -31,7 +32,7 @@ public sealed class GetInviteOverviewQueryHandler(
 		}
 		catch (ArgumentException)
 		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite not found.", request.RawToken));
+			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite", request.RawToken));
 		}
 
 		TenantInvite? tenantInvite =
@@ -39,28 +40,39 @@ public sealed class GetInviteOverviewQueryHandler(
 
 		if (tenantInvite is null)
 		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite not found.", request.RawToken));
+			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite", request.RawToken));
 		}
 
 		DateTimeOffset now = clock.UtcNow;
-		if (tenantInvite.IsExpired(now))
-		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.Conflict("Invite expired."));
-		}
 
-		if (tenantInvite.State == InviteState.RevokedByTenant)
+		if (request.CurrentUser.IsAuthenticated &&
+			!CanAuthenticatedUserSeeInvite(request.CurrentUser.Id, tenantInvite))
 		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.Conflict("Invite revoked."));
-		}
-
-		if (tenantInvite.State == InviteState.DeclinedByUser)
-		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.Conflict("Invite declined."));
+			return TypedResult<OverviewInviteDetails>.Fail(ResultError.NotFound("Invite", request.RawToken));
 		}
 
 		if (tenantInvite.State == InviteState.Accepted)
 		{
-			return TypedResult<OverviewInviteDetails>.Fail(ResultError.Conflict("Invite already accepted."));
+			OverviewInviteDetails acceptedInviteDetails = InviteProjectionMapper.ToOverviewDetails(tenantInvite, now);
+			return TypedResult<OverviewInviteDetails>.Ok(acceptedInviteDetails);
+		}
+
+		if (tenantInvite.State == InviteState.RevokedByTenant)
+		{
+			OverviewInviteDetails revokedInviteDetails = InviteProjectionMapper.ToOverviewDetails(tenantInvite, now);
+			return TypedResult<OverviewInviteDetails>.Ok(revokedInviteDetails);
+		}
+
+		if (tenantInvite.State == InviteState.DeclinedByUser)
+		{
+			OverviewInviteDetails declinedInviteDetails = InviteProjectionMapper.ToOverviewDetails(tenantInvite, now);
+			return TypedResult<OverviewInviteDetails>.Ok(declinedInviteDetails);
+		}
+
+		if (tenantInvite.IsExpired(now))
+		{
+			OverviewInviteDetails expiredInviteDetails = InviteProjectionMapper.ToOverviewDetails(tenantInvite, now);
+			return TypedResult<OverviewInviteDetails>.Ok(expiredInviteDetails);
 		}
 
 		FlowResult.Result limitChecksResult =
@@ -75,5 +87,23 @@ public sealed class GetInviteOverviewQueryHandler(
 		OverviewInviteDetails inviteDetails = InviteProjectionMapper.ToOverviewDetails(tenantInvite, now);
 
 		return TypedResult<OverviewInviteDetails>.Ok(inviteDetails);
+	}
+
+	private static bool CanAuthenticatedUserSeeInvite(AccountId currentAccountId, TenantInvite tenantInvite)
+	{
+		if (currentAccountId == AccountId.Empty)
+		{
+			return false;
+		}
+
+		if (tenantInvite.State != InviteState.Accepted)
+		{
+			// it should not be possible for authenticated user to see any invite details except accepted ones, as we don't want to leak any information about the invite existence or state
+			return false;
+		}
+
+		// check relation of the existing account with invite's details
+		return tenantInvite.AcceptedAccountId.HasValue &&
+			   tenantInvite.AcceptedAccountId.Value == currentAccountId;
 	}
 }

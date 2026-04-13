@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 
 namespace Portiforce.SAA.Application.Models.Auth;
@@ -14,4 +14,6 @@ public interface ICurrentUser
 	Role Role { get; }
 
 	AccountState State { get; }
+
+	string PublicName { get; }
 }

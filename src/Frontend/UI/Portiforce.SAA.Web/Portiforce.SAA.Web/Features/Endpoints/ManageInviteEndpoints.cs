@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 using Portiforce.SAA.Application.FlowResult;
+using Portiforce.SAA.Application.Models.Auth;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
@@ -11,11 +12,13 @@ using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Contexts;
 using Portiforce.SAA.Contracts.Exceptions;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
-using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Configuration;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
+
+using InviteChannel = Portiforce.SAA.Core.Identity.Enums.InviteChannel;
+using InviteTargetKind = Portiforce.SAA.Core.Identity.Enums.InviteTargetKind;
 
 namespace Portiforce.SAA.Web.Features.Endpoints;
 
@@ -71,6 +74,7 @@ public sealed class ManageInviteEndpoints : IEndpoint
 		GetInviteOverviewAsync(
 			[FromRoute] string inviteToken,
 			[FromServices] ITenantContext tenantContext,
+			[FromServices] ICurrentUser currentUser,
 			[FromServices] IMediator mediator,
 			[FromServices] LinkGenerator linkGenerator,
 			HttpContext httpContext,
@@ -96,7 +100,7 @@ public sealed class ManageInviteEndpoints : IEndpoint
 
 		TenantId tenantId = new(tenantContext.TenantId.Value);
 
-		GetInviteOverviewQuery query = new(tenantId, inviteToken);
+		GetInviteOverviewQuery query = new(tenantId, inviteToken, currentUser);
 		TypedResult<OverviewInviteDetails> result = await mediator.Send(query, ct);
 
 		if (!result.IsSuccess || result.Value is null)
@@ -104,9 +108,16 @@ public sealed class ManageInviteEndpoints : IEndpoint
 			return TypedResults.NotFound();
 		}
 
+		bool hasActiveSession = currentUser.IsAuthenticated;
+		string? activeSessionDisplayName = hasActiveSession
+			? currentUser.PublicName
+			: null;
+
 		OverviewInviteDetailsResponse response = result.Value.MapToOverviewInviteDetails(
 			result.Value.CanAccept,
-			result.Value.CanDecline);
+			result.Value.CanDecline,
+			hasActiveSession,
+			activeSessionDisplayName);
 
 		return TypedResults.Ok(response);
 	}
@@ -120,6 +131,7 @@ public sealed class ManageInviteEndpoints : IEndpoint
 		DeclineInviteAsync(
 			[FromRoute] string inviteToken,
 			[FromServices] ITenantContext tenantContext,
+			[FromServices] ICurrentUser currentUser,
 			[FromServices] IMediator mediator,
 			CancellationToken ct)
 	{
@@ -139,6 +151,15 @@ public sealed class ManageInviteEndpoints : IEndpoint
 					StatusCodes.Status409Conflict,
 					"Tenant context is missing.",
 					"The invite cannot be processed because tenant context was not resolved."));
+		}
+
+		if (currentUser.IsAuthenticated)
+		{
+			return TypedResults.Conflict(
+				ApiProblemDetails.CreateProblem(
+					StatusCodes.Status409Conflict,
+					"Authenticated users cannot decline invites.",
+					"Please log out before declining the invite."));
 		}
 
 		TenantId tenantId = new(tenantContext.TenantId.Value);
@@ -162,6 +183,7 @@ public sealed class ManageInviteEndpoints : IEndpoint
 		StartAcceptInviteAsync(
 			[FromRoute] string inviteToken,
 			[FromServices] ITenantContext tenantContext,
+			[FromServices] ICurrentUser currentUser,
 			[FromServices] IMediator mediator,
 			LinkGenerator linkGenerator,
 			HttpContext httpContext,
@@ -187,7 +209,7 @@ public sealed class ManageInviteEndpoints : IEndpoint
 
 		TenantId tenantId = new(tenantContext.TenantId.Value);
 
-		GetInviteOverviewQuery query = new(tenantId, inviteToken);
+		GetInviteOverviewQuery query = new(tenantId, inviteToken, currentUser);
 		TypedResult<OverviewInviteDetails> typedInviteDetailsResult = await mediator.Send(query, ct);
 
 		if (!typedInviteDetailsResult.IsSuccess || typedInviteDetailsResult.Value is null)

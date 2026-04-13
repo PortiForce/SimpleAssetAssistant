@@ -58,6 +58,10 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 		}
 	}
 
+	public string PublicName => this.GetClaim(ClaimTypes.Name)
+								?? this.GetClaim(ClaimTypes.Email)
+								?? string.Empty;
+
 	public bool IsAuthenticated =>
 		httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 

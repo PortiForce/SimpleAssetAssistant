@@ -201,8 +201,12 @@ public static class InviteMapper
 	public static OverviewInviteDetailsResponse MapToOverviewInviteDetails(
 		this OverviewInviteDetails model,
 		bool canAccept,
-		bool canDecline)
+		bool canDecline,
+		bool isAuthenticated,
+		string? publicUserName)
 	{
+		InviteOverviewViewMode overviewMode = ResolveViewMode(model);
+
 		return new OverviewInviteDetailsResponse(
 			model.Id,
 			model.InviteTargetValue,
@@ -213,9 +217,21 @@ public static class InviteMapper
 			model.ExpiresAtUtc,
 			model.SendTimesCount,
 			model.AcceptedAtUtc,
-			canAccept,
-			canDecline);
+			overviewMode == InviteOverviewViewMode.Actionable && canAccept,
+			overviewMode == InviteOverviewViewMode.Actionable && canDecline,
+			overviewMode,
+			isAuthenticated,
+			publicUserName);
 	}
+
+	private static InviteOverviewViewMode ResolveViewMode(OverviewInviteDetails details) => details.State switch
+	{
+		InviteState.Accepted => InviteOverviewViewMode.Accepted,
+		InviteState.DeclinedByUser => InviteOverviewViewMode.Declined,
+		InviteState.RevokedByTenant => InviteOverviewViewMode.Revoked,
+		InviteState.Expired => InviteOverviewViewMode.Expired,
+		_ => InviteOverviewViewMode.Actionable
+	};
 
 	public static InviteSummaryRange ToBusiness(this Contracts.Enums.InviteSummaryRange item) => item switch
 	{
