@@ -168,4 +168,61 @@
   <data name="PageTitleDescription" xml:space="preserve">
     <value>You have received an invitation. Review the details below, then choose whether to accept or decline it.</value>
   </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="LabelAcceptedAt" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="LabelCurrentUser" xml:space="preserve">
+    <value>current user</value>
+  </data>
+  <data name="LabelSendCount" xml:space="preserve">
+    <value>Sent count</value>
+  </data>
+  <data name="LabelSignedInAs" xml:space="preserve">
+    <value>Signed in as:</value>
+  </data>
+  <data name="MessageInviteAcceptedByCurrentSession" xml:space="preserve">
+    <value>You are signed in while viewing an active invite. Review the invitation details below.</value>
+  </data>
+  <data name="MessageInviteAlreadyAccepted" xml:space="preserve">
+    <value>This invitation has already been accepted.</value>
+  </data>
+  <data name="MessageInviteAlreadyAcceptedByYou" xml:space="preserve">
+    <value>You have already accepted this invitation with your current account.</value>
+  </data>
+  <data name="MessageInviteAlreadyDeclined" xml:space="preserve">
+    <value>This invitation has already been declined.</value>
+  </data>
+  <data name="MessageInviteAlreadyExpired" xml:space="preserve">
+    <value>This invitation has expired and can no longer be used.</value>
+  </data>
+  <data name="MessageInviteAlreadyRevoked" xml:space="preserve">
+    <value>This invitation has been revoked and can no longer be used.</value>
+  </data>
+  <data name="MessageInviteCanBeProcessed" xml:space="preserve">
+    <value>This invitation is active. You can accept it to continue or decline it if you do not want to join.</value>
+  </data>
+  <data name="MessageInviteStatusUnknown" xml:space="preserve">
+    <value>The invitation status could not be determined.</value>
+  </data>
+  <data name="TitleInviteAccepted" xml:space="preserve">
+    <value>Invitation accepted</value>
+  </data>
+  <data name="TitleInviteActionable" xml:space="preserve">
+    <value>Invitation is ready</value>
+  </data>
+  <data name="TitleInviteDeclined" xml:space="preserve">
+    <value>Invitation declined</value>
+  </data>
+  <data name="TitleInviteExpired" xml:space="preserve">
+    <value>Invitation expired</value>
+  </data>
+  <data name="TitleInviteRevoked" xml:space="preserve">
+    <value>Invitation revoked</value>
+  </data>
+  <data name="TitleInviteStatus" xml:space="preserve">
+    <value>Invitation status</value>
+  </data>
 </root>

@@ -151,7 +151,7 @@
     <value>Завантаження деталей запрошення...</value>
   </data>
   <data name="MessageInviteNotFound" xml:space="preserve">
-    <value>Це запрошення недійсне або більше недоступне</value>
+    <value>Це запрошення недійсне або більше недоступне.</value>
   </data>
   <data name="MessageUnableAcceptInvite" xml:space="preserve">
     <value>Не вдалося прийняти це запрошення. Спробуйте ще раз.</value>
@@ -167,5 +167,62 @@
   </data>
   <data name="PageTitleDescription" xml:space="preserve">
     <value>Ви отримали запрошення. Перегляньте деталі нижче, а потім виберіть, чи прийняти його, чи відхилити.</value>
+  </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="LabelAcceptedAt" xml:space="preserve">
+    <value>Прийнято</value>
+  </data>
+  <data name="LabelCurrentUser" xml:space="preserve">
+    <value>поточний користувач</value>
+  </data>
+  <data name="LabelSendCount" xml:space="preserve">
+    <value>Кількість надсилань</value>
+  </data>
+  <data name="LabelSignedInAs" xml:space="preserve">
+    <value>Ви ввійшли як:</value>
+  </data>
+  <data name="MessageInviteAcceptedByCurrentSession" xml:space="preserve">
+    <value>Ви переглядаєте активне запрошення, будучи авторизованими. Ознайомтеся з деталями запрошення нижче.</value>
+  </data>
+  <data name="MessageInviteAlreadyAccepted" xml:space="preserve">
+    <value>Це запрошення вже було прийнято.</value>
+  </data>
+  <data name="MessageInviteAlreadyAcceptedByYou" xml:space="preserve">
+    <value>Ви вже прийняли це запрошення за допомогою поточного облікового запису.</value>
+  </data>
+  <data name="MessageInviteAlreadyDeclined" xml:space="preserve">
+    <value>Це запрошення вже було відхилено.</value>
+  </data>
+  <data name="MessageInviteAlreadyExpired" xml:space="preserve">
+    <value>Термін дії цього запрошення закінчився, і його більше не можна використати.</value>
+  </data>
+  <data name="MessageInviteAlreadyRevoked" xml:space="preserve">
+    <value>Це запрошення було відкликано, і його більше не можна використати.</value>
+  </data>
+  <data name="MessageInviteCanBeProcessed" xml:space="preserve">
+    <value>Це запрошення активне. Ви можете прийняти його, щоб продовжити, або відхилити, якщо не хочете приєднуватися.</value>
+  </data>
+  <data name="MessageInviteStatusUnknown" xml:space="preserve">
+    <value>Не вдалося визначити статус запрошення.</value>
+  </data>
+  <data name="TitleInviteAccepted" xml:space="preserve">
+    <value>Запрошення прийнято</value>
+  </data>
+  <data name="TitleInviteActionable" xml:space="preserve">
+    <value>Запрошення готове до обробки</value>
+  </data>
+  <data name="TitleInviteDeclined" xml:space="preserve">
+    <value>Запрошення відхилено</value>
+  </data>
+  <data name="TitleInviteExpired" xml:space="preserve">
+    <value>Термін дії запрошення завершився</value>
+  </data>
+  <data name="TitleInviteRevoked" xml:space="preserve">
+    <value>Запрошення відкликано</value>
+  </data>
+  <data name="TitleInviteStatus" xml:space="preserve">
+    <value>Статус запрошення</value>
   </data>
 </root>

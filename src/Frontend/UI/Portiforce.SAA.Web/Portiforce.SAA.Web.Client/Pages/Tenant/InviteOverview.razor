@@ -1,6 +1,7 @@
 @page "/invite/{InviteToken}"
 
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Enums
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Web.Client.Extensions
 @using Portiforce.SAA.Web.Client.Services.Interfaces
@@ -20,28 +21,42 @@
         </div>
     </div>
 
-	@if (isLoading)
-	{
-		<div class="text-muted">@L["MessageInviteDetailsLoading"]</div>
-	}
-	else if (!string.IsNullOrWhiteSpace(error))
-	{
-		<div class="alert alert-danger">@error</div>
-	}
-	else if (!string.IsNullOrWhiteSpace(successMessage))
-	{
-		<div class="alert alert-success">@successMessage</div>
-	}
+    @if (isLoading)
+    {
+        <div class="text-muted">@L["MessageInviteDetailsLoading"]</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
 
-	@if (!isLoading && invite is null && string.IsNullOrWhiteSpace(error))
-	{
-		<div class="alert alert-warning">@L["MessageInviteNotFound"]</div>
-	}
-	else if (invite is not null)
-	{
-        <div>
-            @L["InviteProcessInfo"]
+    @if (!isLoading && invite is null && string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-warning">
+            @L["MessageInviteNotFound"]
         </div>
+    }
+    else if (invite is not null)
+    {
+        @if (invite.HasActiveSession)
+        {
+            <div class="alert alert-info">
+                <strong>@L["LabelSignedInAs"]</strong>
+                @(!string.IsNullOrWhiteSpace(invite.ActiveSessionDisplayName)
+                    ? invite.ActiveSessionDisplayName
+                    : L["LabelCurrentUser"])
+            </div>
+        }
+
+        <div class="alert @GetOverviewAlertClass(invite.ViewMode)">
+            <div class="fw-semibold">@GetOverviewTitle(invite.ViewMode)</div>
+            <div>@GetOverviewMessage(invite)</div>
+        </div>
+
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
@@ -60,10 +75,6 @@
                                 <span>@L["LabelTier"]:</span>
                                 @invite.InviteTier.ToDisplayName(SharedEnumL)
                             </div>
-                            <div>
-                                <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
-                                <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
-                            </div>
                         </div>
                     </div>
 
@@ -72,70 +83,87 @@
                     </span>
                 </div>
 
-                <hr/>
+                <hr />
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
+                    <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
+
+                    <dt class="col-sm-3">@L["LabelSendCount"]</dt>
+                    <dd class="col-sm-9">@invite.SendTimesCount</dd>
+
+                    <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
+                    <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+                </dl>
             </div>
 
-            <div class="card-footer d-flex justify-content-end gap-2">
-                @if (invite.CanAccept)
-                {
-                    <button type="button" class="btn btn-primary"
-                            disabled="@isSubmitting"
-                            @onclick="AcceptAsync">
-                        @(isSubmitting? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
-                    </button>
-                }
-                @if (invite.CanDecline)
-                {
-                    <button type="button" class="btn btn-outline-danger"
-                            disabled="@isSubmitting"
-                            @onclick="DeclineAsync">
-                        @(isSubmitting ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
-                    </button>
-                }
-            </div>
-        </div>
+            @if (invite.ViewMode == InviteOverviewViewMode.Actionable)
+            {
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    @if (invite.CanAccept)
+                    {
+                        <button type="button"
+                                class="btn btn-primary"
+                                disabled="@isSubmitting"
+                                @onclick="AcceptAsync">
+                            @(isSubmitting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
+                        </button>
+                    }
+
+                    @if (invite.CanDecline)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                disabled="@isSubmitting"
+                                @onclick="DeclineAsync">
+                            @(isSubmitting ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
+                        </button>
+                    }
+                </div>
             }
         </div>
+    }
+</div>
 
 @code {
-	[Parameter]
-	public string InviteToken { get; set; } = string.Empty;
+    [Parameter]
+    public string InviteToken { get; set; } = string.Empty;
 
-	private OverviewInviteDetailsResponse? invite;
-	private bool isLoading = true;
-	private bool isSubmitting;
-	private string? error;
-	private string? successMessage;
+    private OverviewInviteDetailsResponse? invite;
+    private bool isLoading = true;
+    private bool isSubmitting;
+    private string? error;
+    private string? successMessage;
 
-	protected override async Task OnParametersSetAsync()
-	{
-		await this.LoadAsync();
-	}
+    protected override async Task OnParametersSetAsync()
+    {
+        await this.LoadAsync();
+    }
 
-	private async Task LoadAsync()
-	{
-		try
-		{
-			this.isLoading = true;
-			this.error = null;
-			this.successMessage = null;
+    private async Task LoadAsync()
+    {
+        try
+        {
+            this.isLoading = true;
+            this.error = null;
+            this.successMessage = null;
 
             this.invite = await this.ManageInviteApiClient.GetInviteOverviewAsync(this.InviteToken);
-		}
-		catch (Exception ex)
-		{
-			this.invite = null;
+        }
+        catch (Exception ex)
+        {
+            this.invite = null;
             this.error = string.Format(L["MessageUnableLoadInviteInfo"], ex.Message);
-		}
-		finally
-		{
-			this.isLoading = false;
-		}
-	}
+        }
+        finally
+        {
+            this.isLoading = false;
+        }
+    }
 
     private async Task AcceptAsync()
     {
-        if (this.invite is null || !this.invite.CanAccept)
+        if (this.invite is null || !this.invite.CanAccept || this.invite.ViewMode != InviteOverviewViewMode.Actionable)
         {
             return;
         }
@@ -168,7 +196,7 @@
 
     private async Task DeclineAsync()
     {
-        if (this.invite is null || !this.invite.CanDecline)
+        if (this.invite is null || !this.invite.CanDecline || this.invite.ViewMode != InviteOverviewViewMode.Actionable)
         {
             return;
         }
@@ -212,4 +240,50 @@
             this.isLoading = false;
         }
     }
+
+    private string GetOverviewAlertClass(InviteOverviewViewMode viewMode) => viewMode switch
+    {
+        InviteOverviewViewMode.Actionable => "alert-primary",
+        InviteOverviewViewMode.Accepted => "alert-success",
+        InviteOverviewViewMode.Declined => "alert-warning",
+        InviteOverviewViewMode.Revoked => "alert-danger",
+        InviteOverviewViewMode.Expired => "alert-secondary",
+        _ => "alert-secondary"
+    };
+
+    private string GetOverviewTitle(InviteOverviewViewMode viewMode) => viewMode switch
+    {
+        InviteOverviewViewMode.Actionable => L["TitleInviteActionable"],
+        InviteOverviewViewMode.Accepted => L["TitleInviteAccepted"],
+        InviteOverviewViewMode.Declined => L["TitleInviteDeclined"],
+        InviteOverviewViewMode.Revoked => L["TitleInviteRevoked"],
+        InviteOverviewViewMode.Expired => L["TitleInviteExpired"],
+        _ => L["TitleInviteStatus"]
+    };
+
+    private string GetOverviewMessage(OverviewInviteDetailsResponse model) => model.ViewMode switch
+    {
+        InviteOverviewViewMode.Actionable when model.HasActiveSession =>
+            L["MessageInviteAcceptedByCurrentSession"],
+
+        InviteOverviewViewMode.Actionable =>
+            L["MessageInviteCanBeProcessed"],
+
+        InviteOverviewViewMode.Accepted when model.HasActiveSession =>
+            L["MessageInviteAlreadyAcceptedByYou"],
+
+        InviteOverviewViewMode.Accepted =>
+            L["MessageInviteAlreadyAccepted"],
+
+        InviteOverviewViewMode.Declined =>
+            L["MessageInviteAlreadyDeclined"],
+
+        InviteOverviewViewMode.Revoked =>
+            L["MessageInviteAlreadyRevoked"],
+
+        InviteOverviewViewMode.Expired =>
+            L["MessageInviteAlreadyExpired"],
+
+        _ => L["MessageInviteStatusUnknown"]
+    };
 }
