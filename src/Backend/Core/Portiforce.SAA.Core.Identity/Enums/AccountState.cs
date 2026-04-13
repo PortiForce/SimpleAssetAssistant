@@ -3,37 +3,42 @@
 public enum AccountState : byte
 {
 	/// <summary>
-	///     Default account state
+	///     Default zero value (not yet assigned)
 	/// </summary>
-	Unknown = 0,
+	None = 0,
+
+	/// <summary>
+	///     Account state is unknown or undetermined
+	/// </summary>
+	Unknown = 1,
 
 	/// <summary>
 	///     Account is created but not yet verified/activated
 	/// </summary>
-	PendingActivation = 1,
+	PendingActivation = 2,
 
 	/// <summary>
 	///     Account is active
 	/// </summary>
-	Active = 2,
+	Active = 3,
 
 	/// <summary>
 	///     Account has been suspended (reason is TBD), but reversible
 	/// </summary>
-	Suspended = 3,
+	Suspended = 4,
 
 	/// <summary>
 	///     Account is permanently disabled
 	/// </summary>
-	Disabled = 4,
+	Disabled = 5,
 
 	/// <summary>
 	///     Account is scheduled for deletion (grace period) but still recoverable
 	/// </summary>
-	PendingDeletion = 5,
+	PendingDeletion = 6,
 
 	/// <summary>
 	///     Account is soft-deleted
 	/// </summary>
-	Deleted = 6
+	Deleted = 7
 }
