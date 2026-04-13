@@ -25,7 +25,7 @@ public sealed class TenantTests
 	[Fact]
 	public void Rename_WhenEmpty_ShouldThrow()
 	{
-		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
 
 		Action act = () => tenant.Rename("   ");
 
@@ -42,7 +42,8 @@ public sealed class TenantTests
 			"ACME",
 			"Acme",
 			"acme",
-			TenantState.Deleted);
+			TenantState.Deleted,
+			TenantPlan.Demo);
 
 		Action act = () => tenant.Rename("New Name");
 
@@ -54,7 +55,7 @@ public sealed class TenantTests
 	[Fact]
 	public void UpdateRestrictedAssetList_ShouldAddUnique_AndRemove()
 	{
-		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
 		AssetId a1 = AssetId.New();
 		AssetId a2 = AssetId.New();
 
@@ -70,7 +71,7 @@ public sealed class TenantTests
 	[Fact]
 	public void UpdateRestrictedPlatformList_ShouldAddUnique_AndRemove()
 	{
-		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
 		PlatformId p1 = PlatformId.New();
 		PlatformId p2 = PlatformId.New();
 
@@ -86,7 +87,7 @@ public sealed class TenantTests
 	[Fact]
 	public void UpdateSettings_WhenNull_ShouldThrow()
 	{
-		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
 
 		Action act = () => tenant.UpdateSettings(null!);
 

@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Exceptions;
+using Portiforce.SAA.Core.Exceptions;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Interfaces;
 using Portiforce.SAA.Core.Models;
@@ -83,8 +83,8 @@ public sealed class Tenant : Entity<TenantId>, IAggregateRoot
 		string code,
 		string brandName,
 		string domainPrefix,
-		TenantState state = TenantState.Provisioning,
-		TenantPlan plan = TenantPlan.Demo,
+		TenantState state,
+		TenantPlan plan,
 		TenantSettings? settings = null,
 		TenantId id = default)
 		=> new(

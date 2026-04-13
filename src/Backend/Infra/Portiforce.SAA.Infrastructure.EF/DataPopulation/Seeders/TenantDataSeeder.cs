@@ -36,6 +36,7 @@ public static class TenantDataSeeder
 			"DEMO",
 			"demo",
 			"demo",
-			TenantState.Active);
+			TenantState.Active,
+			TenantPlan.Demo);
 	}
 }
