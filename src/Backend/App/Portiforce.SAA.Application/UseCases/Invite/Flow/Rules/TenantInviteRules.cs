@@ -26,7 +26,6 @@ internal static class TenantInviteRules
 
 	public static bool CanBeAccepted(
 		InviteState state,
-		bool? blockFutureInvitesForTarget,
 		DateTimeOffset expirationTime,
 		DateTimeOffset utcNow) =>
 		IsManageable(state, expirationTime, utcNow);
