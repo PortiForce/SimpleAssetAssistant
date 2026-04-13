@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Portiforce.SAA.Contracts.Exceptions;
@@ -16,10 +15,10 @@ public class ApiProblemDetails
 	[JsonPropertyName("instance")] public string? Instance { get; init; }
 
 	/// <summary>
-	///     Optional extension data like traceId, correlationId, etc.
+	///     Gets optional extension data like traceId, correlationId, etc.
 	/// </summary>
 	[JsonExtensionData]
-	public Dictionary<string, JsonElement> Extensions { get; init; } = [];
+	public Dictionary<string, object?> Extensions { get; init; } = [];
 
 	public static ApiProblemDetails CreateProblem(
 		int status,
