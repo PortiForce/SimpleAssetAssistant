@@ -11,6 +11,6 @@ public interface IExternalIdentityReadRepository
 	Task<bool> ExistsAsync(
 		TenantId tenantId,
 		AuthProvider provider,
-		string value,
+		string providerSubject,
 		CancellationToken ct);
 }
