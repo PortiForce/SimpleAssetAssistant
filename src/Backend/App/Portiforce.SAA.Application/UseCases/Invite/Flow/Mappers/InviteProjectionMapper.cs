@@ -93,7 +93,7 @@ internal static class InviteProjectionMapper
 			raw.UpdatedAtUtc,
 			raw.AcceptedAccountId,
 			raw.BlockFutureInvites,
-			TenantInviteRules.CanBeAccepted(raw.State, raw.BlockFutureInvites, raw.ExpiresAtUtc, nowUtc),
+			TenantInviteRules.CanBeAccepted(raw.State, raw.ExpiresAtUtc, nowUtc),
 			TenantInviteRules.CanBeDeclined(raw.State, raw.ExpiresAtUtc, nowUtc));
 	}
 }

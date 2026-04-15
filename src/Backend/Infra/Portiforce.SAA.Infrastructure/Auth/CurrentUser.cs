@@ -26,7 +26,7 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 	{
 		get
 		{
-			string? tenantClaim = this.GetClaim(CustomClaimTypes.TenantId) ?? this.GetClaim(CustomClaimTypes.TenantId);
+			string? tenantClaim = this.GetClaim(CustomClaimTypes.TenantId);
 			return !string.IsNullOrWhiteSpace(tenantClaim)
 				? new TenantId(Guid.Parse(tenantClaim))
 				: TenantId.Empty;
@@ -38,7 +38,7 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
 		get
 		{
 			string? roleClaim = this.GetClaim(ClaimTypes.Role) ??
-								this.GetClaim(CustomClaimTypes.RoleId) ?? this.GetClaim(CustomClaimTypes.RoleId);
+								this.GetClaim(CustomClaimTypes.RoleId);
 
 			return !string.IsNullOrWhiteSpace(roleClaim) && Enum.TryParse(roleClaim, out Role role)
 				? role

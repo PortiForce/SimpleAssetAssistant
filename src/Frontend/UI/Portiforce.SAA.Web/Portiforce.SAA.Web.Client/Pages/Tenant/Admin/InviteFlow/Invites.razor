@@ -1,4 +1,4 @@
-﻿@page "/admin/invites"
+@page "/admin/invites"
 
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.Extensions.Localization
@@ -170,7 +170,7 @@
     private string? error;
     private int totalCount;
 
-    private int TotalPages => totalCount <= 0
+    private int totalPages => totalCount <= 0
         ? 0
         : (int)Math.Ceiling(totalCount / (double)paginationState.ItemsPerPage);
 
