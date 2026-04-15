@@ -8,7 +8,7 @@ public sealed record CreateInviteRequest : IValidatableObject
 {
 	[Required] public InviteChannel Channel { get; set; } = InviteChannel.Email;
 
-	// todo : consider usage of croscutting values
+	// todo : consider usage of crosscutting values
 	[Required]
 	[StringLength(256, MinimumLength = 2)]
 	public string TargetValue { get; set; } = string.Empty;
@@ -45,7 +45,7 @@ public sealed record CreateInviteRequest : IValidatableObject
 
 			case InviteChannel.Telegram:
 				// Accept "@nick" or "nick"
-				string nick = rawValue.StartsWith("@") ? rawValue[1..] : rawValue;
+				string nick = rawValue.StartsWith('@') ? rawValue[1..] : rawValue;
 				if (nick.Length is < 5 or > 32)
 				{
 					yield return new ValidationResult(

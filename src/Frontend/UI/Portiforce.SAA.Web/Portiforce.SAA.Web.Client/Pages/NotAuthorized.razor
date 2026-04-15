@@ -1,0 +1,10 @@
+@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizer<NotAuthorized> L
+
+<div class="container py-4">
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">@L["HeaderAccessDenied"]</h4>
+        <p class="mb-0">@L["MessageAccessDenied"]</p>
+    </div>
+</div>
