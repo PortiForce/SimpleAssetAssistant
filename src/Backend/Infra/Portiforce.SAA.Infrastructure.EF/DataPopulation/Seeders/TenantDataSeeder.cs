@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Client;
 
 namespace Portiforce.SAA.Infrastructure.EF.DataPopulation.Seeders;
@@ -7,10 +7,10 @@ public static class TenantDataSeeder
 {
 	public static List<Tenant> BuildTenants()
 	{
-		var tenants = new List<Tenant>();
+		List<Tenant> tenants = [];
 
-		var rootTenant = GetPortiforceTenant();
-		var demoTenant = GetDemoTenant();
+		Tenant rootTenant = GetPortiforceTenant();
+		Tenant demoTenant = GetDemoTenant();
 
 		tenants.Add(rootTenant);
 		tenants.Add(demoTenant);
@@ -21,24 +21,22 @@ public static class TenantDataSeeder
 	public static Tenant GetPortiforceTenant()
 	{
 		return Tenant.Create(
-			name: "PortiForce",
-			code: "PORTIFORCE",
-			brandName: "PortiForce",
-			domainPrefix: "app",
-			state: TenantState.Active,
-			plan: TenantPlan.Pro
-		);
+			"PortiForce",
+			"PORTIFORCE",
+			"PortiForce",
+			"app",
+			TenantState.Active,
+			TenantPlan.Pro);
 	}
 
 	public static Tenant GetDemoTenant()
 	{
 		return Tenant.Create(
-			name: "Demo",
-			code: "DEMO",
-			brandName: "demo",
-			domainPrefix: "demo",
-			state: TenantState.Active,
-			plan: TenantPlan.Demo
-		);
+			"Demo",
+			"DEMO",
+			"demo",
+			"demo",
+			TenantState.Active,
+			TenantPlan.Demo);
 	}
 }

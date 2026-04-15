@@ -10,40 +10,89 @@ public sealed class TenantTests
 	[Fact]
 	public void Create_ShouldTrimAndValidateName()
 	{
-		var t = Tenant.Create(
-			name: "  Acme Corp  ",
-			code: "ACME",
-			brandName: "Acme",
-			domainPrefix: "acme",
-			state: TenantState.Active,
-			plan: TenantPlan.Demo,
-			settings: TenantSettings.Default());
+		Tenant tenant = Tenant.Create(
+			"  Acme Corp  ",
+			"ACME",
+			"Acme",
+			"acme",
+			TenantState.Active,
+			TenantPlan.Demo,
+			TenantSettings.Default());
 
-		t.Name.Should().Be("Acme Corp");
+		_ = tenant.Name.Should().Be("Acme Corp");
 	}
 
 	[Fact]
 	public void Rename_WhenEmpty_ShouldThrow()
 	{
-		var t = Tenant.Create("Acme", "ACME", "Acme", "acme");
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
 
-		var act = () => t.Rename("   ");
-		act.Should().Throw<DomainValidationException>();
+		Action act = () => tenant.Rename("   ");
+
+		_ = act.Should()
+			.Throw<DomainValidationException>()
+			.WithMessage("*Tenant name is required*");
+	}
+
+	[Fact]
+	public void Rename_WhenDeleted_ShouldThrow()
+	{
+		Tenant tenant = Tenant.Create(
+			"Acme",
+			"ACME",
+			"Acme",
+			"acme",
+			TenantState.Deleted,
+			TenantPlan.Demo);
+
+		Action act = () => tenant.Rename("New Name");
+
+		_ = act.Should()
+			.Throw<DomainValidationException>()
+			.WithMessage("*deleted*");
 	}
 
 	[Fact]
 	public void UpdateRestrictedAssetList_ShouldAddUnique_AndRemove()
 	{
-		var t = Tenant.Create("Acme", "ACME", "Acme", "acme");
-		var a1 = AssetId.New();
-		var a2 = AssetId.New();
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
+		AssetId a1 = AssetId.New();
+		AssetId a2 = AssetId.New();
 
-		t.UpdateRestrictedAssetList([a1, a1, a2], isRestricted: true);
+		tenant.UpdateRestrictedAssetList([a1, a1, a2], true);
 
-		t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a1, a2]);
+		_ = tenant.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a1, a2]);
 
-		t.UpdateRestrictedAssetList([a1], isRestricted: false);
+		tenant.UpdateRestrictedAssetList([a1], false);
 
-		t.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a2]);
+		_ = tenant.RestrictedAssets.Select(x => x.AssetId).Should().BeEquivalentTo([a2]);
+	}
+
+	[Fact]
+	public void UpdateRestrictedPlatformList_ShouldAddUnique_AndRemove()
+	{
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
+		PlatformId p1 = PlatformId.New();
+		PlatformId p2 = PlatformId.New();
+
+		tenant.UpdateRestrictedPlatformList([p1, p1, p2], true);
+
+		_ = tenant.RestrictedPlatforms.Select(x => x.PlatformId).Should().BeEquivalentTo([p1, p2]);
+
+		tenant.UpdateRestrictedPlatformList([p1], false);
+
+		_ = tenant.RestrictedPlatforms.Select(x => x.PlatformId).Should().BeEquivalentTo([p2]);
+	}
+
+	[Fact]
+	public void UpdateSettings_WhenNull_ShouldThrow()
+	{
+		Tenant tenant = Tenant.Create("Acme", "ACME", "Acme", "acme", TenantState.Active, TenantPlan.Demo);
+
+		Action act = () => tenant.UpdateSettings(null!);
+
+		_ = act.Should()
+			.Throw<DomainValidationException>()
+			.WithMessage("*Settings cannot be null*");
 	}
 }

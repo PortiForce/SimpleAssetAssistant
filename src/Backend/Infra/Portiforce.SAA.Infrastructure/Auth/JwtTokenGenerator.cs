@@ -2,9 +2,11 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure.Configuration;
@@ -13,11 +15,12 @@ namespace Portiforce.SAA.Infrastructure.Auth;
 
 public class JwtTokenGenerator : ITokenGenerator
 {
+	private readonly JwtSettings _settings;
+
 	public JwtTokenGenerator(IOptions<JwtSettings> settings)
 	{
-		_settings = settings.Value;
+		this._settings = settings.Value;
 	}
-	private readonly JwtSettings _settings;
 
 	public string GenerateAccessToken(IAccountInfo accountInfo)
 	{
@@ -30,29 +33,22 @@ public class JwtTokenGenerator : ITokenGenerator
 			new(CustomClaimTypes.State, accountInfo.State.ToString())
 		];
 
-		SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
-		SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+		SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(this._settings.Secret));
+		SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha256);
 
-		JwtSecurityToken token = new JwtSecurityToken(
-			issuer: _settings.Issuer,
-			audience: _settings.Audience,
-			claims: claims,
-			expires: DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes),
-			signingCredentials: credentials
-		);
+		JwtSecurityToken token = new(
+			this._settings.Issuer,
+			this._settings.Audience,
+			claims,
+			expires: DateTime.UtcNow.AddMinutes(this._settings.ExpiryMinutes),
+			signingCredentials: credentials);
 
 		return new JwtSecurityTokenHandler().WriteToken(token);
 	}
 
-	public string GenerateRefreshToken()
-	{
-		return GenerateRandomToken();
-	}
+	public string GenerateRefreshToken() => this.GenerateRandomToken();
 
-	public string GenerateInviteToken()
-	{
-		return GenerateRandomToken();
-	}
+	public string GenerateInviteToken() => this.GenerateRandomToken();
 
 	private string GenerateRandomToken()
 	{

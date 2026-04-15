@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Web.Infrastructure;
 
@@ -8,7 +8,7 @@ public sealed class MeEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		app.MapGet(ApiRoutes.Ptofile, (HttpContext ctx) =>
+		app.MapGet(ApiRoutes.Profile, (HttpContext ctx) =>
 			{
 				if (ctx.User.Identity?.IsAuthenticated != true)
 				{

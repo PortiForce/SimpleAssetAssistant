@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Models.Auth;
@@ -8,285 +9,356 @@ using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Queries;
 using Portiforce.SAA.Application.UseCases.Invite.Projections;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
+using Portiforce.SAA.Application.UseCases.Invite.Projections.Summary;
 using Portiforce.SAA.Application.UseCases.Invite.Result;
 using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.Enums;
 using Portiforce.SAA.Contracts.Models.Client.Invite;
+using Portiforce.SAA.Contracts.Models.Client.Invite.Summary;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Core.Primitives.Ids;
 using Portiforce.SAA.Web.Infrastructure;
 using Portiforce.SAA.Web.Mappers;
+
 using InviteChannel = Portiforce.SAA.Contracts.Enums.InviteChannel;
+using InviteSummaryRange = Portiforce.SAA.Contracts.Enums.InviteSummaryRange;
+using InviteTargetKind = Portiforce.SAA.Contracts.Enums.InviteTargetKind;
+using InviteTrendBucket = Portiforce.SAA.Contracts.Enums.InviteTrendBucket;
 
 namespace Portiforce.SAA.Web.Features.Endpoints.Tenant;
 
 public sealed class InviteEndpoints : IEndpoint
 {
-	/*
-		GET    /bff/invites
-		GET    /bff/invites/{inviteId:guid}
-		GET    /bff/invites/template
-		POST   /bff/invites
-		POST   /bff/invites/{inviteId:guid}/resend
-		POST   /bff/invites/{inviteId:guid}/revoke
-	 */
+    /*
+        GET    /bff/admin/invites
+        GET    /bff/admin/invites/summary
+        GET    /bff/admin/invites/{inviteId:guid}
+        GET    /bff/admin/invites/template
+        POST   /bff/admin/invites
+        POST   /bff/admin/invites/{inviteId:guid}/resend
+        POST   /bff/admin/invites/{inviteId:guid}/revoke
+     */
 
-	private const int DefaultInviteLifetimeHours = 48;
+    private const string ListTenantInvitesEndpointName = "ListTenantInvites";
+    private const string GetTenantInviteSummaryEndpointName = "GetTenantInviteSummary";
+    private const string GetTenantInviteDetailsEndpointName = "GetTenantInviteDetails";
+    private const string CreateTenantInviteEndpointName = "CreateTenantInvite";
+    private const string ResendTenantInviteEndpointName = "ResendTenantInvite";
+    private const string RevokeTenantInviteEndpointName = "RevokeTenantInvite";
 
-	public void MapEndpoint(IEndpointRouteBuilder app)
-	{
-		var group = app.MapGroup(ApiRoutes.Invites.Root)
-			.WithTags("Tenant Invites")
-			.RequireAuthorization(UiPolicies.TenantAdmin)
-			.AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
+    private const int DefaultInviteLifetimeHours = 48;
 
-		group.MapGet(string.Empty, ListInvitesAsync)
-			.WithName("ListTenantInvites")
-			.Produces<InviteListResponse>(StatusCodes.Status200OK)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden);
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        RouteGroupBuilder group = app.MapGroup(ApiRoutes.AdminInviteRoutes.Root)
+            .WithTags("Tenant Invites")
+            .RequireAuthorization(UiPolicies.TenantAdmin)
+            .AddEndpointFilter<ValidationFilter<CreateInviteRequest>>();
 
-		group.MapGet("/{inviteId:guid}", GetInviteDetailsAsync)
-			.WithName("GetTenantInviteDetails")
-			.Produces<InviteDetailsResponse>(StatusCodes.Status200OK)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden)
-			.ProducesProblem(StatusCodes.Status404NotFound);
+        _ = group.MapGet(string.Empty, ListInvitesAsync)
+            .WithName(ListTenantInvitesEndpointName)
+            .Produces<InviteListResponse>()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
 
-		group.MapPost("/new", CreateInviteAsync)
-			.WithName("CreateTenantInvite")
-			.Produces<CreateInviteResponse>(StatusCodes.Status201Created)
-			.ProducesValidationProblem()
-			.ProducesProblem(StatusCodes.Status400BadRequest)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden)
-			.ProducesProblem(StatusCodes.Status409Conflict);
+        _ = group.MapGet("/summary", GetInviteSummaryAsync)
+            .WithName(GetTenantInviteSummaryEndpointName)
+            .Produces<InviteSummaryResponse>()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
 
-		group.MapPost("/{inviteId:guid}/resend", ResendInviteAsync)
-			.WithName("ResendTenantInvite")
-			.Produces(StatusCodes.Status204NoContent)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden)
-			.ProducesProblem(StatusCodes.Status404NotFound)
-			.ProducesProblem(StatusCodes.Status409Conflict);
+        _ = group.MapGet("/{inviteId:guid}", GetInviteDetailsAsync)
+            .WithName(GetTenantInviteDetailsEndpointName)
+            .Produces<AdminInviteDetailsResponse>()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
-		group.MapPost("/{inviteId:guid}/revoke", RevokeInviteAsync)
-			.WithName("RevokeTenantInvite")
-			.Produces(StatusCodes.Status204NoContent)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden)
-			.ProducesProblem(StatusCodes.Status404NotFound)
-			.ProducesProblem(StatusCodes.Status409Conflict);
-	}
+        _ = group.MapPost("/new", CreateInviteAsync)
+            .WithName(CreateTenantInviteEndpointName)
+            .Produces<CreateInviteResponse>(StatusCodes.Status201Created)
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
 
-	private static async Task<Results<Ok<InviteListResponse>, UnauthorizedHttpResult, ForbidHttpResult>> ListInvitesAsync(
-		[FromQuery] string? search,
-		[FromQuery] InviteStatus[]? statuses,
-		[FromQuery] InviteChannel[]? channels,
-		[FromQuery] int page,
-		[FromQuery] int pageSize,
-		[FromQuery] bool? hasAccount,
-		[FromServices] IMediator mediator,
-		[FromServices] ICurrentUser currentUser,
-		CancellationToken ct)
-	{
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
+        _ = group.MapPost("/{inviteId:guid}/resend", ResendInviteAsync)
+            .WithName(ResendTenantInviteEndpointName)
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
-		HashSet<InviteState> statusList = statuses?.ToBusinessSet();
-		HashSet<Core.Identity.Enums.InviteChannel> channelList = channels?.ToBusinessSet();
+        _ = group.MapPost("/{inviteId:guid}/revoke", RevokeInviteAsync)
+            .WithName(RevokeTenantInviteEndpointName)
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
+    }
 
-		var query = new GetInviteListQuery(
-			currentUser.TenantId,
-			search,
-			statusList,
-			channelList,
-			hasAccount,
-			new PageRequest(
-				page,
-				pageSize));
+    private static async Task<Results<Ok<InviteListResponse>, UnauthorizedHttpResult, ForbidHttpResult>>
+        ListInvitesAsync(
+            [FromQuery] string? search,
+            [FromQuery] InviteStatus[]? statuses,
+            [FromQuery] InviteChannel[]? channels,
+            [FromQuery] int page,
+            [FromQuery] int pageSize,
+            [FromQuery] bool? hasAccount,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            CancellationToken ct)
+    {
+        if (currentUser.TenantId == TenantId.Empty)
+        {
+            return TypedResults.Forbid();
+        }
 
-		PagedResult<InviteListItem> result = await mediator.Send(query, ct);
+        HashSet<InviteState> statusList = statuses?.ToBusinessSet();
+        HashSet<Core.Identity.Enums.InviteChannel> channelList = channels?.ToBusinessSet();
 
-		InviteListResponse response = result.MapToInviteList();
-		return TypedResults.Ok(response);
-	}
+        GetInviteListQuery query = new(
+            currentUser.TenantId,
+            search,
+            statusList,
+            channelList,
+            hasAccount,
+            new PageRequest(
+                page,
+                pageSize));
 
-	private static async Task<Results<Ok<InviteDetailsResponse>, UnauthorizedHttpResult, ForbidHttpResult, NotFound>> GetInviteDetailsAsync(
-		Guid inviteId,
-		[FromServices] IMediator mediator,
-		[FromServices] ICurrentUser currentUser,
-		CancellationToken ct)
-	{
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
+        PagedResult<InviteListItem> result = await mediator.Send(query, ct);
 
-		var getDetailsCommand = new GetInviteDetailsQuery(currentUser.TenantId, inviteId);
-		TypedResult<InviteDetails> result = await mediator.Send(getDetailsCommand, ct);
+        InviteListResponse response = result.MapToInviteList();
+        return TypedResults.Ok(response);
+    }
 
-		if (!result.IsSuccess || result.Value == null) 
-		{
-			return TypedResults.NotFound();
-		}
+    private static async Task<Results<Ok<InviteSummaryResponse>, UnauthorizedHttpResult, ForbidHttpResult>>
+        GetInviteSummaryAsync(
+            [FromQuery] InviteStatus[]? statuses,
+            [FromQuery] InviteChannel[]? channels,
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate,
+            [FromQuery] bool? hasAccount,
+            [FromQuery] bool? includeRevoked,
+            [FromQuery] InviteSummaryRange range,
+            [FromQuery] InviteTrendBucket trendBucket,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            CancellationToken ct)
+    {
+        if (currentUser.TenantId == TenantId.Empty)
+        {
+            return TypedResults.Forbid();
+        }
 
-		InviteDetailsResponse inviteDetailsResponse = result.Value.MapToInviteDetails();
-		return TypedResults.Ok(inviteDetailsResponse);
-	}
+        HashSet<InviteState> statusList = statuses?.ToBusinessSet();
+        HashSet<Core.Identity.Enums.InviteChannel> channelList = channels?.ToBusinessSet();
 
-	private static async Task<Results<Created<CreateInviteResponse>, ValidationProblem, ProblemHttpResult, UnauthorizedHttpResult, ForbidHttpResult>> CreateInviteAsync(
-		[FromBody] CreateInviteRequest request,
-		[FromServices] IMediator mediator,
-		[FromServices] ICurrentUser currentUser,
-		[FromServices] IClock clock,
-		HttpContext httpContext,
-		CancellationToken ct)
-	{
-		if (currentUser.TenantId == TenantId.Empty)
-		{
-			return TypedResults.Forbid();
-		}
+        GetInviteSummaryQuery query = new(
+            currentUser.TenantId,
+            statusList,
+            channelList,
+            fromDate,
+            toDate,
+            hasAccount,
+            includeRevoked,
+            range.ToBusiness(),
+            trendBucket.ToBusiness());
 
-		Role? role = request.IntendedRole.ToBusiness();
-		AccountTier? tier = request.IntendedTier.ToBusiness();
+        InviteSummary result = await mediator.Send(query, ct);
 
-		if (role is null || tier is null)
-		{
-			return TypedResults.Problem(
-				title: "Invalid invite payload",
-				detail: "Unsupported role or tier.",
-				statusCode: StatusCodes.Status400BadRequest);
-		}
+        InviteSummaryResponse response = result.MapToInviteSummary();
+        return TypedResults.Ok(response);
+    }
 
-		InviteTarget inviteTarget;
-		try
-		{
-			inviteTarget = request.Channel switch
-			{
-				InviteChannel.Email => InviteTarget.Email(request.TargetValue),
-				InviteChannel.Telegram => InviteTarget.Telegram(request.TargetValue),
-				InviteChannel.AppleId => InviteTarget.AppleId(request.TargetValue),
-				_ => throw new ArgumentOutOfRangeException(nameof(request.Channel))
-			};
-		}
-		catch (ArgumentException ex)
-		{
-			return TypedResults.Problem(
-				title: "Invalid invite target",
-				detail: ex.Message,
-				statusCode: StatusCodes.Status400BadRequest);
-		}
+    private static async
+        Task<Results<Ok<AdminInviteDetailsResponse>, UnauthorizedHttpResult, ForbidHttpResult, NotFound>>
+        GetInviteDetailsAsync(
+            Guid inviteId,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            CancellationToken ct)
+    {
+        if (currentUser.TenantId == TenantId.Empty)
+        {
+            return TypedResults.Forbid();
+        }
 
-		DateTimeOffset now = clock.UtcNow;
-		DateTimeOffset expiresAtUtc = now.AddHours(DefaultInviteLifetimeHours);
+        GetInviteDetailsQuery getDetailsCommand = new(currentUser.TenantId, inviteId);
+        TypedResult<AdminInviteDetails> result = await mediator.Send(getDetailsCommand, ct);
 
-		var command = new CreateInviteCommand(
-			TenantId: currentUser.TenantId,
-			InviteTarget: inviteTarget,
-			IntendedRole: role.Value,
-			IntendedTier: tier.Value,
-			InvitedByAccountId: currentUser.Id,
-			CreatedAtUtc: now,
-			ExpiredAtUtc: expiresAtUtc);
+        if (!result.IsSuccess || result.Value == null)
+        {
+            return TypedResults.NotFound();
+        }
 
-		TypedResult<CreateInviteResult> result = await mediator.Send(command, ct);
+        AdminInviteDetailsResponse inviteDetailsResponse = result.Value.MapToInviteDetails();
+        return TypedResults.Ok(inviteDetailsResponse);
+    }
 
-		if (!result.IsSuccess)
-		{
-			return TypedResults.Problem(
-				title: "Invite creation failed",
-				detail: result.Error?.Message,
-				statusCode: MapToStatusCode(result));
-		}
+    private static async
+        Task<Results<Created<CreateInviteResponse>, ValidationProblem, ProblemHttpResult, UnauthorizedHttpResult,
+            ForbidHttpResult>> CreateInviteAsync(
+            [FromBody] CreateInviteRequest request,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            [FromServices] IClock clock,
+            HttpContext httpContext,
+            CancellationToken ct)
+    {
+        if (currentUser.TenantId == TenantId.Empty)
+        {
+            return TypedResults.Forbid();
+        }
 
-		var response = new CreateInviteResponse(
-			InviteId: result.Value.InviteId,
-			RawToken: result.Value.Token,
-			ExpiresAtUtc: result.Value.ExpiresAtUtc);
+        Role? role = request.IntendedRole.ToBusiness();
+        AccountTier? tier = request.IntendedTier.ToBusiness();
 
-		return TypedResults.Created($"/bff/invites/{result.Value.InviteId}", response);
-	}
+        if (role is null || tier is null)
+        {
+            return TypedResults.Problem(
+                title: "Invalid invite payload",
+                detail: "Unsupported role or tier.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-	private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>> ResendInviteAsync(
-		Guid inviteId,
-		[FromServices] IMediator mediator,
-		[FromServices] ICurrentUser currentUser,
-		CancellationToken ct)
-	{
-		// todo : implement me
-		//var resendInviteCommand = new ResendInviteCommand(currentUser.TenantId, inviteId);
+        InviteTarget inviteTarget;
+        try
+        {
+            inviteTarget = request.TargetKind switch
+            {
+                InviteTargetKind.Phone => InviteTarget.ApplePhone(request.TargetValue),
+                InviteTargetKind.Email => request.Channel == InviteChannel.AppleAccount
+                    ? InviteTarget.AppleEmail(request.TargetValue)
+                    : InviteTarget.Email(request.TargetValue),
+                InviteTargetKind.TelegramUserName => InviteTarget.TelegramUserName(request.TargetValue),
+                _ => throw new ArgumentOutOfRangeException(nameof(request.TargetKind))
+            };
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.Problem(
+                title: "Invalid invite target",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-		//TypedResult<ResendInviteResult> result = await mediator.Send(resendInviteCommand, ct);
+        DateTimeOffset now = clock.UtcNow;
+        DateTimeOffset expiresAtUtc = now.AddHours(DefaultInviteLifetimeHours);
 
-		//if (!result.IsSuccess)
-		//{
-		//	return TypedResults.Problem(
-		//		title: "Invite resend failed",
-		//		detail: result.Error?.Message,
-		//		statusCode: MapToStatusCode(result));
-		//}
+        CreateInviteCommand command = new(
+            currentUser.TenantId,
+            inviteTarget,
+            role.Value,
+            tier.Value,
+            currentUser.Id,
+            request.Alias,
+            now,
+            expiresAtUtc);
 
-		return TypedResults.Problem(
-			title: "Not Implemented",
-			detail: "Resend invite endpoint is not implemented yet.",
-			statusCode: StatusCodes.Status501NotImplemented);
-	}
+        TypedResult<CreateInviteResult> result = await mediator.Send(command, ct);
 
-	private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>> RevokeInviteAsync(
-		Guid inviteId,
-		[FromServices] IMediator mediator,
-		[FromServices] ICurrentUser currentUser,
-		CancellationToken ct)
-	{
-		// todo: implement me
-		//var revokeInviteCommand = new RevokeInviteCommand(currentUser.TenantId, inviteId);
+        if (!result.IsSuccess)
+        {
+            return TypedResults.Problem(
+                title: "Invite creation failed",
+                detail: result.Error?.Message,
+                statusCode: MapToStatusCode(result));
+        }
 
-		//TypedResult<RevokeInviteResult> result = await mediator.Send(revokeInviteCommand, ct);
+        CreateInviteResponse response = new(
+            result.Value.InviteId,
+            result.Value.Token,
+            result.Value.ExpiresAtUtc);
 
-		//if (!result.IsSuccess)
-		//{
-		//	return TypedResults.Problem(
-		//		title: "Invite resend failed",
-		//		detail: result.Error?.Message,
-		//		statusCode: MapToStatusCode(result));
-		//}
+        return TypedResults.Created($"/bff/invites/{result.Value.InviteId}", response);
+    }
 
-		return TypedResults.Problem(
-			title: "Not Implemented",
-			detail: "Revoke invite endpoint is not implemented yet.",
-			statusCode: StatusCodes.Status501NotImplemented);
-	}
+    private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>>
+        ResendInviteAsync(
+            Guid inviteId,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            CancellationToken ct)
+    {
+        // todo : implement me
+        //var resendInviteCommand = new ResendInviteCommand(currentUser.TenantId, inviteId);
 
-	private static int MapToStatusCode<T>(TypedResult<T> result)
-	{
-		if (result.Error is null || string.IsNullOrEmpty(result.Error.Code))
-		{
-			return StatusCodes.Status400BadRequest;
-		}
+        //TypedResult<ResendInviteResult> result = await mediator.Send(resendInviteCommand, ct);
 
-		var errorCode = result.Error.Code;
+        //if (!result.IsSuccess)
+        //{
+        //	return TypedResults.Problem(
+        //		title: "Invite resend failed",
+        //		detail: result.Error?.Message,
+        //		statusCode: MapToStatusCode(result));
+        //}
 
-		if (errorCode.Contains("NotFound", StringComparison.OrdinalIgnoreCase))
-		{
-			return StatusCodes.Status404NotFound;
-		}
+        return TypedResults.Problem(
+            title: "Not Implemented",
+            detail: "Resend invite endpoint is not implemented yet.",
+            statusCode: StatusCodes.Status501NotImplemented);
+    }
 
-		if (errorCode.Contains("Conflict", StringComparison.OrdinalIgnoreCase))
-		{
-			return StatusCodes.Status409Conflict;
-		}
+    private static async Task<Results<NoContent, UnauthorizedHttpResult, ForbidHttpResult, NotFound, ProblemHttpResult>>
+        RevokeInviteAsync(
+            Guid inviteId,
+            [FromServices] IMediator mediator,
+            [FromServices] ICurrentUser currentUser,
+            CancellationToken ct)
+    {
+        // todo: implement me
+        //var revokeInviteCommand = new RevokeInviteCommand(currentUser.TenantId, inviteId);
 
-		if (errorCode.Contains("Validation", StringComparison.OrdinalIgnoreCase))
-		{
-			return StatusCodes.Status400BadRequest;
-		}
+        //TypedResult<RevokeInviteResult> result = await mediator.Send(revokeInviteCommand, ct);
 
-		// Default fallback
-		return StatusCodes.Status400BadRequest;
-	}
+        //if (!result.IsSuccess)
+        //{
+        //	return TypedResults.Problem(
+        //		title: "Invite resend failed",
+        //		detail: result.Error?.Message,
+        //		statusCode: MapToStatusCode(result));
+        //}
+
+        return TypedResults.Problem(
+            title: "Not Implemented",
+            detail: "Revoke invite endpoint is not implemented yet.",
+            statusCode: StatusCodes.Status501NotImplemented);
+    }
+
+    private static int MapToStatusCode<T>(TypedResult<T> result)
+    {
+        if (result.Error is null || string.IsNullOrEmpty(result.Error.Code))
+        {
+            return StatusCodes.Status400BadRequest;
+        }
+
+        string errorCode = result.Error.Code;
+
+        if (errorCode.Contains("NotFound", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCodes.Status404NotFound;
+        }
+
+        if (errorCode.Contains("Conflict", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCodes.Status409Conflict;
+        }
+
+        if (errorCode.Contains("Validation", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCodes.Status400BadRequest;
+        }
+
+        // Default fallback
+        return StatusCodes.Status400BadRequest;
+    }
 }

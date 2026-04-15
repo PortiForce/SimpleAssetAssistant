@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Portiforce.SAA.Contracts.Configuration;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Web.Infrastructure;
@@ -9,7 +9,7 @@ public sealed class ProfileEndpoints : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		var group = app.MapGroup(ApiRoutes.Ptofile)
+		var group = app.MapGroup(ApiRoutes.Profile)
 			.WithTags("Profile")
 			.RequireAuthorization(UiPolicies.TenantUser);
 

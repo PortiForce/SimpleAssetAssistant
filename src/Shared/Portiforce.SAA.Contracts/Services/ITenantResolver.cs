@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Contracts.Models.Client;
+using Portiforce.SAA.Contracts.Models.Client;
 
 namespace Portiforce.SAA.Contracts.Services;
 

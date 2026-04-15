@@ -9,7 +9,7 @@ namespace Portiforce.SAA.Domain.Tests.Activities.Models.Actions;
 internal static class ActivityTestFactory
 {
 	public static ExternalMetadata ExternalMetadata()
-		=> new(source: "tests", externalId: "ext-1");
+		=> new("tests", "ext-1");
 
 	public static AssetMovementLeg PrincipalLeg(
 		MovementDirection direction,
@@ -17,24 +17,24 @@ internal static class ActivityTestFactory
 		decimal amount = 1m,
 		byte nativeDecimals = 8)
 		=> AssetMovementLeg.Create(
-			activityId: ActivityId.New(),
-			assetId: assetId ?? AssetId.New(),
-			amount: Quantity.Create(amount),
-			role: MovementRole.Principal,
-			direction: direction,
-			allocation: AssetAllocationType.Spot,
-			nativeDecimals: nativeDecimals);
+			ActivityId.New(),
+			assetId ?? AssetId.New(),
+			Quantity.Create(amount),
+			MovementRole.Principal,
+			direction,
+			AssetAllocationType.Spot,
+			nativeDecimals);
 
 	public static AssetMovementLeg FeeLegOutflow(
 		AssetId? assetId = null,
 		decimal amount = 0.1m,
 		byte nativeDecimals = 8)
 		=> AssetMovementLeg.Create(
-			activityId: ActivityId.New(),
-			assetId: assetId ?? AssetId.New(),
-			amount: Quantity.Create(amount),
-			role: MovementRole.Fee,
-			direction: MovementDirection.Outflow,
-			allocation: AssetAllocationType.Spot,
-			nativeDecimals: nativeDecimals);
+			ActivityId.New(),
+			assetId ?? AssetId.New(),
+			Quantity.Create(amount),
+			MovementRole.Fee,
+			MovementDirection.Outflow,
+			AssetAllocationType.Spot,
+			nativeDecimals);
 }

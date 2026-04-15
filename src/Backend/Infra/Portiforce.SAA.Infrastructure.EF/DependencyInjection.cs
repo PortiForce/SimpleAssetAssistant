@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,13 +45,14 @@ public static class DependencyInjection
 					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
 					sql.CommandTimeout(30);
 					sql.EnableRetryOnFailure(
-						maxRetryCount: 5,
-						maxRetryDelay: TimeSpan.FromSeconds(20),
-						errorNumbersToAdd: null);
+						5,
+						TimeSpan.FromSeconds(20),
+						null);
 				});
 			opt.EnableDetailedErrors();
 
 #if DEBUG
+
 			// only for local debugging
 			opt.EnableSensitiveDataLogging();
 #endif
@@ -74,6 +75,7 @@ public static class DependencyInjection
 
 		services.AddScoped<IInviteReadRepository, InviteReadRepository>();
 		services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
+		services.AddScoped<IInviteSummaryRepository, InviteSummaryRepository>();
 
 		services.AddScoped<IAccountReadRepository, AccountReadRepository>();
 		services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();
@@ -98,6 +100,9 @@ public static class DependencyInjection
 
 		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
 		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
+
+		services.AddScoped<IAccountIdentifierReadRepository, AccountIdentifierReadRepository>();
+		services.AddScoped<IAccountIdentifierWriteRepository, AccountIdentifierWriteRepository>();
 
 		return services;
 	}

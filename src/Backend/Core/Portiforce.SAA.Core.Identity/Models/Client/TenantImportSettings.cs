@@ -23,26 +23,25 @@ public sealed record TenantImportSettings
 				$"Max file size for upload is limited to {EntityConstraints.Domain.Tenant.MaxFileSizeMb} mb");
 		}
 
-		RequireReviewBeforeProcessing = requireReviewBeforeProcessing;
-		MaxRowsPerImport = maxRowsPerImport;
-		MaxFileSizeMb = maxFileSizeMb;
+		this.RequireReviewBeforeProcessing = requireReviewBeforeProcessing;
+		this.MaxRowsPerImport = maxRowsPerImport;
+		this.MaxFileSizeMb = maxFileSizeMb;
 	}
 
 	// Private Empty Constructor for EF Core
 	private TenantImportSettings()
 	{
-
 	}
 
 	public bool RequireReviewBeforeProcessing { get; init; } = true;
+
 	public int MaxRowsPerImport { get; init; }
+
 	public int MaxFileSizeMb { get; init; }
 
 	public static TenantImportSettings Create(
 		bool requireReviewBeforeProcessing,
 		int maxRowsPerImport,
-		int maxFileSizeMb)
-	{
-		return new TenantImportSettings(requireReviewBeforeProcessing, maxRowsPerImport, maxFileSizeMb);
-	}
+		int maxFileSizeMb) =>
+		new(requireReviewBeforeProcessing, maxRowsPerImport, maxFileSizeMb);
 }

@@ -1,44 +1,29 @@
-﻿using Portiforce.SAA.Core.Interfaces;
+﻿using System.Runtime.CompilerServices;
+
+using Portiforce.SAA.Core.Interfaces;
 
 namespace Portiforce.SAA.Core.Models;
 
 /// <summary>
-/// Abstract base class for all Domain Entities.
-/// Implements equality based on the ID (Identity Pattern).
+///     Abstract base class for all Domain Entities.
+///     Implements equality based on the ID (Identity Pattern).
 /// </summary>
 public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 	where TId : struct, IEquatable<TId>
 {
-	public TId Id { get; protected set; }
-
 	protected Entity(TId id)
 	{
-		Id = id;
+		this.Id = id;
 	}
 
 	/// <summary>
-	///  For serializers / tooling. Domain invariants enforced by factories/methods.
+	///     For serializers / tooling. Domain invariants enforced by factories/methods.
 	/// </summary>
-	protected Entity() { }
-
-	public override bool Equals(object? obj)
+	protected Entity()
 	{
-		if (obj is null)
-		{
-			return false;
-		}
-
-		if (ReferenceEquals(this, obj))
-		{
-			return true;
-		}
-
-		if (obj.GetType() != GetType())
-		{
-			return false;
-		}
-		return Equals((Entity<TId>)obj);
 	}
+
+	public TId Id { get; protected set; }
 
 	public bool Equals(Entity<TId>? other)
 	{
@@ -52,13 +37,13 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 			return true;
 		}
 
-		if (GetType() != other.GetType())
+		if (this.GetType() != other.GetType())
 		{
 			return false;
 		}
 
 		// If IDs are default (empty), they are not equal unless it's the exact same instance
-		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		if (EqualityComparer<TId>.Default.Equals(this.Id, default))
 		{
 			return false;
 		}
@@ -68,19 +53,40 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 			return false;
 		}
 
-		return EqualityComparer<TId>.Default.Equals(Id, other.Id);
+		return EqualityComparer<TId>.Default.Equals(this.Id, other.Id);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+
+		if (ReferenceEquals(this, obj))
+		{
+			return true;
+		}
+
+		if (obj.GetType() != this.GetType())
+		{
+			return false;
+		}
+
+		return this.Equals((Entity<TId>)obj);
 	}
 
 	public override int GetHashCode()
 	{
-		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		if (EqualityComparer<TId>.Default.Equals(this.Id, default))
 		{
-			return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+			return RuntimeHelpers.GetHashCode(this);
 		}
 
-		return HashCode.Combine(GetType(), Id);
+		return HashCode.Combine(this.GetType(), this.Id);
 	}
 
+#pragma warning disable SA1201 // Elements should appear in the correct order
 	public static bool operator ==(Entity<TId>? a, Entity<TId>? b)
 	{
 		if (a is null && b is null)
@@ -92,11 +98,10 @@ public abstract class Entity<TId> : IEntity<TId>, IEquatable<Entity<TId>>
 		{
 			return false;
 		}
+
 		return a.Equals(b);
 	}
+#pragma warning restore SA1201 // Elements should appear in the correct order
 
-	public static bool operator !=(Entity<TId>? a, Entity<TId>? b)
-	{
-		return !(a == b);
-	}
+	public static bool operator !=(Entity<TId>? a, Entity<TId>? b) => !(a == b);
 }

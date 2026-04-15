@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Identity.Models.Client;
@@ -12,22 +12,42 @@ public class SystemAccountSeeder(IOptions<PlatformUsers> platformUsersOptions)
 {
 	private readonly PlatformUsers _config = platformUsersOptions.Value;
 
-	public Account BuildPlatformSystemAccount(Tenant rootTenant)
+	public Account BuildPlatformSystemAccount(Tenant tenant)
 	{
-		Enum.TryParse(_config.PlatformBackground.Tier, out AccountTier accountTier);
+		_ = Enum.TryParse(this._config.PlatformBackground.Tier, out AccountTier accountTier);
 
 		return Account.Create(
-			rootTenant.Id,
-			_config.PlatformBackground.Alias,
-			new ContactInfo(Email.Create(_config.PlatformBackground.Email)),
+			tenant.Id,
+			this._config.PlatformBackground.Alias,
+			new ContactInfo(Email.Create(this._config.PlatformBackground.Email)),
 			Role.TenantBackground,
-			AccountState.Active,
+			AccountState.Suspended,
 			accountTier,
-			settings: new AccountSettings
+			new AccountSettings
 			{
 				DefaultCurrency = FiatCurrency.UAH,
 				Locale = "uk-UA",
-				TimeZoneId = "UTC",
+				TimeZoneId = "Europe/Kyiv",
+				TwoFactorPreferred = true
+			});
+	}
+
+	public Account BuildDemoSystemAccount(Tenant tenant)
+	{
+		_ = Enum.TryParse(this._config.PlatformBackground.Tier, out AccountTier accountTier);
+
+		return Account.Create(
+			tenant.Id,
+			this._config.DemoBackground.Alias,
+			new ContactInfo(Email.Create(this._config.DemoBackground.Email)),
+			Role.TenantBackground,
+			AccountState.Suspended,
+			accountTier,
+			new AccountSettings
+			{
+				DefaultCurrency = FiatCurrency.GBP,
+				Locale = "en-GB",
+				TimeZoneId = "Europe/London",
 				TwoFactorPreferred = true
 			});
 	}

@@ -1,5 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
+
 using Microsoft.EntityFrameworkCore;
+
 using Portiforce.SAA.Application.Models.Common.DataAccess;
 
 namespace Portiforce.SAA.Infrastructure.EF.Extensions;
@@ -11,9 +13,9 @@ internal static class QueryablePagingExtensions
 		PageRequest page,
 		CancellationToken ct)
 	{
-		var total = await query.CountAsync(ct).ConfigureAwait(false);
+		int total = await query.CountAsync(ct).ConfigureAwait(false);
 
-		var items = await query
+		List<T> items = await query
 			.Skip((page.PageNumber - 1) * page.PageSize)
 			.Take(page.PageSize)
 			.ToListAsync(ct)
@@ -37,13 +39,13 @@ internal static class QueryablePagingExtensions
 			return query;
 		}
 
-		if (!allowedSort.TryGetValue(page.SortBy, out var expr))
+		if (!allowedSort.TryGetValue(page.SortBy, out Expression<Func<T, object>>? expr))
 		{
 			// ignore unknown sort keys
 			return query;
 		}
 
-		return page.IsDescending 
+		return page.IsDescending
 			? query.OrderByDescending(expr)
 			: query.OrderBy(expr);
 	}

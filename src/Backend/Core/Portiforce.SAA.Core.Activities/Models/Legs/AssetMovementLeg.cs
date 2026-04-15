@@ -9,20 +9,6 @@ namespace Portiforce.SAA.Core.Activities.Models.Legs;
 
 public sealed record AssetMovementLeg : Fact<LegId>
 {
-	public AssetId AssetId { get; init; }
-
-	public ActivityId ActivityId { get; init; }
-
-	public Quantity Amount { get; init; }
-
-	public MovementDirection Direction { get; init; }
-
-	public MovementRole Role { get; init; } = MovementRole.Principal;
-
-	public AssetAllocationType Allocation { get; init; } = AssetAllocationType.Spot;
-
-	public string? InstrumentKey { get; init; }
-
 	private AssetMovementLeg(
 		LegId id,
 		ActivityId activityId,
@@ -31,7 +17,8 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		MovementRole role,
 		MovementDirection direction,
 		AssetAllocationType allocation,
-		string? instrumentKey): base(id)
+		string? instrumentKey)
+		: base(id)
 	{
 		if (amount == Quantity.Zero)
 		{
@@ -52,18 +39,34 @@ public sealed record AssetMovementLeg : Fact<LegId>
 		{
 			throw new DomainValidationException($"Fee leg always should be of outflow type, currentType: {direction}");
 		}
-		
-		ActivityId = activityId;
-		AssetId = assetId;
-		Amount = amount;
-		Role = role;
-		Allocation = allocation;
-		Direction = direction;
-		InstrumentKey = instrumentKey;
+
+		this.ActivityId = activityId;
+		this.AssetId = assetId;
+		this.Amount = amount;
+		this.Role = role;
+		this.Allocation = allocation;
+		this.Direction = direction;
+		this.InstrumentKey = instrumentKey;
 	}
 
 	// Private Empty Constructor for EF Core
-	private AssetMovementLeg() : base() { }
+	private AssetMovementLeg()
+	{
+	}
+
+	public AssetId AssetId { get; init; }
+
+	public ActivityId ActivityId { get; init; }
+
+	public Quantity Amount { get; init; }
+
+	public MovementDirection Direction { get; init; }
+
+	public MovementRole Role { get; init; } = MovementRole.Principal;
+
+	public AssetAllocationType Allocation { get; init; } = AssetAllocationType.Spot;
+
+	public string? InstrumentKey { get; init; }
 
 	public static AssetMovementLeg Create(
 		ActivityId activityId,
@@ -78,7 +81,7 @@ public sealed record AssetMovementLeg : Fact<LegId>
 	{
 		ConsistencyRules.EnsureScaleDoesNotExceed(amount.Value, nativeDecimals, nameof(amount));
 
-		return new (
+		return new AssetMovementLeg(
 			id.IsEmpty ? LegId.New() : id,
 			activityId,
 			assetId,

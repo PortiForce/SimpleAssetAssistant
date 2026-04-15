@@ -1,4 +1,4 @@
-﻿using Portiforce.SAA.Contracts.Enums;
+using Portiforce.SAA.Contracts.Enums;
 
 namespace Portiforce.SAA.Contracts.Models.Client.Account;
 

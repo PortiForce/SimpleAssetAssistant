@@ -1,27 +1,29 @@
-﻿using Portiforce.SAA.Core.Interfaces;
+﻿using System.Runtime.CompilerServices;
+
+using Portiforce.SAA.Core.Interfaces;
 
 namespace Portiforce.SAA.Core.Models;
 
 /// <summary>
-/// Immutable persisted fact. Equality is identity-based (Id only),
-/// not record "value equality".
+///     Immutable persisted fact. Equality is identity-based (Id only),
+///     not record "value equality".
 /// </summary>
 public abstract record Fact<TId> : IEntity<TId>
 	where TId : struct, IEquatable<TId>
 {
-	public TId Id { get; private set; }
-
 	// Protected Constructor for Domain Logic
 	protected Fact(TId id)
 	{
-		Id = id;
+		this.Id = id;
 	}
 
 	// Protected Empty Constructor for EF Core Chain
 	// Using default! suppresses null warnings, EF fixes this at runtime.
-#pragma warning disable CS8618
-	protected Fact() { }
-#pragma warning restore CS8618
+	protected Fact()
+	{
+	}
+
+	public TId Id { get; }
 
 	// IMPORTANT: this method REPLACES the record-generated one.
 	// Make sure you have it ONLY ONCE in the type.
@@ -37,27 +39,27 @@ public abstract record Fact<TId> : IEntity<TId>
 			return false;
 		}
 
-		if (other.GetType() != GetType())
+		if (other.GetType() != this.GetType())
 		{
 			return false;
 		}
 
 		// Treat default Id as transient => never equal (consistent with Entity<TId>)
-		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		if (EqualityComparer<TId>.Default.Equals(this.Id, default))
 		{
 			return false;
 		}
 
-		return EqualityComparer<TId>.Default.Equals(Id, other.Id);
+		return EqualityComparer<TId>.Default.Equals(this.Id, other.Id);
 	}
-	
+
 	public override int GetHashCode()
 	{
-		if (EqualityComparer<TId>.Default.Equals(Id, default))
+		if (EqualityComparer<TId>.Default.Equals(this.Id, default))
 		{
-			return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+			return RuntimeHelpers.GetHashCode(this);
 		}
 
-		return EqualityComparer<TId>.Default.GetHashCode(Id);
+		return EqualityComparer<TId>.Default.GetHashCode(this.Id);
 	}
 }

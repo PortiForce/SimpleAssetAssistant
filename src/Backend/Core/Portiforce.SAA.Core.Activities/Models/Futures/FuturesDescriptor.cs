@@ -4,7 +4,9 @@ namespace Portiforce.SAA.Core.Activities.Models.Futures;
 
 public sealed record FuturesDescriptor
 {
-	private FuturesDescriptor() { }
+	private FuturesDescriptor()
+	{
+	}
 
 	private FuturesDescriptor(
 		string instrumentKey,
@@ -13,17 +15,19 @@ public sealed record FuturesDescriptor
 		string quoteAssetCode,
 		FuturesPositionEffect positionsEffect)
 	{
-		InstrumentKey = instrumentKey;
-		ContractKind = contractKind;
-		BaseAssetCode = baseAssetCode;
-		QuoteAssetCode = quoteAssetCode;
-		PositionEffect = positionsEffect;
+		this.InstrumentKey = instrumentKey;
+		this.ContractKind = contractKind;
+		this.BaseAssetCode = baseAssetCode;
+		this.QuoteAssetCode = quoteAssetCode;
+		this.PositionEffect = positionsEffect;
 	}
 
 	public string InstrumentKey { get; init; }
+
 	public FuturesContractKind ContractKind { get; init; } = FuturesContractKind.Perpetual;
 
 	public string? BaseAssetCode { get; init; }
+
 	public string? QuoteAssetCode { get; init; }
 
 	public FuturesPositionEffect? PositionEffect { get; init; }
@@ -35,7 +39,7 @@ public sealed record FuturesDescriptor
 		string quoteAssetCode,
 		FuturesPositionEffect positionsEffect)
 	{
-		return new(
+		return new FuturesDescriptor(
 			instrumentKey,
 			contractKind,
 			baseAssetCode,

@@ -5,9 +5,23 @@ namespace Portiforce.SAA.Core.Activities.Rules;
 public static class ActivityGuards
 {
 	/// <summary>
-	/// Validates that a given Reason is compatible with a given ActivityKind.
-	/// IMPORTANT: Transfer is not "reasoned" in this model; do not call this for Transfer.
+	///     Determines whether the specified combination of activity kind and reason is allowed according to predefined
+	///     business rules.
 	/// </summary>
+	/// <remarks>
+	///     The allowed combinations are determined by business logic and may change as the model evolves. Not
+	///     all activity kinds support all reasons; for example, transfer activities are not considered reasoned activities in
+	///     the current model.
+	/// </remarks>
+	/// <param name="activityKind">
+	///     The type of asset activity to evaluate. Specifies the general category of the activity, such as trade, exchange,
+	///     income, or service.
+	/// </param>
+	/// <param name="reason">
+	///     The reason associated with the asset activity. Indicates the specific cause or context for the activity, such as
+	///     buy, sell, conversion, or reward.
+	/// </param>
+	/// <returns>true if the specified activity kind and reason pair is permitted; otherwise, false.</returns>
 	public static bool IsReasonActivityPairAllowed(AssetActivityKind activityKind, AssetActivityReason reason) =>
 		activityKind switch
 		{
