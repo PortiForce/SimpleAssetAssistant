@@ -10,6 +10,6 @@ public interface IInviteChannelSender
 
 	Task<InviteSendResult> SendAsync(
 		TenantInvite invite,
-		string rawInviteToken,
+		string inviteLink,
 		CancellationToken ct);
 }

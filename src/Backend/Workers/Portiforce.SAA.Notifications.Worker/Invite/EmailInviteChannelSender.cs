@@ -1,9 +1,13 @@
-using System.Net;
-using System.Net.Mail;
 using System.Text.Encodings.Web;
+
+using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using MimeKit;
 
 using Portiforce.SAA.Application.Interfaces.Services.Invite;
 using Portiforce.SAA.Application.Models.Invite;
@@ -13,7 +17,7 @@ using Portiforce.SAA.Infrastructure.Invite;
 
 using EmailAddress = Portiforce.SAA.Core.Primitives.Email;
 
-namespace Portiforce.SAA.Infrastructure.Services.Invite;
+namespace Portiforce.SAA.Notifications.Worker.Invite;
 
 public sealed class EmailInviteChannelSender(
 	IOptions<InviteEmailOptions> options,
@@ -25,11 +29,11 @@ public sealed class EmailInviteChannelSender(
 
 	public async Task<InviteSendResult> SendAsync(
 		TenantInvite invite,
-		string rawInviteToken,
+		string inviteLink,
 		CancellationToken ct)
 	{
 		ArgumentNullException.ThrowIfNull(invite);
-		ArgumentException.ThrowIfNullOrWhiteSpace(rawInviteToken);
+		ArgumentException.ThrowIfNullOrWhiteSpace(inviteLink);
 
 		if (invite.InviteTarget.Channel != InviteChannel.Email ||
 			invite.InviteTarget.Kind != InviteTargetKind.Email)
@@ -59,27 +63,55 @@ public sealed class EmailInviteChannelSender(
 				"Invite recipient is invalid.");
 		}
 
-		string inviteUrl = BuildInviteUrl(this.options.PublicAppBaseUrl, rawInviteToken);
 		string subject = BuildSubject(this.options.SubjectPrefix);
-		string htmlBody = BuildHtmlBody(invite, inviteUrl);
-		string textBody = BuildTextBody(invite, inviteUrl);
+		string htmlBody = BuildHtmlBody(invite, inviteLink);
+		string textBody = BuildTextBody(invite, inviteLink);
 
 		try
 		{
-			using MailMessage message = CreateMailMessage(
+			using MimeMessage message = CreateMessage(
 				this.options,
 				recipientEmail.Value,
 				subject,
 				htmlBody,
 				textBody);
 
-			using SmtpClient client = CreateSmtpClient(this.options);
+			using SmtpClient client = new();
 
-			await client.SendMailAsync(message).WaitAsync(ct);
+#if DEBUG
+
+			// todo: NOT FOR PRODUCTION USE - This is to allow sending emails even if the SMTP server has a self-signed certificate or other certificate issues.
+			client.ServerCertificateValidationCallback = static (_, _, _, _) => true;
+#endif
+
+			await client.ConnectAsync(
+				this.options.Host,
+				this.options.Port,
+				GetSecureSocketOptions(this.options),
+				ct);
+
+			if (!string.IsNullOrWhiteSpace(this.options.UserName))
+			{
+				await client.AuthenticateAsync(this.options.UserName, this.options.Password, ct);
+			}
+
+			_ = await client.SendAsync(message, ct);
+			await client.DisconnectAsync(true, ct);
 
 			return InviteSendResult.Success();
 		}
-		catch (SmtpException ex)
+		catch (CommandException ex)
+		{
+			logger.LogWarning(
+				ex,
+				"Invite email sending failed for invite {InviteId}.",
+				invite.Id);
+
+			return InviteSendResult.Failure(
+				"invite_email_delivery_failed",
+				"Invite email could not be delivered.");
+		}
+		catch (ProtocolException ex)
 		{
 			logger.LogWarning(
 				ex,
@@ -101,14 +133,6 @@ public sealed class EmailInviteChannelSender(
 				"invite_email_delivery_failed",
 				"Invite email could not be delivered.");
 		}
-	}
-
-	private static string BuildInviteUrl(string publicAppBaseUrl, string rawInviteToken)
-	{
-		string baseUrl = publicAppBaseUrl.TrimEnd('/');
-		string encodedToken = WebUtility.UrlEncode(rawInviteToken);
-
-		return $"{baseUrl}/invite/{encodedToken}";
 	}
 
 	private static string BuildSubject(string? subjectPrefix)
@@ -134,15 +158,9 @@ public sealed class EmailInviteChannelSender(
                 	<p>You have been invited to join a tenant in Portiforce SAA.</p>
                 	<p><strong>Role:</strong> {encodedRole}<br />
                 	<strong>Tier:</strong> {encodedTier}</p>
-                	<p>
-                		Use the link below to review and accept the invitation:
-                	</p>
-                	<p>
-                		<a href="{encodedUrl}">{encodedUrl}</a>
-                	</p>
-                	<p>
-                		If you did not expect this invitation, you can safely ignore this message.
-                	</p>
+                	<p>Use the link below to review and accept the invitation:</p>
+                	<p><a href="{encodedUrl}">{encodedUrl}</a></p>
+                	<p>If you did not expect this invitation, you can safely ignore this message.</p>
                 </body>
                 </html>
                 """;
@@ -163,49 +181,37 @@ public sealed class EmailInviteChannelSender(
          If you did not expect this invitation, you can safely ignore this message.
          """;
 
-	private static MailMessage CreateMailMessage(
+	private static MimeMessage CreateMessage(
 		InviteEmailOptions options,
 		string recipientEmail,
 		string subject,
 		string htmlBody,
 		string textBody)
 	{
-		MailMessage message = new()
-		{
-			From = new MailAddress(options.FromEmail, options.FromDisplayName),
-			Subject = subject,
-			Body = textBody,
-			IsBodyHtml = false
-		};
+		MimeMessage message = new();
 
-		_ = message.To.Add(recipientEmail);
+		message.From.Add(new MailboxAddress(options.FromDisplayName, options.FromEmail));
+		message.To.Add(MailboxAddress.Parse(recipientEmail));
+		message.Subject = subject;
 
-		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html");
-		AlternateView textView = AlternateView.CreateAlternateViewFromString(textBody, null, "text/plain");
+		BodyBuilder bodyBuilder = new() { TextBody = textBody, HtmlBody = htmlBody };
 
-		_ = message.AlternateViews.Add(textView);
-		_ = message.AlternateViews.Add(htmlView);
+		message.Body = bodyBuilder.ToMessageBody();
 
 		return message;
 	}
 
-	private static SmtpClient CreateSmtpClient(InviteEmailOptions options)
+	private static SecureSocketOptions GetSecureSocketOptions(InviteEmailOptions options)
 	{
-		SmtpClient client = new(options.Host, options.Port)
+		if (!options.EnableSsl)
 		{
-			EnableSsl = options.EnableSsl,
-			DeliveryMethod = SmtpDeliveryMethod.Network
+			return SecureSocketOptions.None;
+		}
+
+		return options.Port switch
+		{
+			465 => SecureSocketOptions.SslOnConnect,
+			_ => SecureSocketOptions.StartTls
 		};
-
-		if (!string.IsNullOrWhiteSpace(options.UserName))
-		{
-			client.Credentials = new NetworkCredential(options.UserName, options.Password);
-		}
-		else
-		{
-			client.UseDefaultCredentials = true;
-		}
-
-		return client;
 	}
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Portiforce.SAA.Application.Models.Common.Messaging;
 using Portiforce.SAA.Core.Activities.Models.Actions;
 using Portiforce.SAA.Core.Activities.Models.Legs;
 using Portiforce.SAA.Core.Assets.Models;
@@ -11,6 +12,7 @@ using Portiforce.SAA.Infrastructure.EF.Configuration;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Auth;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Core;
+using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Infra;
 using Portiforce.SAA.Infrastructure.EF.DbContexts.Configurations.Ledger;
 
 namespace Portiforce.SAA.Infrastructure.EF.DbContexts;
@@ -49,6 +51,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 	// Functionality
 	public DbSet<TenantInvite> Invites => this.Set<TenantInvite>();
+
+	// Infra
+	public DbSet<OutboxMessage> OutboxMessages => this.Set<OutboxMessage>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
@@ -92,6 +97,9 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 		// flow
 		_ = modelBuilder.ApplyConfiguration(new TenantInviteConfiguration());
+
+		// infra
+		_ = modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 
 		// relationships
 		ConfigureRelationships(modelBuilder);

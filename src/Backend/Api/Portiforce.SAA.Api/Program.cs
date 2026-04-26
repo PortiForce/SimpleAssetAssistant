@@ -15,6 +15,7 @@ using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation;
 using Portiforce.SAA.Infrastructure.Services.Security;
 using Portiforce.SAA.Infrastructure.Services.Time;
+using Portiforce.SAA.Notifications.Worker;
 
 using Scalar.AspNetCore;
 
@@ -88,6 +89,7 @@ public class Program
 		_ = builder.Services.AddCoreIdentity();
 		_ = builder.Services.AddInfrastructure(builder.Configuration);
 		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
+		_ = builder.Services.AddNotificationsInfrastructure(builder.Configuration);
 
 		WebApplication app = builder.Build();
 

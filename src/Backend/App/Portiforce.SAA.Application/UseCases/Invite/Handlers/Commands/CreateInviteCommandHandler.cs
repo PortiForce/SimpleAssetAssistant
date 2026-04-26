@@ -3,10 +3,13 @@ using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
+using Portiforce.SAA.Application.Interfaces.Notification;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
+using Portiforce.SAA.Application.Interfaces.Services.Invite;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
+using Portiforce.SAA.Application.Models.Invite;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
@@ -23,9 +26,10 @@ public sealed class CreateInviteCommandHandler(
 	IClock clock,
 	ITenantLimitsService tenantLimitsService,
 	IAccountIdentifierReadRepository accountIdentifierReadRepository,
-	IExternalIdentityReadRepository externalIdentityReadRepository,
 	IInviteReadRepository inviteReadRepository,
 	IInviteWriteRepository inviteWriteRepository,
+	IInviteNotificationOutboxWriter inviteNotificationOutboxWriter,
+	IInviteLinkBuilder inviteLinkBuilder,
 	IUnitOfWork unitOfWork)
 	: IRequestHandler<CreateInviteCommand, TypedResult<CreateInviteResult>>
 {
@@ -126,9 +130,31 @@ public sealed class CreateInviteCommandHandler(
 			now,
 			expiresAt);
 
+		TypedResult<string> buildInviteUrlResult =
+			await inviteLinkBuilder.BuildInviteOverviewUrlAsync(request.TenantId, rawInviteToken, ct);
+
+		if (!buildInviteUrlResult.IsSuccess || string.IsNullOrWhiteSpace(buildInviteUrlResult.Value))
+		{
+			return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict("unable to construct invite URL"));
+		}
+
+		SendInviteEmailMessage sendInviteEmailMessage = SendInviteEmailMessage.Create(
+			request.TenantId,
+			invite.Id,
+			request.InviteTarget.Value,
+			request.Alias,
+			buildInviteUrlResult.Value,
+			expiresAt,
+			now);
+
 		try
 		{
 			await inviteWriteRepository.AddAsync(invite, ct);
+
+			await inviteNotificationOutboxWriter.AddInviteEmailAsync(
+				sendInviteEmailMessage,
+				ct);
+
 			_ = await unitOfWork.SaveChangesAsync(ct);
 		}
 		catch (UniqueConstraintViolationException)

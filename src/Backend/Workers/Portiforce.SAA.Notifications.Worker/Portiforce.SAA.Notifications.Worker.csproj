@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.16.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj" />
+    <ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
+    <ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure\Portiforce.SAA.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

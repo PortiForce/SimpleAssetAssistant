@@ -1,9 +1,10 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using Portiforce.SAA.Application.Entitlements.Resolvers;
 using Portiforce.SAA.Application.Interfaces.Guards;
+using Portiforce.SAA.Application.Interfaces.Notification;
 using Portiforce.SAA.Application.Interfaces.Resolvers;
 using Portiforce.SAA.Application.Interfaces.Services.Activity;
 using Portiforce.SAA.Application.Interfaces.Services.Asset;
@@ -14,6 +15,7 @@ using Portiforce.SAA.Application.Tech.Messaging;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Guards;
 using Portiforce.SAA.Application.UseCases.Activity.Flow.Services;
 using Portiforce.SAA.Application.UseCases.Auth.Flow.Services;
+using Portiforce.SAA.Application.UseCases.Invite.Flow.Services;
 using Portiforce.SAA.Application.UseCases.SharedFlow.Services;
 
 namespace Portiforce.SAA.Application;
@@ -22,32 +24,33 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddApplication(this IServiceCollection services)
 	{
-		var asm = typeof(DependencyInjection).Assembly;
+		Assembly asm = typeof(DependencyInjection).Assembly;
 
 		// 1. Register Handlers (Commands, Queries, Notifications)
 		RegisterHandlers(services, asm);
 
 		// 2. Register Mediator & Publisher
 		// Register the concrete class first as Scoped
-		services.AddScoped<Mediator>();
+		_ = services.AddScoped<Mediator>();
 
 		// Forward interfaces to the concrete instance
 		// This ensures IMediator and IPublisher are the SAME instance per request
-		services.AddScoped<IMediator>(sp => sp.GetRequiredService<Mediator>());
-		services.AddScoped<IPublisher>(sp => sp.GetRequiredService<Mediator>());
+		_ = services.AddScoped<IMediator>(sp => sp.GetRequiredService<Mediator>());
+		_ = services.AddScoped<IPublisher>(sp => sp.GetRequiredService<Mediator>());
 
 		// 3. Remaining services registration
 		// Core tech
-		services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
+		_ = services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
 
 		// UseCases: guards/services
-		services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuard>();
-		services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
-		services.AddScoped<IAssetLookupService, AssetLookupService>();
-		services.AddScoped<ITenantLimitsService, TenantLimitsService>();
-		services.AddScoped<ILoginValidationService, LoginValidationService>();
+		_ = services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuard>();
+		_ = services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
+		_ = services.AddScoped<IAssetLookupService, AssetLookupService>();
+		_ = services.AddScoped<ITenantLimitsService, TenantLimitsService>();
+		_ = services.AddScoped<ILoginValidationService, LoginValidationService>();
+		_ = services.AddScoped<IInviteNotificationOutboxWriter, InviteNotificationOutboxWriter>();
 
-		services.AddScoped<IAuthService, AuthService>();
+		_ = services.AddScoped<IAuthService, AuthService>();
 
 		return services;
 	}
@@ -72,7 +75,7 @@ public static class DependencyInjection
 				// Register Command/Query Handlers and Notification Handlers
 				if (def == typeof(IRequestHandler<,>) || def == typeof(INotificationHandler<>))
 				{
-					services.AddScoped(itf, type);
+					_ = services.AddScoped(itf, type);
 				}
 			}
 		}

@@ -2,8 +2,6 @@ namespace Portiforce.SAA.Infrastructure.Invite;
 
 public sealed class InviteEmailOptions
 {
-	public string PublicAppBaseUrl { get; set; } = string.Empty;
-
 	public string Host { get; set; } = string.Empty;
 
 	public int Port { get; set; } = 587;
@@ -21,8 +19,6 @@ public sealed class InviteEmailOptions
 	public string? SubjectPrefix { get; set; }
 
 	public bool IsValid() =>
-		!string.IsNullOrWhiteSpace(this.PublicAppBaseUrl) &&
-		Uri.TryCreate(this.PublicAppBaseUrl, UriKind.Absolute, out _) &&
 		!string.IsNullOrWhiteSpace(this.Host) &&
 		this.Port > 0 &&
 		!string.IsNullOrWhiteSpace(this.FromEmail);

@@ -24,6 +24,7 @@
 		<ProjectReference Include="..\..\..\Shared\Portiforce.SAA.Contracts\Portiforce.SAA.Contracts.csproj" />
 		<ProjectReference Include="..\..\App\Portiforce.SAA.Application\Portiforce.SAA.Application.csproj" />
 		<ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure.EF\Portiforce.SAA.Infrastructure.EF.csproj" />
+		<ProjectReference Include="..\..\Workers\Portiforce.SAA.Notifications.Worker\Portiforce.SAA.Notifications.Worker.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

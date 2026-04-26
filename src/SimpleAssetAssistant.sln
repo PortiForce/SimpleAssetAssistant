@@ -45,6 +45,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7FDBC9D2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Domain.Tests", "Tests\Portiforce.SAA.Domain.Tests\Portiforce.SAA.Domain.Tests.csproj", "{FB8B9CFF-20DF-4316-B730-85936B5C40DB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - Workers", "04 - Workers", "{DE45D499-6804-4173-A915-F122EAC079A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Notifications.Worker", "Backend\Workers\Portiforce.SAA.Notifications.Worker\Portiforce.SAA.Notifications.Worker.csproj", "{38C7F6B3-7968-47B6-8447-E19E1C10BE04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +103,10 @@ Global
 		{FB8B9CFF-20DF-4316-B730-85936B5C40DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB8B9CFF-20DF-4316-B730-85936B5C40DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB8B9CFF-20DF-4316-B730-85936B5C40DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +129,8 @@ Global
 		{CF75B9B6-C47A-41F1-9412-4989BF66CB17} = {BFD582AA-460D-4FBB-91B3-E9D280137C77}
 		{217F2B2B-01E1-402F-9290-CC7E21506E0B} = {AADBC8E8-288F-47A6-B908-5700C93386E2}
 		{FB8B9CFF-20DF-4316-B730-85936B5C40DB} = {7FDBC9D2-42BB-4735-B164-B11711DA99EA}
+		{DE45D499-6804-4173-A915-F122EAC079A1} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
+		{38C7F6B3-7968-47B6-8447-E19E1C10BE04} = {DE45D499-6804-4173-A915-F122EAC079A1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}
