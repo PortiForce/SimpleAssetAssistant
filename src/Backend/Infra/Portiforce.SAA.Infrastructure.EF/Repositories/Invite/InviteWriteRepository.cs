@@ -6,11 +6,12 @@ namespace Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
 
 internal sealed class InviteWriteRepository(AssetAssistantDbContext db) : IInviteWriteRepository
 {
-	public async Task AddAsync(TenantInvite entity, CancellationToken ct) => await db.Invites.AddAsync(entity, ct);
+	public Task AddAsync(TenantInvite entity, CancellationToken ct) =>
+		db.Invites.AddAsync(entity, ct).AsTask();
 
-	public async Task UpdateAsync(TenantInvite tenantInvite, CancellationToken ct)
+	public Task UpdateAsync(TenantInvite tenantInvite, CancellationToken ct)
 	{
 		_ = db.Invites.Update(tenantInvite);
-		await Task.CompletedTask;
+		return Task.CompletedTask;
 	}
 }

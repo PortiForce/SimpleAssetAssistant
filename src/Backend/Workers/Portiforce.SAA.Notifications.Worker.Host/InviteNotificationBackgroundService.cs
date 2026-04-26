@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-using Portiforce.SAA.Application.Interfaces.Notification;
+using Portiforce.SAA.Application.Interfaces.Messaging;
 
 namespace Portiforce.SAA.Notifications.Worker.Host;
 

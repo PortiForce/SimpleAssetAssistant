@@ -1,6 +1,6 @@
 using Portiforce.SAA.Application.Models.Invite;
 
-namespace Portiforce.SAA.Application.Interfaces.Notification;
+namespace Portiforce.SAA.Application.Interfaces.Messaging;
 
 public interface IInviteNotificationOutboxWriter
 {

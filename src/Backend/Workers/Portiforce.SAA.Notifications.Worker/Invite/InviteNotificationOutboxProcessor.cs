@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using Portiforce.SAA.Application.Interfaces.Common.Time;
-using Portiforce.SAA.Application.Interfaces.Notification;
+using Portiforce.SAA.Application.Interfaces.Messaging;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.BackgroundTasks.Outbox;
 using Portiforce.SAA.Application.Interfaces.Services.Invite;

@@ -30,7 +30,7 @@ public sealed class InviteLinkBuilder(
 			return TypedResult<string>.Fail(ResultError.InvalidTenantId());
 		}
 
-		if (string.IsNullOrWhiteSpace(this.options.PublicAppBaseUrl))
+		if (!IsConfiguredValue(this.options.PublicAppBaseUrl))
 		{
 			return TypedResult<string>.Fail(ResultError.Validation("Invite public app base URL is not configured."));
 		}
@@ -56,4 +56,8 @@ public sealed class InviteLinkBuilder(
 		return TypedResult<string>.Ok(
 			$"https://{tenant.DomainPrefix}.{this.options.PublicAppBaseUrl.TrimEnd('/')}/invite/{encodedToken}");
 	}
+
+	private static bool IsConfiguredValue(string? value) =>
+		!string.IsNullOrWhiteSpace(value) &&
+		!value.Contains("{from-configs}", StringComparison.OrdinalIgnoreCase);
 }
