@@ -130,31 +130,42 @@ public sealed class CreateInviteCommandHandler(
 			now,
 			expiresAt);
 
-		TypedResult<string> buildInviteUrlResult =
-			await inviteLinkBuilder.BuildInviteOverviewUrlAsync(request.TenantId, rawInviteToken, ct);
+		string? inviteUrl = null;
 
-		if (!buildInviteUrlResult.IsSuccess || string.IsNullOrWhiteSpace(buildInviteUrlResult.Value))
+		if (request.InviteTarget.Channel == InviteChannel.Email)
 		{
-			return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict("unable to construct invite URL"));
-		}
+			TypedResult<string> buildInviteUrlResult =
+				await inviteLinkBuilder.BuildInviteOverviewUrlAsync(request.TenantId, rawInviteToken, ct);
 
-		SendInviteByChannelMessage sendInviteEmailMessage = SendInviteByChannelMessage.Create(
-			request.TenantId,
-			invite.Id,
-			request.InviteTarget.Channel,
-			request.InviteTarget.Value,
-			request.Alias,
-			buildInviteUrlResult.Value,
-			expiresAt,
-			now);
+			if (!buildInviteUrlResult.IsSuccess || string.IsNullOrWhiteSpace(buildInviteUrlResult.Value))
+			{
+				return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict("unable to construct invite URL"));
+			}
+
+			inviteUrl = buildInviteUrlResult.Value;
+		}
 
 		try
 		{
 			await inviteWriteRepository.AddAsync(invite, ct);
 
-			await inviteNotificationOutboxWriter.AddInviteEmailAsync(
-				sendInviteEmailMessage,
-				ct);
+			if (request.InviteTarget.Channel == InviteChannel.Email &&
+				!string.IsNullOrWhiteSpace(inviteUrl))
+			{
+				SendInviteByChannelMessage sendInviteEmailMessage = SendInviteByChannelMessage.Create(
+					request.TenantId,
+					invite.Id,
+					request.InviteTarget.Channel,
+					request.InviteTarget.Value,
+					request.Alias,
+					inviteUrl,
+					expiresAt,
+					now);
+
+				await inviteNotificationOutboxWriter.AddInviteEmailAsync(
+					sendInviteEmailMessage,
+					ct);
+			}
 
 			_ = await unitOfWork.SaveChangesAsync(ct);
 		}
