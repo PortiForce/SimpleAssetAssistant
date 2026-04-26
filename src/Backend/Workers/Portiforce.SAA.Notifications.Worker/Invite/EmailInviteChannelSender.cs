@@ -4,6 +4,7 @@ using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,6 +21,7 @@ namespace Portiforce.SAA.Notifications.Worker.Invite;
 
 public sealed class EmailInviteChannelSender(
 	IOptions<InviteEmailOptions> options,
+	IHostEnvironment environment,
 	ILogger<EmailInviteChannelSender> logger) : IInviteChannelSender
 {
 	private readonly InviteEmailOptions options = options.Value;
@@ -81,11 +83,11 @@ public sealed class EmailInviteChannelSender(
 
 			using SmtpClient client = new();
 
-#if DEBUG
-
-			// todo: NOT FOR PRODUCTION USE - This is to allow sending emails even if the SMTP server has a self-signed certificate or other certificate issues.
-			client.ServerCertificateValidationCallback = static (_, _, _, _) => true;
-#endif
+			if (environment.IsDevelopment())
+			{
+				// Allow self-signed certificates in development only
+				client.ServerCertificateValidationCallback = static (_, _, _, _) => true;
+			}
 
 			await client.ConnectAsync(
 				this.options.Host,

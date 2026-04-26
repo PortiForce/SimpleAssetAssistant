@@ -73,7 +73,7 @@
     [Parameter]
     public string ConfirmButtonClass { get; set; } = "btn-primary";
 
-    public Task<bool> ShowAsync(
+    public async Task<bool> ShowAsync(
         string? title = null,
         string? description = null)
     {
@@ -84,11 +84,11 @@
 
         activeTitle = title;
         activeDescription = description;
-        pendingConfirmation = new TaskCompletionSource<bool>();
+        pendingConfirmation = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         isOpen = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
 
-        return pendingConfirmation.Task;
+        return await pendingConfirmation.Task;
     }
 
     private string DisplayTitle => activeTitle ?? Title;

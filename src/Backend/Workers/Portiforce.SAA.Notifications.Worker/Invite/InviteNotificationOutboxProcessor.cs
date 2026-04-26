@@ -13,7 +13,7 @@ namespace Portiforce.SAA.Notifications.Worker.Invite;
 
 public sealed class InviteNotificationOutboxProcessor(
 	IOutboxMessageReadRepository outboxMessageReadRepository,
-	IInviteChannelSender inviteChannelSender,
+	IEnumerable<IInviteChannelSender> inviteChannelSenders,
 	IJsonSerializer jsonSerializer,
 	IClock clock,
 	IUnitOfWork unitOfWork,
@@ -43,6 +43,22 @@ public sealed class InviteNotificationOutboxProcessor(
 			batchSize,
 			ct);
 
+		if (messages.Count == 0)
+		{
+			return 0;
+		}
+
+		// Claim the batch by marking all messages as Published before sending.
+		// Published acts as an in-progress lock: GetReadyToProcessAsync only queries Pending/Failed,
+		// so a second worker instance won't pick up the same messages.
+		// Failed sends call MarkFailed, which transitions the message back to Failed (retryable).
+		foreach (OutboxMessage msg in messages)
+		{
+			msg.MarkPublished(now);
+		}
+
+		_ = await unitOfWork.SaveChangesAsync(ct);
+
 		int processedCount = 0;
 
 		foreach (OutboxMessage outboxMessage in messages)
@@ -54,7 +70,28 @@ public sealed class InviteNotificationOutboxProcessor(
 				SendInviteByChannelMessage message =
 					jsonSerializer.Deserialize<SendInviteByChannelMessage>(outboxMessage.PayloadJson);
 
-				InviteSendResult result = await inviteChannelSender.SendAsync(message, ct);
+				IInviteChannelSender? sender = inviteChannelSenders
+					.FirstOrDefault(s => s.Channel == message.Channel);
+
+				if (sender is null)
+				{
+					DateTimeOffset noSenderFailedAt = clock.UtcNow;
+
+					logger.LogWarning(
+						"No sender registered for channel '{Channel}' on outbox message {OutboxMessageId}.",
+						message.Channel,
+						outboxMessage.Id);
+
+					outboxMessage.MarkFailed(
+						$"No sender registered for channel '{message.Channel}'.",
+						noSenderFailedAt,
+						noSenderFailedAt.Add(RetryDelay),
+						maxAttempts);
+
+					continue;
+				}
+
+				InviteSendResult result = await sender.SendAsync(message, ct);
 				DateTimeOffset completedAtUtc = clock.UtcNow;
 
 				if (result.IsSuccess)

@@ -29,7 +29,7 @@ public class Program
 		_ = builder.Services.AddApplication();
 		_ = builder.Services.AddInfrastructure(builder.Configuration);
 		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
-		_ = builder.Services.AddNotificationsInfrastructure(builder.Configuration);
+		_ = builder.Services.AddNotificationsInfrastructure();
 
 		_ = builder.Services.AddOptions<InviteEmailOptions>()
 			.Validate(
