@@ -1,0 +1,219 @@
+using System.Text.Encodings.Web;
+
+using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using MimeKit;
+
+using Portiforce.SAA.Application.Interfaces.Services.Invite;
+using Portiforce.SAA.Application.Models.Invite;
+using Portiforce.SAA.Core.Identity.Enums;
+using Portiforce.SAA.Infrastructure.Invite;
+
+using EmailAddress = Portiforce.SAA.Core.Primitives.Email;
+
+namespace Portiforce.SAA.Notifications.Worker.Invite;
+
+public sealed class EmailInviteChannelSender(
+	IOptions<InviteEmailOptions> options,
+	IHostEnvironment environment,
+	ILogger<EmailInviteChannelSender> logger) : IInviteChannelSender
+{
+	private readonly InviteEmailOptions options = options.Value;
+
+	public InviteChannel Channel => InviteChannel.Email;
+
+	public async Task<InviteSendResult> SendAsync(
+		SendInviteByChannelMessage message,
+		CancellationToken ct)
+	{
+		ArgumentNullException.ThrowIfNull(message);
+
+		if (message.TenantId.IsEmpty || message.InviteId == Guid.Empty)
+		{
+			return InviteSendResult.Failure(
+				"invite_message_invalid",
+				"Invite message is invalid.");
+		}
+
+		if (string.IsNullOrWhiteSpace(message.InviteUrl))
+		{
+			return InviteSendResult.Failure(
+				"invite_link_missing",
+				"Invite link is missing.");
+		}
+
+		if (!this.options.IsValid())
+		{
+			logger.LogError("Invite email sender is not configured correctly.");
+			return InviteSendResult.Failure(
+				"invite_sender_not_configured",
+				"Invite delivery is not available right now.");
+		}
+
+		EmailAddress recipientEmail;
+		try
+		{
+			recipientEmail = EmailAddress.Create(message.Recipient);
+		}
+		catch (ArgumentException)
+		{
+			return InviteSendResult.Failure(
+				"invite_recipient_invalid",
+				"Invite recipient is invalid.");
+		}
+
+		string subject = BuildSubject(this.options.SubjectPrefix);
+		string htmlBody = BuildHtmlBody(message);
+		string textBody = BuildTextBody(message);
+
+		try
+		{
+			using MimeMessage mimeMessage = CreateMessage(
+				this.options,
+				recipientEmail.Value,
+				subject,
+				htmlBody,
+				textBody);
+
+			using SmtpClient client = new();
+
+			if (environment.IsDevelopment())
+			{
+				// Allow self-signed certificates in development only
+				client.ServerCertificateValidationCallback = static (_, _, _, _) => true;
+			}
+
+			await client.ConnectAsync(
+				this.options.Host,
+				this.options.Port,
+				GetSecureSocketOptions(this.options),
+				ct);
+
+			if (!string.IsNullOrWhiteSpace(this.options.UserName))
+			{
+				await client.AuthenticateAsync(this.options.UserName, this.options.Password, ct);
+			}
+
+			_ = await client.SendAsync(mimeMessage, ct);
+			await client.DisconnectAsync(true, ct);
+
+			return InviteSendResult.Success();
+		}
+		catch (CommandException ex)
+		{
+			logger.LogWarning(
+				ex,
+				"Invite email sending failed for invite {InviteId}.",
+				message.InviteId);
+
+			return InviteSendResult.Failure(
+				"invite_email_delivery_failed",
+				"Invite email could not be delivered.");
+		}
+		catch (ProtocolException ex)
+		{
+			logger.LogWarning(
+				ex,
+				"Invite email sending failed for invite {InviteId}.",
+				message.InviteId);
+
+			return InviteSendResult.Failure(
+				"invite_email_delivery_failed",
+				"Invite email could not be delivered.");
+		}
+		catch (InvalidOperationException ex)
+		{
+			logger.LogWarning(
+				ex,
+				"Invite email sending failed for invite {InviteId}.",
+				message.InviteId);
+
+			return InviteSendResult.Failure(
+				"invite_email_delivery_failed",
+				"Invite email could not be delivered.");
+		}
+	}
+
+	private static string BuildSubject(string? subjectPrefix)
+	{
+		string prefix = string.IsNullOrWhiteSpace(subjectPrefix)
+			? string.Empty
+			: $"{subjectPrefix.Trim()} ";
+
+		return $"{prefix}You have been invited";
+	}
+
+	private static string BuildHtmlBody(SendInviteByChannelMessage message)
+	{
+		string encodedAlias = HtmlEncoder.Default.Encode(message.Alias ?? "there");
+		string encodedUrl = HtmlEncoder.Default.Encode(message.InviteUrl);
+		string encodedExpiresAt = HtmlEncoder.Default.Encode(message.ExpiresAtUtc.ToString("u"));
+
+		return $"""
+                <html>
+                <body>
+                	<p>Hello {encodedAlias},</p>
+                	<p>You have been invited to join a tenant in Portiforce SAA.</p>
+                	<p>This invitation expires at {encodedExpiresAt}.</p>
+                	<p>Use the link below to review and accept the invitation:</p>
+                	<p><a href="{encodedUrl}">{encodedUrl}</a></p>
+                	<p>If you did not expect this invitation, you can safely ignore this message.</p>
+                </body>
+                </html>
+                """;
+	}
+
+	private static string BuildTextBody(SendInviteByChannelMessage message) =>
+		$"""
+         Hello {message.Alias ?? "there"},
+
+         You have been invited to join a tenant in Portiforce SAA.
+
+         This invitation expires at {message.ExpiresAtUtc:u}.
+
+         Open this link to review and accept the invitation:
+         {message.InviteUrl}
+
+         If you did not expect this invitation, you can safely ignore this message.
+         """;
+
+	private static MimeMessage CreateMessage(
+		InviteEmailOptions options,
+		string recipientEmail,
+		string subject,
+		string htmlBody,
+		string textBody)
+	{
+		MimeMessage message = new();
+
+		message.From.Add(new MailboxAddress(options.FromDisplayName, options.FromEmail));
+		message.To.Add(MailboxAddress.Parse(recipientEmail));
+		message.Subject = subject;
+
+		BodyBuilder bodyBuilder = new() { TextBody = textBody, HtmlBody = htmlBody };
+
+		message.Body = bodyBuilder.ToMessageBody();
+
+		return message;
+	}
+
+	private static SecureSocketOptions GetSecureSocketOptions(InviteEmailOptions options)
+	{
+		if (!options.EnableSsl)
+		{
+			return SecureSocketOptions.None;
+		}
+
+		return options.Port switch
+		{
+			465 => SecureSocketOptions.SslOnConnect,
+			_ => SecureSocketOptions.StartTls
+		};
+	}
+}

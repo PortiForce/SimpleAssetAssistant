@@ -132,6 +132,9 @@
   <data name="ButtonClear" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="ButtonConfirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
   <data name="ButtonDetails" xml:space="preserve">
     <value>Details</value>
   </data>

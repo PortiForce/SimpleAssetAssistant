@@ -8,6 +8,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
+using Portiforce.SAA.Application.Interfaces.Persistence.BackgroundTasks.Outbox;
 using Portiforce.SAA.Application.Interfaces.Persistence.Client;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
 using Portiforce.SAA.Application.Interfaces.Persistence.Platform;
@@ -21,6 +22,7 @@ using Portiforce.SAA.Infrastructure.EF.Repositories;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Activity;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Asset;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
+using Portiforce.SAA.Infrastructure.EF.Repositories.BackgroundTasks.Outbox;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Client;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Platform;
@@ -103,6 +105,9 @@ public static class DependencyInjection
 
 		services.AddScoped<IAccountIdentifierReadRepository, AccountIdentifierReadRepository>();
 		services.AddScoped<IAccountIdentifierWriteRepository, AccountIdentifierWriteRepository>();
+
+		services.AddScoped<IOutboxMessageReadRepository, OutboxMessageReadRepository>();
+		services.AddScoped<IOutboxMessageWriteRepository, OutboxMessageWriteRepository>();
 
 		return services;
 	}

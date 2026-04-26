@@ -72,9 +72,18 @@ namespace Portiforce.SAA.Web.Client.Resources.Pages.Tenant.Admin.InviteFlow {
         /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to revoke this invite?.
         /// </summary>
-        internal static string ConfirmRevokeInvite {
+        internal static string ConfirmRevokeInviteDescription {
             get {
-                return ResourceManager.GetString("ConfirmRevokeInvite", resourceCulture);
+                return ResourceManager.GetString("ConfirmRevokeInviteDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revoke invitation?.
+        /// </summary>
+        internal static string ConfirmRevokeInviteTitle {
+            get {
+                return ResourceManager.GetString("ConfirmRevokeInviteTitle", resourceCulture);
             }
         }
         

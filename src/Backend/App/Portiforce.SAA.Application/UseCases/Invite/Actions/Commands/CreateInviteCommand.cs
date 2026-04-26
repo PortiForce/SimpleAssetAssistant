@@ -8,7 +8,7 @@ using Portiforce.SAA.Core.Primitives.Ids;
 namespace Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 
 /// <summary>
-///     Represents a command to create an invite for a specified target within a tenant, assigning an intended role and
+///     Represents a command to create an invitation for a specified target within a tenant, assigning an intended role and
 ///     account tier.
 /// </summary>
 /// <param name="TenantId">The identifier of the tenant in which the invite is being created.</param>

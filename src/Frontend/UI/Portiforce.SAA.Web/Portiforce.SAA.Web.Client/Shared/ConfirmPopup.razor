@@ -1,0 +1,128 @@
+@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizer<SharedActionResources> SharedActionL
+
+@if (isOpen)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="@titleElementId"
+         aria-describedby="@descriptionElementId">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="@titleElementId" class="modal-title">@DisplayTitle</h5>
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="@CancelButtonLabel"
+                            @onclick="CancelAsync">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p id="@descriptionElementId" class="mb-0 confirm-popup-description">@DisplayDescription</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="CancelAsync">
+                        @CancelButtonLabel
+                    </button>
+                    <button type="button"
+                            class="btn @ConfirmButtonClass"
+                            @onclick="ConfirmAsync">
+                        @ConfirmButtonLabel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+<style>
+    .confirm-popup-description {
+        white-space: pre-line;
+    }
+</style>
+
+@code {
+    private readonly string titleElementId = $"confirm-popup-title-{Guid.NewGuid():N}";
+    private readonly string descriptionElementId = $"confirm-popup-description-{Guid.NewGuid():N}";
+
+    private TaskCompletionSource<bool>? pendingConfirmation;
+    private bool isOpen;
+    private string? activeTitle;
+    private string? activeDescription;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? ConfirmButtonText { get; set; }
+
+    [Parameter]
+    public string? CancelButtonText { get; set; }
+
+    [Parameter]
+    public string ConfirmButtonClass { get; set; } = "btn-primary";
+
+    public async Task<bool> ShowAsync(
+        string? title = null,
+        string? description = null)
+    {
+        if (pendingConfirmation is not null)
+        {
+            pendingConfirmation.TrySetResult(false);
+        }
+
+        activeTitle = title;
+        activeDescription = description;
+        pendingConfirmation = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        isOpen = true;
+        await InvokeAsync(StateHasChanged);
+
+        return await pendingConfirmation.Task;
+    }
+
+    private string DisplayTitle => activeTitle ?? Title;
+
+    private string DisplayDescription => activeDescription ?? Description;
+
+    private string ConfirmButtonLabel =>
+        string.IsNullOrWhiteSpace(ConfirmButtonText)
+            ? SharedActionL["ButtonConfirm"].Value
+            : ConfirmButtonText;
+
+    private string CancelButtonLabel =>
+        string.IsNullOrWhiteSpace(CancelButtonText)
+            ? SharedActionL["ButtonCancel"].Value
+            : CancelButtonText;
+
+    private Task ConfirmAsync()
+    {
+        Complete(true);
+        return Task.CompletedTask;
+    }
+
+    private Task CancelAsync()
+    {
+        Complete(false);
+        return Task.CompletedTask;
+    }
+
+    private void Complete(bool result)
+    {
+        isOpen = false;
+        activeTitle = null;
+        activeDescription = null;
+        pendingConfirmation?.TrySetResult(result);
+        pendingConfirmation = null;
+    }
+}

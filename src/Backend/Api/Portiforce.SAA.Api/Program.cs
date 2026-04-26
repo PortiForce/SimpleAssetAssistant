@@ -15,7 +15,6 @@ using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.EF.DataPopulation;
 using Portiforce.SAA.Infrastructure.Services.Security;
 using Portiforce.SAA.Infrastructure.Services.Time;
-
 using Scalar.AspNetCore;
 
 namespace Portiforce.SAA.Api;
@@ -58,16 +57,16 @@ public class Program
 			.Bind(builder.Configuration.GetSection("JwtSettings"))
 			.Validate(
 				s =>
-					!string.IsNullOrWhiteSpace(s.Issuer) &&
-					!string.IsNullOrWhiteSpace(s.Audience) &&
-					!string.IsNullOrWhiteSpace(s.Secret) &&
+					IsConfiguredValue(s.Issuer) &&
+					IsConfiguredValue(s.Audience) &&
+					IsConfiguredValue(s.Secret) &&
 					s.Secret.Length >= 32,
 				"JwtSettings are invalid. Issuer/Audience/Secret are required; Secret should be >= 32 chars.")
 			.ValidateOnStart();
 
 		_ = builder.Services.AddOptions<TokenHashingOptions>()
 			.BindConfiguration("TokenHashingOptions")
-			.Validate(o => !string.IsNullOrWhiteSpace(o.Pepper), "TokenHashing:Pepper is required")
+			.Validate(o => IsConfiguredValue(o.Pepper), "TokenHashingOptions:Pepper must be configured.")
 			.ValidateOnStart();
 
 		_ = builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
@@ -121,4 +120,8 @@ public class Program
 
 	private static void RegisterServices(WebApplicationBuilder builder) =>
 		_ = builder.Services.AddScoped<ITenantIdServiceResolver, TenantIdServiceResolver>();
+
+	private static bool IsConfiguredValue(string? value) =>
+		!string.IsNullOrWhiteSpace(value) &&
+		!value.Contains("{from-configs}", StringComparison.OrdinalIgnoreCase);
 }

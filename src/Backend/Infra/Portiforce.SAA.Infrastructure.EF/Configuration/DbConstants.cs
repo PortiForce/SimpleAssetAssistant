@@ -48,6 +48,13 @@ internal static class DbConstants
 				public const string SessionTokenTableName = "SessionTokens";
 			}
 
+			public static class InfrastructureSchema
+			{
+				public const string SchemaName = "inf";
+
+				public const string OutboxMessageTableName = "OutboxMessages";
+			}
+
 			public static class DefaultSchema
 			{
 				public const string SchemaName = "pf";

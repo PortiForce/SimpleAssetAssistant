@@ -2,11 +2,14 @@ using Portiforce.SAA.Application.Exceptions;
 using Portiforce.SAA.Application.FlowResult;
 using Portiforce.SAA.Application.Interfaces.Common.Security;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
+using Portiforce.SAA.Application.Interfaces.Messaging;
 using Portiforce.SAA.Application.Interfaces.Models.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
+using Portiforce.SAA.Application.Interfaces.Services.Invite;
 using Portiforce.SAA.Application.Interfaces.Services.Tenant;
+using Portiforce.SAA.Application.Models.Invite;
 using Portiforce.SAA.Application.Tech.Abstractions.Messaging;
 using Portiforce.SAA.Application.UseCases.Invite.Actions.Commands;
 using Portiforce.SAA.Application.UseCases.Invite.Projections.Details;
@@ -23,9 +26,10 @@ public sealed class CreateInviteCommandHandler(
 	IClock clock,
 	ITenantLimitsService tenantLimitsService,
 	IAccountIdentifierReadRepository accountIdentifierReadRepository,
-	IExternalIdentityReadRepository externalIdentityReadRepository,
 	IInviteReadRepository inviteReadRepository,
 	IInviteWriteRepository inviteWriteRepository,
+	IInviteNotificationOutboxWriter inviteNotificationOutboxWriter,
+	IInviteLinkBuilder inviteLinkBuilder,
 	IUnitOfWork unitOfWork)
 	: IRequestHandler<CreateInviteCommand, TypedResult<CreateInviteResult>>
 {
@@ -126,9 +130,43 @@ public sealed class CreateInviteCommandHandler(
 			now,
 			expiresAt);
 
+		string? inviteUrl = null;
+
+		if (request.InviteTarget.Channel == InviteChannel.Email)
+		{
+			TypedResult<string> buildInviteUrlResult =
+				await inviteLinkBuilder.BuildInviteOverviewUrlAsync(request.TenantId, rawInviteToken, ct);
+
+			if (!buildInviteUrlResult.IsSuccess || string.IsNullOrWhiteSpace(buildInviteUrlResult.Value))
+			{
+				return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict("unable to construct invite URL"));
+			}
+
+			inviteUrl = buildInviteUrlResult.Value;
+		}
+
 		try
 		{
 			await inviteWriteRepository.AddAsync(invite, ct);
+
+			if (request.InviteTarget.Channel == InviteChannel.Email &&
+				!string.IsNullOrWhiteSpace(inviteUrl))
+			{
+				SendInviteByChannelMessage sendInviteEmailMessage = SendInviteByChannelMessage.Create(
+					request.TenantId,
+					invite.Id,
+					request.InviteTarget.Channel,
+					request.InviteTarget.Value,
+					request.Alias,
+					inviteUrl,
+					expiresAt,
+					now);
+
+				await inviteNotificationOutboxWriter.AddInviteEmailAsync(
+					sendInviteEmailMessage,
+					ct);
+			}
+
 			_ = await unitOfWork.SaveChangesAsync(ct);
 		}
 		catch (UniqueConstraintViolationException)

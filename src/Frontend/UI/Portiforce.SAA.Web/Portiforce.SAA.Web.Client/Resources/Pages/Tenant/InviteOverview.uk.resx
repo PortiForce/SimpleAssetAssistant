@@ -225,4 +225,24 @@
   <data name="TitleInviteStatus" xml:space="preserve">
     <value>Статус запрошення</value>
   </data>
+  <data name="TitleConfirmDeclineInvite" xml:space="preserve">
+    <value>Відхилити запрошення?</value>
+  </data>
+  <data name="DescriptionConfirmDeclineInvite" xml:space="preserve">
+    <value>Якщо ви відхилите це запрошення, процес вашого підключення буде зупинено.
+
+Адміністратор отримає інформацію, що ви відхилили запрошення, і більше не зможе використати це запрошення повторно. Якщо ви передумаєте пізніше, вам може знадобитися звернутися до адміністратора.
+
+Ви впевнені, що хочете відхилити це запрошення?</value>
+  </data>
+  <data name="ConfirmDeclineInviteDescription" xml:space="preserve">
+    <value>Якщо ви відхилите це запрошення, процес вашого підключення буде зупинено.
+
+Адміністратор отримає інформацію, що ви відхилили запрошення, і більше не зможе використати це запрошення повторно. Якщо ви передумаєте пізніше, вам може знадобитися звернутися до адміністратора.
+
+Ви впевнені, що хочете відхилити це запрошення?</value>
+  </data>
+  <data name="ConfirmDeclineInviteTitle" xml:space="preserve">
+    <value>Відхилити запрошення?</value>
+  </data>
 </root>

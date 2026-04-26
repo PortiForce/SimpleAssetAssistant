@@ -19,10 +19,74 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("pf")
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Portiforce.SAA.Application.Models.Common.Messaging.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTimeOffset?>("NextAttemptAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ProcessedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PublishedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<byte>("State")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Outbox_IdempotencyKey");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Outbox_TenantId");
+
+                    b.HasIndex("State", "NextAttemptAtUtc", "Type")
+                        .HasDatabaseName("IX_Outbox_State_NextAttempt_Type");
+
+                    b.ToTable("OutboxMessages", "inf");
+                });
 
             modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", b =>
                 {
@@ -650,6 +714,12 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                                 .HasColumnType("tinyint")
                                 .HasColumnName("InviteTargetKind");
 
+                            b1.Property<string>("Locale")
+                                .IsRequired()
+                                .HasMaxLength(6)
+                                .HasColumnType("nvarchar(6)")
+                                .HasColumnName("InviteTargetLocale");
+
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(256)
@@ -860,6 +930,15 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
                         .HasColumnType("tinyint");
 
                     b.HasDiscriminator().HasValue((byte)7);
+                });
+
+            modelBuilder.Entity("Portiforce.SAA.Application.Models.Common.Messaging.OutboxMessage", b =>
+                {
+                    b.HasOne("Portiforce.SAA.Core.Identity.Models.Client.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Portiforce.SAA.Core.Activities.Models.Actions.AssetActivityBase", b =>

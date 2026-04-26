@@ -14,7 +14,8 @@ public sealed record InviteTarget
 	private InviteTarget(
 		string value,
 		InviteChannel channel,
-		InviteTargetKind kind)
+		InviteTargetKind kind,
+		string locale = "en-GB")
 	{
 		if (string.IsNullOrWhiteSpace(value))
 		{
@@ -26,6 +27,7 @@ public sealed record InviteTarget
 		this.Channel = channel;
 		this.Kind = kind;
 		this.Value = Normalize(kind, value);
+		this.Locale = locale;
 	}
 
 	public string Value { get; init; }
@@ -35,6 +37,8 @@ public sealed record InviteTarget
 	public InviteChannel Channel { get; init; }
 
 	public InviteTargetKind Kind { get; init; }
+
+	public string Locale { get; init; } = "en-GB";
 
 	public static InviteTarget Email(string email) =>
 		new(email, InviteChannel.Email, InviteTargetKind.Email);

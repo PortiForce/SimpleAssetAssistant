@@ -1,7 +1,8 @@
-﻿namespace Portiforce.SAA.Application.Enums;
+namespace Portiforce.SAA.Application.Enums;
 
 public enum RestrictionAction : byte
 {
-	Ban, 
+	Ban,
+
 	Allow
 }

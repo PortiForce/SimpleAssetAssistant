@@ -14,6 +14,41 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 20s
+
+  smtp:
+    image: rnwood/smtp4dev:latest
+    container_name: portiforce-smtp
+    ports:
+      - "2525:25"
+      - "5000:80"
+
+  notifications-worker:
+    container_name: portiforce-notifications-worker
+    build:
+      context: ../..
+      dockerfile: Backend/Workers/Portiforce.SAA.Notifications.Worker.Host/Dockerfile
+    depends_on:
+      sql:
+        condition: service_healthy
+      smtp:
+        condition: service_started
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      ConnectionStrings__AssetAssistantSQLDb: "Server=${SQL_SERVER};Database=${SQL_DATABASE};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;"
+      InviteNotificationWorker__BatchSize: "${INVITE_NOTIFICATION_BATCH_SIZE}"
+      InviteNotificationWorker__MaxAttempts: "${INVITE_NOTIFICATION_MAX_ATTEMPTS}"
+      InviteNotificationWorker__PollInterval: "${INVITE_NOTIFICATION_POLL_INTERVAL}"
+      InviteNotificationWorker__RunImmediately: "${INVITE_NOTIFICATION_RUN_IMMEDIATELY}"
+      InviteEmailOptions__FromDisplayName: "${INVITE_EMAIL_FROM_DISPLAY_NAME}"
+      InviteEmailOptions__Host: "smtp"
+      InviteEmailOptions__Port: "25"
+      InviteEmailOptions__EnableSsl: "false"
+      InviteEmailOptions__FromEmail: "${INVITE_EMAIL_FROM_EMAIL}"
+      InviteEmailOptions__UserName: "${INVITE_EMAIL_USERNAME}"
+      InviteEmailOptions__Password: "${INVITE_EMAIL_PASSWORD}"
+      InviteEmailOptions__SubjectPrefix: "${INVITE_EMAIL_SUBJECT_PREFIX}"
+    restart: unless-stopped
 
 volumes:
   portiforce-sql-data:
