@@ -168,4 +168,10 @@
   <data name="LabelAlias" xml:space="preserve">
     <value>Alias</value>
   </data>
+  <data name="ConfirmRevokeInviteTitle" xml:space="preserve">
+    <value>Revoke invitation?</value>
+  </data>
+  <data name="ConfirmRevokeInviteDescription" xml:space="preserve">
+    <value>Are you sure you want to revoke this invite?</value>
+  </data>
 </root>

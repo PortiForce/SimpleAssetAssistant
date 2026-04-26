@@ -6,12 +6,12 @@
 @using Portiforce.SAA.Contracts.UiSetup
 @using Portiforce.SAA.Web.Client.Extensions
 @using Portiforce.SAA.Web.Client.Services.Interfaces
+@using Portiforce.SAA.Web.Client.Shared
 
 @attribute [Authorize(Policy = UiPolicies.TenantAdmin)]
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 @inject IAdminApiClient AdminApiClient
-@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<InviteDetails> L
 @inject IStringLocalizer<SharedActionResources> SharedActionL
 @inject IStringLocalizer<SharedEnumResources> SharedEnumL
@@ -122,10 +122,17 @@ else
     </div>
 }
 
+<ConfirmPopup @ref="revokeInviteConfirm"
+              Title="@L["TitleConfirmRevokeInvite"].Value"
+              Description="@L["DescriptionConfirmRevokeInvite"].Value"
+              ConfirmButtonText="@SharedActionL["ActionRevoke"].Value"
+              ConfirmButtonClass="btn-danger" />
+
 @code {
     [Parameter]
     public Guid InviteId { get; set; }
 
+    private ConfirmPopup? revokeInviteConfirm;
     private AdminInviteDetailsResponse? invite;
     private bool isLoading = true;
     private bool isRevoking;
@@ -164,11 +171,7 @@ else
             return;
         }
 
-        bool confirmed = await JSRuntime.InvokeAsync<bool>(
-            "confirm",
-            L["ConfirmMessage_RevokeInvite"].Value);
-
-        if (!confirmed)
+        if (revokeInviteConfirm is null || !await revokeInviteConfirm.ShowAsync(L["ConfirmRevokeInviteTitle"], L["ConfirmRevokeInviteDescription"]))
         {
             return;
         }

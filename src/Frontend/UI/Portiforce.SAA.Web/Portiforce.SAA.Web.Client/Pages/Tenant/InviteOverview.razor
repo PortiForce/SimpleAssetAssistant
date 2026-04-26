@@ -5,10 +5,10 @@
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Web.Client.Extensions
 @using Portiforce.SAA.Web.Client.Services.Interfaces
+@using Portiforce.SAA.Web.Client.Shared
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
-@inject IJSRuntime JSRuntime
 @inject IManageInviteApiClient ManageInviteApiClient
 @inject NavigationManager Navigation
 @inject IStringLocalizer<InviteOverview> L
@@ -125,10 +125,17 @@
     }
 </div>
 
+<ConfirmPopup @ref="declineInviteConfirm"
+              Title="@L["TitleConfirmDeclineInvite"].Value"
+              Description="@L["DescriptionConfirmDeclineInvite"].Value"
+              ConfirmButtonText="@L["ActionInviteDecline"].Value"
+              ConfirmButtonClass="btn-danger" />
+
 @code {
     [Parameter]
     public string InviteToken { get; set; } = string.Empty;
 
+    private ConfirmPopup? declineInviteConfirm;
     private OverviewInviteDetailsResponse? invite;
     private bool isLoading = true;
     private bool isAccepting;
@@ -202,8 +209,7 @@
             return;
         }
 
-        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_DeclineInvite"].Value);
-        if (!confirm)
+        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync(L["ConfirmDeclineInviteTitle"], L["ConfirmDeclineInviteDescription"]))
         {
             return;
         }

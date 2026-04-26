@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -162,7 +162,10 @@
   <data name="MessageErrorLoadInvites" xml:space="preserve">
     <value>Could not load invites: {0}</value>
   </data>
-  <data name="ConfirmRevokeInvite" xml:space="preserve">
+  <data name="ConfirmRevokeInviteTitle" xml:space="preserve">
+    <value>Revoke invitation?</value>
+  </data>
+  <data name="ConfirmRevokeInviteDescription" xml:space="preserve">
     <value>Are you sure you want to revoke this invite?</value>
   </data>
   <data name="MessageErrorRevokeInvite" xml:space="preserve">

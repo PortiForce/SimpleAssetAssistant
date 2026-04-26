@@ -15,7 +15,6 @@
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 @inject IAdminApiClient ApiClient
-@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<Invites> L
 @inject IStringLocalizer<SharedActionResources> SharedActionL
@@ -146,11 +145,18 @@
     }
 </div>
 
+<ConfirmPopup @ref="revokeInviteConfirm"
+              Title="@L["TitleConfirmRevokeInvite"].Value"
+              Description="@L["DescriptionConfirmRevokeInvite"].Value"
+              ConfirmButtonText="@SharedActionL["ActionRevoke"].Value"
+              ConfirmButtonClass="btn-danger" />
+
 @code {
     private const int DefaultPageSize = 10;
 
     private readonly PaginationState paginationState = new() { ItemsPerPage = DefaultPageSize };
 
+    private ConfirmPopup? revokeInviteConfirm;
     private QuickGrid<InviteListItemResponse>? grid;
     private GridItemsProvider<InviteListItemResponse> invitesProvider = default!;
 
@@ -275,8 +281,7 @@
 
     private async Task RevokeInviteAsync(Guid inviteId)
     {
-        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_RevokeInvite"].Value);
-        if (!confirm)
+        if (revokeInviteConfirm is null || !await revokeInviteConfirm.ShowAsync(L["ConfirmRevokeInviteTitle"], L["ConfirmRevokeInviteDescription"]))
         {
             return;
         }

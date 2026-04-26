@@ -132,6 +132,9 @@
   <data name="ButtonClear" xml:space="preserve">
     <value>Очистити</value>
   </data>
+  <data name="ButtonConfirm" xml:space="preserve">
+    <value>Підтвердити</value>
+  </data>
   <data name="ButtonDetails" xml:space="preserve">
     <value>Деталі</value>
   </data>
