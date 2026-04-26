@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Terms of Use</value>
+  </data>
+  <data name="Heading" xml:space="preserve">
+    <value>Terms of Use</value>
+  </data>
+  <data name="ResponsibleUse" xml:space="preserve">
+    <value>By using PortiForce Simple Asset Assistant, you agree to use the application responsibly and only for lawful purposes. You are responsible for the information you enter, import, manage, or share through the system.</value>
+  </data>
+  <data name="NoWarranty" xml:space="preserve">
+    <value>PortiForce is provided as-is, without warranties of any kind. The project maintainers do not guarantee that the application will be uninterrupted, error-free, secure, or suitable for a specific business, financial, legal, or operational purpose.</value>
+  </data>
+  <data name="VerifyData" xml:space="preserve">
+    <value>You should independently verify any asset, activity, account, or reporting data before relying on it for decisions. PortiForce is not financial, tax, accounting, legal, or investment advice.</value>
+  </data>
+  <data name="DeploymentResponsibility" xml:space="preserve">
+    <value>If you deploy, operate, or modify the application, you are responsible for your own hosting, configuration, secrets, security controls, backups, and compliance obligations.</value>
+  </data>
+</root>

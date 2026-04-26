@@ -1,0 +1,21 @@
+@page "/terms"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Terms> L
+
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+<section class="content-page">
+    <h1>@L["Heading"]</h1>
+    <p>
+        @L["ResponsibleUse"]
+    </p>
+    <p>
+        @L["NoWarranty"]
+    </p>
+    <p>
+        @L["VerifyData"]
+    </p>
+    <p>
+        @L["DeploymentResponsibility"]
+    </p>
+</section>

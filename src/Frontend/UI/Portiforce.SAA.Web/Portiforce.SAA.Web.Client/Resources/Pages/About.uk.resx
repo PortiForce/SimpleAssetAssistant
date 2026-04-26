@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Про PortiForce</value>
+  </data>
+  <data name="Heading" xml:space="preserve">
+    <value>Про PortiForce</value>
+  </data>
+  <data name="Intro" xml:space="preserve">
+    <value>PortiForce Simple Asset Assistant — це застосунок з відкритим кодом для організації інформації про активи, активності облікових записів, доступу в межах орендаря та процесів онбордингу через запрошення.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Проєкт створений як практичний приклад і робочий інструмент для сценаріїв керування активами в багатокористувацькому середовищі. Він містить Blazor-клієнт, backend API, інфраструктуру збереження даних і фонову обробку сповіщень.</value>
+  </data>
+  <data name="SourcePrefix" xml:space="preserve">
+    <value>Вихідний код доступний на</value>
+  </data>
+  <data name="SourceLinkText" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+</root>

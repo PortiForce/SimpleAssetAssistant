@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @inject ITenantUrlContext TenantUrlContext
 
 @using Microsoft.Extensions.Localization
@@ -12,6 +12,7 @@
 {
     <div class="hero">
         <div class="hero-card">
+            <div class="tenant-brand">@TenantBrandName</div>
             <h1>@L["TitleProductName"]</h1>
             <p class="lead">
                 @L["SubtitleTenantResolvedLead"]
@@ -112,4 +113,8 @@ else
     private TenantInfo Tenant { get; set; } = new();
 
     private string baseDomain => Tenant.BaseDomain;
+
+    private string TenantBrandName => string.IsNullOrWhiteSpace(Tenant.BrandName)
+        ? Tenant.Prefix ?? L["TitleProductName"].Value
+        : Tenant.BrandName;
 }

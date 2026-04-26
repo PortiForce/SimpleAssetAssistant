@@ -1,0 +1,18 @@
+@page "/disclaimer"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Disclaimer> L
+
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+<section class="content-page">
+    <h1>@L["Heading"]</h1>
+    <p>
+        @L["ProvidedAsIs"]
+    </p>
+    <p>
+        @L["ReviewBeforeUse"]
+    </p>
+    <p>
+        @L["NoProfessionalAdvice"]
+    </p>
+</section>

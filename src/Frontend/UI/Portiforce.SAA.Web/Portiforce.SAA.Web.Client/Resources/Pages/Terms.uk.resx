@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Умови використання</value>
+  </data>
+  <data name="Heading" xml:space="preserve">
+    <value>Умови використання</value>
+  </data>
+  <data name="ResponsibleUse" xml:space="preserve">
+    <value>Використовуючи PortiForce Simple Asset Assistant, ви погоджуєтеся використовувати застосунок відповідально та лише для законних цілей. Ви відповідаєте за інформацію, яку вводите, імпортуєте, керуєте або поширюєте через систему.</value>
+  </data>
+  <data name="NoWarranty" xml:space="preserve">
+    <value>PortiForce надається "як є", без будь-яких гарантій. Супровідники проєкту не гарантують, що застосунок працюватиме безперервно, без помилок, безпечно або буде придатним для конкретної бізнесової, фінансової, юридичної чи операційної мети.</value>
+  </data>
+  <data name="VerifyData" xml:space="preserve">
+    <value>Перед тим як покладатися на будь-які дані про активи, активність, облікові записи чи звіти для ухвалення рішень, слід самостійно їх перевірити. PortiForce не є фінансовою, податковою, бухгалтерською, юридичною чи інвестиційною порадою.</value>
+  </data>
+  <data name="DeploymentResponsibility" xml:space="preserve">
+    <value>Якщо ви розгортаєте, експлуатуєте або змінюєте застосунок, ви самостійно відповідаєте за хостинг, конфігурацію, секрети, засоби безпеки, резервні копії та дотримання вимог.</value>
+  </data>
+</root>

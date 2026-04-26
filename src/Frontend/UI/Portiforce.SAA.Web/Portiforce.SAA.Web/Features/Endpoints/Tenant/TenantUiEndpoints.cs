@@ -20,6 +20,7 @@ public sealed class TenantUiEndpoints : IEndpoint
 			(ITenantContext tenant, IOptions<TenancyOptions> options) => Results.Ok(new TenantInfo
 			{
 				Prefix = tenant.Prefix,
+				BrandName = tenant.PublicName,
 				IsLanding = tenant.IsLanding,
 				BaseDomain = options.Value.BaseDomain
 			}));

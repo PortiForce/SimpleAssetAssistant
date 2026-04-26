@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrandSubtitle" xml:space="preserve">
+    <value>Простий помічник з активів</value>
+  </data>
+  <data name="HomeLinkTitle" xml:space="preserve">
+    <value>Перейти до портфеля</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Авторське право {0} PortiForce.</value>
+  </data>
+  <data name="GitHubLink" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="AboutLink" xml:space="preserve">
+    <value>Про проєкт</value>
+  </data>
+  <data name="TermsLink" xml:space="preserve">
+    <value>Умови</value>
+  </data>
+  <data name="DisclaimerLink" xml:space="preserve">
+    <value>Відмова від відповідальності</value>
+  </data>
+</root>

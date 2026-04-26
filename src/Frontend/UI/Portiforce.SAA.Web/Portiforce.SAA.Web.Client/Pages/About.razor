@@ -1,0 +1,21 @@
+@page "/about"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<About> L
+
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+<section class="content-page">
+    <h1>@L["Heading"]</h1>
+    <p>
+        @L["Intro"]
+    </p>
+    <p>
+        @L["Description"]
+    </p>
+    <p>
+        @L["SourcePrefix"]
+        <a href="https://github.com/PortiForce/SimpleAssetAssistant" target="_blank" rel="noopener noreferrer">
+            @L["SourceLinkText"]
+        </a>.
+    </p>
+</section>

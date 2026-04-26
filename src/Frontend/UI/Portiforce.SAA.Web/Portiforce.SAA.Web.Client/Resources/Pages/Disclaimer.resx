@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Disclaimer</value>
+  </data>
+  <data name="Heading" xml:space="preserve">
+    <value>Disclaimer</value>
+  </data>
+  <data name="ProvidedAsIs" xml:space="preserve">
+    <value>PortiForce Simple Asset Assistant is provided as-is and as-available. The authors and maintainers accept no responsibility for losses, damages, data issues, service interruptions, configuration mistakes, or other outcomes arising from use of the software.</value>
+  </data>
+  <data name="ReviewBeforeUse" xml:space="preserve">
+    <value>The application may contain bugs, incomplete features, security issues, or behavior that changes over time. You should review the source code, test your deployment, and apply appropriate safeguards before using it with real users or real data.</value>
+  </data>
+  <data name="NoProfessionalAdvice" xml:space="preserve">
+    <value>Nothing in this application should be treated as professional advice. You remain responsible for evaluating the accuracy, suitability, and security of the software for your own use case.</value>
+  </data>
+</root>
