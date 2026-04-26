@@ -49,6 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - Workers", "04 - Worker
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Notifications.Worker", "Backend\Workers\Portiforce.SAA.Notifications.Worker\Portiforce.SAA.Notifications.Worker.csproj", "{38C7F6B3-7968-47B6-8447-E19E1C10BE04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portiforce.SAA.Notifications.Worker.Host", "Backend\Workers\Portiforce.SAA.Notifications.Worker.Host\Portiforce.SAA.Notifications.Worker.Host.csproj", "{E0E6160F-50F5-4A06-8A55-0FEA45277FA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,10 @@ Global
 		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38C7F6B3-7968-47B6-8447-E19E1C10BE04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0E6160F-50F5-4A06-8A55-0FEA45277FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0E6160F-50F5-4A06-8A55-0FEA45277FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0E6160F-50F5-4A06-8A55-0FEA45277FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0E6160F-50F5-4A06-8A55-0FEA45277FA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,6 +137,7 @@ Global
 		{FB8B9CFF-20DF-4316-B730-85936B5C40DB} = {7FDBC9D2-42BB-4735-B164-B11711DA99EA}
 		{DE45D499-6804-4173-A915-F122EAC079A1} = {4A0B79B1-3E85-4236-8082-2AEFBAB949DE}
 		{38C7F6B3-7968-47B6-8447-E19E1C10BE04} = {DE45D499-6804-4173-A915-F122EAC079A1}
+		{E0E6160F-50F5-4A06-8A55-0FEA45277FA9} = {DE45D499-6804-4173-A915-F122EAC079A1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63DFB998-4B5B-4C78-8C33-5110B6262F0F}

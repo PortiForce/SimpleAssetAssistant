@@ -87,5 +87,5 @@ CodeCoverage/
 [Bb]uild[Ll]og.*
 
 *.txt
-src/_Infra/.env
+src/Backend/_Infra/.env
 /src/Frontend/UI/Portiforce.SAA.Web/Portiforce.SAA.Web/Certs

@@ -12,7 +12,6 @@ using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.Services.Time;
-using Portiforce.SAA.Notifications.Worker;
 using Portiforce.SAA.Web.Client.Services;
 using Portiforce.SAA.Web.Client.Services.ApiClients;
 using Portiforce.SAA.Web.Client.Services.Interfaces;
@@ -185,7 +184,6 @@ public class Program
 		_ = builder.Services.AddCoreIdentity();
 		_ = builder.Services.AddInfrastructure(builder.Configuration);
 		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
-		_ = builder.Services.AddNotificationsInfrastructure(builder.Configuration);
 
 		_ = builder.Services.AddSingleton<IClock, SystemClock>();
 

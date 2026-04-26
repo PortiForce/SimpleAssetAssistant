@@ -18,7 +18,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h3 class="mb-0">@L["PageTitle"]</h3>
-            <div>@L["PageTitleDescription"]</div>
+            @if (invite is { State: InviteStatus.Pending })
+            {
+                <div>@L["PageTitleDescription"]</div>
+            }
         </div>
     </div>
 
@@ -61,24 +64,26 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="h5 mb-1">@invite.InviteTargetValue</div>
-                        <div class="text-muted">
-                            <div>
-                                <span>@L["LabelChannel"]:</span>
-                                @invite.InviteChannel.ToDisplayName(SharedEnumL)
-                            </div>
-                            <div>
-                                <span>@L["LabelRole"]:</span>
-                                @invite.InviteRole.ToDisplayName(SharedEnumL)
-                            </div>
-                            <div>
-                                <span>@L["LabelTier"]:</span>
-                                @invite.InviteTier.ToDisplayName(SharedEnumL)
+                    @if (invite.State == InviteStatus.Pending)
+                    {
+                        <div>
+                            <div class="h5 mb-1">@invite.InviteTargetValue</div>
+                            <div class="text-muted">
+                                <div>
+                                    <span>@L["LabelChannel"]:</span>
+                                    @invite.InviteChannel.ToDisplayName(SharedEnumL)
+                                </div>
+                                <div>
+                                    <span>@L["LabelRole"]:</span>
+                                    @invite.InviteRole.ToDisplayName(SharedEnumL)
+                                </div>
+                                <div>
+                                    <span>@L["LabelTier"]:</span>
+                                    @invite.InviteTier.ToDisplayName(SharedEnumL)
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    }
                     <span class="badge @invite.State.ToCssBadgeClass()">
                         @invite.State.ToDisplayName(SharedEnumL)
                     </span>
@@ -86,10 +91,12 @@
 
                 <hr />
                 <dl class="row mb-0">
-                    <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
-                    <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
-                    
-                    @if (invite.State == InviteStatus.Accepted)
+                    @if (invite.State == InviteStatus.Pending)
+                    {
+                        <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
+                        <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
+                    }
+                    else if (invite.State == InviteStatus.Accepted)
                     {
                         <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
                         <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
