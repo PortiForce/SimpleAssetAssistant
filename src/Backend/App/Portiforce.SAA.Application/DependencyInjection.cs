@@ -22,62 +22,62 @@ namespace Portiforce.SAA.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
-    {
-        Assembly asm = typeof(DependencyInjection).Assembly;
+	public static IServiceCollection AddApplication(this IServiceCollection services)
+	{
+		Assembly asm = typeof(DependencyInjection).Assembly;
 
-        // 1. Register Handlers (Commands, Queries, Notifications)
-        RegisterHandlers(services, asm);
+		// 1. Register Handlers (Commands, Queries, Notifications)
+		RegisterHandlers(services, asm);
 
-        // 2. Register Mediator & Publisher
-        // Register the concrete class first as Scoped
-        _ = services.AddScoped<Mediator>();
+		// 2. Register Mediator & Publisher
+		// Register the concrete class first as Scoped
+		_ = services.AddScoped<Mediator>();
 
-        // Forward interfaces to the concrete instance
-        // This ensures IMediator and IPublisher are the SAME instance per request
-        _ = services.AddScoped<IMediator>(sp => sp.GetRequiredService<Mediator>());
-        _ = services.AddScoped<IPublisher>(sp => sp.GetRequiredService<Mediator>());
+		// Forward interfaces to the concrete instance
+		// This ensures IMediator and IPublisher are the SAME instance per request
+		_ = services.AddScoped<IMediator>(sp => sp.GetRequiredService<Mediator>());
+		_ = services.AddScoped<IPublisher>(sp => sp.GetRequiredService<Mediator>());
 
-        // 3. Remaining services registration
-        // Core tech
-        _ = services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
+		// 3. Remaining services registration
+		// Core tech
+		_ = services.AddSingleton<ITenantEntitlementsResolver, DefaultTenantEntitlementsResolver>();
 
-        // UseCases: guards/services
-        _ = services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuard>();
-        _ = services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
-        _ = services.AddScoped<IAssetLookupService, AssetLookupService>();
-        _ = services.AddScoped<ITenantLimitsService, TenantLimitsService>();
-        _ = services.AddScoped<ILoginValidationService, LoginValidationService>();
-        _ = services.AddScoped<IInviteNotificationOutboxWriter, InviteNotificationOutboxWriter>();
+		// UseCases: guards/services
+		_ = services.AddScoped<IActivityIdempotencyGuard, ActivityIdempotencyGuard>();
+		_ = services.AddScoped<IActivityPersistenceService, ActivityPersistenceService>();
+		_ = services.AddScoped<IAssetLookupService, AssetLookupService>();
+		_ = services.AddScoped<ITenantLimitsService, TenantLimitsService>();
+		_ = services.AddScoped<ILoginValidationService, LoginValidationService>();
+		_ = services.AddScoped<IInviteNotificationOutboxWriter, InviteNotificationOutboxWriter>();
 
-        _ = services.AddScoped<IAuthService, AuthService>();
+		_ = services.AddScoped<IAuthService, AuthService>();
 
-        return services;
-    }
+		return services;
+	}
 
-    private static void RegisterHandlers(IServiceCollection services, Assembly asm)
-    {
-        // Filter for non-abstract, non-interface classes
-        IEnumerable<TypeInfo> types = asm.DefinedTypes
-            .Where(t => t is { IsAbstract: false, IsInterface: false });
+	private static void RegisterHandlers(IServiceCollection services, Assembly asm)
+	{
+		// Filter for non-abstract, non-interface classes
+		IEnumerable<TypeInfo> types = asm.DefinedTypes
+			.Where(t => t is { IsAbstract: false, IsInterface: false });
 
-        foreach (TypeInfo type in types)
-        {
-            foreach (Type itf in type.ImplementedInterfaces)
-            {
-                if (!itf.IsGenericType)
-                {
-                    continue;
-                }
+		foreach (TypeInfo type in types)
+		{
+			foreach (Type itf in type.ImplementedInterfaces)
+			{
+				if (!itf.IsGenericType)
+				{
+					continue;
+				}
 
-                Type def = itf.GetGenericTypeDefinition();
+				Type def = itf.GetGenericTypeDefinition();
 
-                // Register Command/Query Handlers and Notification Handlers
-                if (def == typeof(IRequestHandler<,>) || def == typeof(INotificationHandler<>))
-                {
-                    _ = services.AddScoped(itf, type);
-                }
-            }
-        }
-    }
+				// Register Command/Query Handlers and Notification Handlers
+				if (def == typeof(IRequestHandler<,>) || def == typeof(INotificationHandler<>))
+				{
+					_ = services.AddScoped(itf, type);
+				}
+			}
+		}
+	}
 }
