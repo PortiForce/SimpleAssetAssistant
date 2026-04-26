@@ -5,6 +5,6 @@ namespace Portiforce.SAA.Application.Interfaces.Notification;
 public interface IInviteNotificationOutboxWriter
 {
 	ValueTask AddInviteEmailAsync(
-		SendInviteEmailMessage message,
+		SendInviteByChannelMessage message,
 		CancellationToken ct);
 }

@@ -12,7 +12,6 @@ using MimeKit;
 using Portiforce.SAA.Application.Interfaces.Services.Invite;
 using Portiforce.SAA.Application.Models.Invite;
 using Portiforce.SAA.Core.Identity.Enums;
-using Portiforce.SAA.Core.Identity.Models.Invite;
 using Portiforce.SAA.Infrastructure.Invite;
 
 using EmailAddress = Portiforce.SAA.Core.Primitives.Email;
@@ -28,19 +27,23 @@ public sealed class EmailInviteChannelSender(
 	public InviteChannel Channel => InviteChannel.Email;
 
 	public async Task<InviteSendResult> SendAsync(
-		TenantInvite invite,
-		string inviteLink,
+		SendInviteByChannelMessage message,
 		CancellationToken ct)
 	{
-		ArgumentNullException.ThrowIfNull(invite);
-		ArgumentException.ThrowIfNullOrWhiteSpace(inviteLink);
+		ArgumentNullException.ThrowIfNull(message);
 
-		if (invite.InviteTarget.Channel != InviteChannel.Email ||
-			invite.InviteTarget.Kind != InviteTargetKind.Email)
+		if (message.TenantId.IsEmpty || message.InviteId == Guid.Empty)
 		{
 			return InviteSendResult.Failure(
-				"invite_channel_not_supported",
-				"Invite channel is not supported by this sender.");
+				"invite_message_invalid",
+				"Invite message is invalid.");
+		}
+
+		if (string.IsNullOrWhiteSpace(message.InviteUrl))
+		{
+			return InviteSendResult.Failure(
+				"invite_link_missing",
+				"Invite link is missing.");
 		}
 
 		if (!this.options.IsValid())
@@ -54,7 +57,7 @@ public sealed class EmailInviteChannelSender(
 		EmailAddress recipientEmail;
 		try
 		{
-			recipientEmail = EmailAddress.Create(invite.InviteTarget.Value);
+			recipientEmail = EmailAddress.Create(message.Recipient);
 		}
 		catch (ArgumentException)
 		{
@@ -64,12 +67,12 @@ public sealed class EmailInviteChannelSender(
 		}
 
 		string subject = BuildSubject(this.options.SubjectPrefix);
-		string htmlBody = BuildHtmlBody(invite, inviteLink);
-		string textBody = BuildTextBody(invite, inviteLink);
+		string htmlBody = BuildHtmlBody(message);
+		string textBody = BuildTextBody(message);
 
 		try
 		{
-			using MimeMessage message = CreateMessage(
+			using MimeMessage mimeMessage = CreateMessage(
 				this.options,
 				recipientEmail.Value,
 				subject,
@@ -95,7 +98,7 @@ public sealed class EmailInviteChannelSender(
 				await client.AuthenticateAsync(this.options.UserName, this.options.Password, ct);
 			}
 
-			_ = await client.SendAsync(message, ct);
+			_ = await client.SendAsync(mimeMessage, ct);
 			await client.DisconnectAsync(true, ct);
 
 			return InviteSendResult.Success();
@@ -105,7 +108,7 @@ public sealed class EmailInviteChannelSender(
 			logger.LogWarning(
 				ex,
 				"Invite email sending failed for invite {InviteId}.",
-				invite.Id);
+				message.InviteId);
 
 			return InviteSendResult.Failure(
 				"invite_email_delivery_failed",
@@ -116,7 +119,7 @@ public sealed class EmailInviteChannelSender(
 			logger.LogWarning(
 				ex,
 				"Invite email sending failed for invite {InviteId}.",
-				invite.Id);
+				message.InviteId);
 
 			return InviteSendResult.Failure(
 				"invite_email_delivery_failed",
@@ -127,7 +130,7 @@ public sealed class EmailInviteChannelSender(
 			logger.LogWarning(
 				ex,
 				"Invite email sending failed for invite {InviteId}.",
-				invite.Id);
+				message.InviteId);
 
 			return InviteSendResult.Failure(
 				"invite_email_delivery_failed",
@@ -144,20 +147,18 @@ public sealed class EmailInviteChannelSender(
 		return $"{prefix}You have been invited";
 	}
 
-	private static string BuildHtmlBody(TenantInvite invite, string inviteUrl)
+	private static string BuildHtmlBody(SendInviteByChannelMessage message)
 	{
-		string encodedAlias = HtmlEncoder.Default.Encode(invite.Alias);
-		string encodedUrl = HtmlEncoder.Default.Encode(inviteUrl);
-		string encodedRole = HtmlEncoder.Default.Encode(invite.IntendedRole.ToString());
-		string encodedTier = HtmlEncoder.Default.Encode(invite.IntendedTier.ToString());
+		string encodedAlias = HtmlEncoder.Default.Encode(message.Alias ?? "there");
+		string encodedUrl = HtmlEncoder.Default.Encode(message.InviteUrl);
+		string encodedExpiresAt = HtmlEncoder.Default.Encode(message.ExpiresAtUtc.ToString("u"));
 
 		return $"""
                 <html>
                 <body>
                 	<p>Hello {encodedAlias},</p>
                 	<p>You have been invited to join a tenant in Portiforce SAA.</p>
-                	<p><strong>Role:</strong> {encodedRole}<br />
-                	<strong>Tier:</strong> {encodedTier}</p>
+                	<p>This invitation expires at {encodedExpiresAt}.</p>
                 	<p>Use the link below to review and accept the invitation:</p>
                 	<p><a href="{encodedUrl}">{encodedUrl}</a></p>
                 	<p>If you did not expect this invitation, you can safely ignore this message.</p>
@@ -166,17 +167,16 @@ public sealed class EmailInviteChannelSender(
                 """;
 	}
 
-	private static string BuildTextBody(TenantInvite invite, string inviteUrl) =>
+	private static string BuildTextBody(SendInviteByChannelMessage message) =>
 		$"""
-         Hello {invite.Alias},
+         Hello {message.Alias ?? "there"},
 
          You have been invited to join a tenant in Portiforce SAA.
 
-         Role: {invite.IntendedRole}
-         Tier: {invite.IntendedTier}
+         This invitation expires at {message.ExpiresAtUtc:u}.
 
          Open this link to review and accept the invitation:
-         {inviteUrl}
+         {message.InviteUrl}
 
          If you did not expect this invitation, you can safely ignore this message.
          """;

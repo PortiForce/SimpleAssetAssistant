@@ -138,9 +138,10 @@ public sealed class CreateInviteCommandHandler(
 			return TypedResult<CreateInviteResult>.Fail(ResultError.Conflict("unable to construct invite URL"));
 		}
 
-		SendInviteEmailMessage sendInviteEmailMessage = SendInviteEmailMessage.Create(
+		SendInviteByChannelMessage sendInviteEmailMessage = SendInviteByChannelMessage.Create(
 			request.TenantId,
 			invite.Id,
+			request.InviteTarget.Channel,
 			request.InviteTarget.Value,
 			request.Alias,
 			buildInviteUrlResult.Value,

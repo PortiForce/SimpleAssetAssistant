@@ -224,5 +224,12 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 			.WithMany()
 			.HasForeignKey(x => x.AcceptedAccountId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		// Tenant -> Outbox messages
+		_ = modelBuilder.Entity<OutboxMessage>()
+			.HasOne<Tenant>()
+			.WithMany()
+			.HasForeignKey(x => x.TenantId)
+			.OnDelete(DeleteBehavior.Restrict);
 	}
 }

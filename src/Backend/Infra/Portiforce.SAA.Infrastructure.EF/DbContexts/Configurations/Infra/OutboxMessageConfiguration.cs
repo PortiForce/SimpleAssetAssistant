@@ -25,8 +25,50 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
 			.HasConversion(new StrongIdConverter<TenantId>(x => x.Value, TenantId.From))
 			.IsRequired();
 
+		_ = builder.Property(x => x.Type)
+			.HasMaxLength(300)
+			.IsRequired();
+
+		_ = builder.Property(x => x.PayloadJson)
+			.IsRequired();
+
+		_ = builder.Property(x => x.State)
+			.HasConversion<byte>()
+			.IsRequired();
+
+		_ = builder.Property(x => x.CreatedAtUtc)
+			.IsRequired();
+
+		_ = builder.Property(x => x.PublishedAtUtc);
+
+		_ = builder.Property(x => x.ProcessedAtUtc);
+
+		_ = builder.Property(x => x.AttemptCount)
+			.IsRequired();
+
+		_ = builder.Property(x => x.NextAttemptAtUtc);
+
+		_ = builder.Property(x => x.LastError)
+			.HasMaxLength(4_000);
+
+		_ = builder.Property(x => x.IdempotencyKey)
+			.HasMaxLength(500)
+			.IsRequired();
+
 		// Concurrency (shadow)
+		_ = builder.Property<byte[]>("RowVersion")
+			.IsRowVersion()
+			.IsConcurrencyToken();
 
 		// Indexes
+		_ = builder.HasIndex(x => new { x.State, x.NextAttemptAtUtc, x.Type })
+			.HasDatabaseName("IX_Outbox_State_NextAttempt_Type");
+
+		_ = builder.HasIndex(x => x.TenantId)
+			.HasDatabaseName("IX_Outbox_TenantId");
+
+		_ = builder.HasIndex(x => x.IdempotencyKey)
+			.IsUnique()
+			.HasDatabaseName("UX_Outbox_IdempotencyKey");
 	}
 }

@@ -56,9 +56,6 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 		this.PublishedAtUtc = null;
 		this.ProcessedAtUtc = null;
 		this.LastError = null;
-
-		// Easier polling query:
-		// WHERE State IN (...) AND NextAttemptAtUtc <= now
 		this.NextAttemptAtUtc = createdAtUtc;
 	}
 
@@ -107,7 +104,7 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 	public void MarkPublished(DateTimeOffset publishedAtUtc)
 	{
-		this.EnsureNotBeforeCreated(publishedAtUtc, nameof(publishedAtUtc));
+		this.EnforceDateValidations(publishedAtUtc, nameof(publishedAtUtc));
 
 		if (this.State == OutboxMessageState.Processed)
 		{
@@ -126,7 +123,7 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 	public void MarkProcessed(DateTimeOffset processedAtUtc)
 	{
-		this.EnsureNotBeforeCreated(processedAtUtc, nameof(processedAtUtc));
+		this.EnforceDateValidations(processedAtUtc, nameof(processedAtUtc));
 
 		if (this.State == OutboxMessageState.Processed)
 		{
@@ -150,7 +147,7 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 		DateTimeOffset nextAttemptAtUtc,
 		int maxAttempts)
 	{
-		this.EnsureNotBeforeCreated(failedAtUtc, nameof(failedAtUtc));
+		this.EnforceDateValidations(failedAtUtc, nameof(failedAtUtc));
 
 		if (nextAttemptAtUtc <= failedAtUtc)
 		{
@@ -202,7 +199,7 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 		this.NextAttemptAtUtc = nextAttemptAtUtc;
 	}
 
-	private void EnsureNotBeforeCreated(DateTimeOffset value, string parameterName)
+	private void EnforceDateValidations(DateTimeOffset value, string parameterName)
 	{
 		if (value < this.CreatedAtUtc)
 		{

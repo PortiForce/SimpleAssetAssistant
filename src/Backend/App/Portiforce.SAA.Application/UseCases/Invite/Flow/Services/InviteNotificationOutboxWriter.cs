@@ -14,7 +14,7 @@ internal sealed class InviteNotificationOutboxWriter(
 	: IInviteNotificationOutboxWriter
 {
 	public async ValueTask AddInviteEmailAsync(
-		SendInviteEmailMessage message,
+		SendInviteByChannelMessage message,
 		CancellationToken ct)
 	{
 		string payloadJson = jsonSerializer.Serialize(message);

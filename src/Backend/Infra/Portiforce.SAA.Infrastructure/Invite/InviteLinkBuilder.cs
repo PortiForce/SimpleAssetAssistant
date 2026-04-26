@@ -9,9 +9,8 @@ using Portiforce.SAA.Application.Interfaces.Services.Invite;
 using Portiforce.SAA.Application.UseCases.Client.Tenant.Projections;
 using Portiforce.SAA.Core.Identity.Enums;
 using Portiforce.SAA.Core.Primitives.Ids;
-using Portiforce.SAA.Infrastructure.Invite;
 
-namespace Portiforce.SAA.Notifications.Worker.Services;
+namespace Portiforce.SAA.Infrastructure.Invite;
 
 public sealed class InviteLinkBuilder(
 	ITenantReadRepository tenantReadRepository,
