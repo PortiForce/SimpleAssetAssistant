@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\Infra\Portiforce.SAA.Infrastructure\Portiforce.SAA.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Roslynator.Analyzers" Version="4.15.0" />
+  </ItemGroup>
+
 </Project>
