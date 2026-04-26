@@ -252,7 +252,19 @@ public class Program
 			_ = app.UseHsts();
 		}
 
-		_ = app.UseExceptionHandler();
+		// API/BFF paths → ProblemDetails JSON via GlobalExceptionHandler
+		app.UseWhen(
+			ctx => ctx.Request.Path.StartsWithSegments("/bff") ||
+				   ctx.Request.Path.StartsWithSegments("/auth") ||
+				   ctx.Request.Path.StartsWithSegments("/public"),
+			branch => branch.UseExceptionHandler());
+
+		// UI/Blazor paths → user-friendly error page
+		app.UseWhen(
+			ctx => !ctx.Request.Path.StartsWithSegments("/bff") &&
+				   !ctx.Request.Path.StartsWithSegments("/auth") &&
+				   !ctx.Request.Path.StartsWithSegments("/public"),
+			branch => branch.UseExceptionHandler("/Error"));
 		_ = app.UseHttpsRedirection();
 		_ = app.UseStaticFiles();
 		_ = app.UseRouting();
