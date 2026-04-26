@@ -7,7 +7,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
 namespace Portiforce.SAA.Infrastructure.EF.Repositories.BackgroundTasks.Outbox;
 
-public sealed class OutboxMessageReadRepository(AssetAssistantDbContext db) : IOutboxMessageReadRepository
+internal sealed class OutboxMessageReadRepository(AssetAssistantDbContext db) : IOutboxMessageReadRepository
 {
 	public async Task<OutboxMessage?> GetByIdAsync(Guid id, CancellationToken ct) =>
 		await db.OutboxMessages

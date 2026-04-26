@@ -4,7 +4,7 @@ using Portiforce.SAA.Infrastructure.EF.DbContexts;
 
 namespace Portiforce.SAA.Infrastructure.EF.Repositories.BackgroundTasks.Outbox;
 
-public sealed class OutboxMessageWriteRepository(AssetAssistantDbContext db) : IOutboxMessageWriteRepository
+internal sealed class OutboxMessageWriteRepository(AssetAssistantDbContext db) : IOutboxMessageWriteRepository
 {
 	public async Task AddAsync(OutboxMessage entity, CancellationToken ct) =>
 		await db.OutboxMessages.AddAsync(entity, ct);
