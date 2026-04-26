@@ -59,7 +59,18 @@ public class Program
 										  "TenantApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
-		});
+		})
+			.ConfigurePrimaryHttpMessageHandler(() => CreateTenantApiClientHandler(builder.Environment));
+
+		_ = builder.Services.AddHttpClient<ITenantApiClient, TenantApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+									  ?? throw new InvalidOperationException(
+										  "TenantApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		})
+			.ConfigurePrimaryHttpMessageHandler(() => CreateTenantApiClientHandler(builder.Environment));
 
 		_ = builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
 		{
@@ -311,5 +322,18 @@ public class Program
 			"base-uri 'self';",
 			"form-action 'self';",
 			"object-src 'none';");
+	}
+
+	private static HttpMessageHandler CreateTenantApiClientHandler(IHostEnvironment environment)
+	{
+		HttpClientHandler handler = new();
+
+		if (environment.IsDevelopment())
+		{
+			handler.ServerCertificateCustomValidationCallback =
+				HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+		}
+
+		return handler;
 	}
 }

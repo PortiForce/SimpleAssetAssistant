@@ -3,6 +3,7 @@
 
 @using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.Contexts
+@using Portiforce.SAA.Contracts.Models.Client
 @inject IStringLocalizer<Home> L
 
 <PageTitle>@L["PageTitle"]</PageTitle>
@@ -107,16 +108,8 @@ else
 }
 
 @code {
-    private string baseDomain { get; set; }
+    [CascadingParameter]
+    private TenantInfo Tenant { get; set; } = new();
 
-    protected override void OnInitialized()
-    {
-        baseDomain = ResolveBaseDomain();
-    }
-
-    private string ResolveBaseDomain()
-    {
-        var parts = TenantUrlContext.GetDomainParts();
-        return parts.Length > 2 ? parts.Last() : string.Empty;
-    }
+    private string baseDomain => Tenant.BaseDomain;
 }

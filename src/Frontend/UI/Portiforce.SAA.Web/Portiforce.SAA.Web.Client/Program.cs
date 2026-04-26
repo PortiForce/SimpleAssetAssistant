@@ -79,7 +79,11 @@ internal class Program
 			.AddHttpMessageHandler<BrowserCredentialsHandler>()
 			.AddHttpMessageHandler<AntiforgeryHandler>();
 
-		_ = builder.Services.AddScoped<TenantApiClient>();
+		_ = builder.Services.AddHttpClient<ITenantApiClient, TenantApiClient>(client =>
+			{
+				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+			})
+			.AddHttpMessageHandler<BrowserCredentialsHandler>();
 
 		WebAssemblyHost host = builder.Build();
 
