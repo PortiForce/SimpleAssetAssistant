@@ -8,6 +8,7 @@
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
+@inject IJSRuntime JSRuntime
 @inject IManageInviteApiClient ManageInviteApiClient
 @inject NavigationManager Navigation
 @inject IStringLocalizer<InviteOverview> L
@@ -84,16 +85,15 @@
                 </div>
 
                 <hr />
-
                 <dl class="row mb-0">
                     <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
                     <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
-
-                    <dt class="col-sm-3">@L["LabelSendCount"]</dt>
-                    <dd class="col-sm-9">@invite.SendTimesCount</dd>
-
-                    <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
-                    <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+                    
+                    @if (invite.State == InviteStatus.Accepted)
+                    {
+                        <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
+                        <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+                    }
                 </dl>
             </div>
 
@@ -104,9 +104,9 @@
                     {
                         <button type="button"
                                 class="btn btn-primary"
-                                disabled="@isSubmitting"
+                                disabled="@(isAccepting || isDeclining)"
                                 @onclick="AcceptAsync">
-                            @(isSubmitting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
+                            @(isAccepting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
                         </button>
                     }
 
@@ -114,9 +114,9 @@
                     {
                         <button type="button"
                                 class="btn btn-outline-danger"
-                                disabled="@isSubmitting"
+                                disabled="@(isAccepting || isDeclining)"
                                 @onclick="DeclineAsync">
-                            @(isSubmitting ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
+                            @(isDeclining ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
                         </button>
                     }
                 </div>
@@ -131,7 +131,8 @@
 
     private OverviewInviteDetailsResponse? invite;
     private bool isLoading = true;
-    private bool isSubmitting;
+    private bool isAccepting;
+    private bool isDeclining;
     private string? error;
     private string? successMessage;
 
@@ -170,7 +171,7 @@
 
         try
         {
-            this.isSubmitting = true;
+            this.isAccepting = true;
             this.error = null;
             this.successMessage = null;
 
@@ -190,7 +191,7 @@
         }
         finally
         {
-            this.isSubmitting = false;
+            this.isAccepting = false;
         }
     }
 
@@ -201,9 +202,15 @@
             return;
         }
 
+        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_DeclineInvite"].Value);
+        if (!confirm)
+        {
+            return;
+        }
+
         try
         {
-            this.isSubmitting = true;
+            this.isDeclining = true;
             this.error = null;
 
             await this.ManageInviteApiClient.DeclineInviteAsync(this.InviteToken);
@@ -217,7 +224,7 @@
         }
         finally
         {
-            this.isSubmitting = false;
+            this.isDeclining = false;
         }
     }
 

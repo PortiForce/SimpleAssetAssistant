@@ -166,7 +166,7 @@ else
 
         bool confirmed = await JSRuntime.InvokeAsync<bool>(
             "confirm",
-            L["ConfirmMessage_RevokeInvite"]);
+            L["ConfirmMessage_RevokeInvite"].Value);
 
         if (!confirmed)
         {

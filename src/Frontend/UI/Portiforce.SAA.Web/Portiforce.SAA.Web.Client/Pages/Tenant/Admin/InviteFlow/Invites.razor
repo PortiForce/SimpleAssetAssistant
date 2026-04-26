@@ -275,7 +275,7 @@
 
     private async Task RevokeInviteAsync(Guid inviteId)
     {
-        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_RevokeInvite"]);
+        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", L["ConfirmMessage_RevokeInvite"].Value);
         if (!confirm)
         {
             return;
