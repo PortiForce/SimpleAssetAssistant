@@ -41,6 +41,7 @@ public sealed class InviteNotificationOutboxProcessor(
 			MessageTypes.SendInviteEmailV1,
 			now,
 			batchSize,
+			RetryDelay,
 			ct);
 
 		if (messages.Count == 0)
@@ -49,8 +50,11 @@ public sealed class InviteNotificationOutboxProcessor(
 		}
 
 		// Claim the batch by marking all messages as Published before sending.
-		// Published acts as an in-progress lock: GetReadyToProcessAsync only queries Pending/Failed,
-		// so a second worker instance won't pick up the same messages.
+		// Published acts as an in-progress lease: GetReadyToProcessAsync only queries Pending/Failed
+		// and Published messages whose PublishedAtUtc is older than the lease timeout (RetryDelay).
+		// This means a second worker won't pick up the same messages within the lease window.
+		// If this worker crashes after SaveChanges, the messages will be re-claimed automatically
+		// after the lease timeout expires (RetryDelay), preventing permanent stuck messages.
 		// Failed sends call MarkFailed, which transitions the message back to Failed (retryable).
 		foreach (OutboxMessage msg in messages)
 		{

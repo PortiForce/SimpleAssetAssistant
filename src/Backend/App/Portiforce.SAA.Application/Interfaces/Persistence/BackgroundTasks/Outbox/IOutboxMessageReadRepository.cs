@@ -8,5 +8,6 @@ public interface IOutboxMessageReadRepository : IReadRepository<OutboxMessage, G
 		string type,
 		DateTimeOffset nowUtc,
 		int batchSize,
+		TimeSpan publishedLeaseTimeout,
 		CancellationToken ct);
 }
