@@ -209,7 +209,7 @@
             return;
         }
 
-        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync(L["ConfirmDeclineInviteTitle"], L["ConfirmDeclineInviteDescription"]))
+        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync(L["ConfirmDeclineInviteTitle"].Value, L["ConfirmDeclineInviteDescription"].Value))
         {
             return;
         }
