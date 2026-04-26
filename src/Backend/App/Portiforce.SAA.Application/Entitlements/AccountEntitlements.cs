@@ -1,7 +1,6 @@
-﻿namespace Portiforce.SAA.Application.Entitlements;
+namespace Portiforce.SAA.Application.Entitlements;
 
 public sealed record AccountEntitlements(
 	int MaxPlatformsPerUser,
 	int MaxAssetsVisible,
-	bool AllowExports
-);
+	bool AllowExports);

@@ -1,10 +1,13 @@
-﻿namespace Portiforce.SAA.Application.Exceptions;
+namespace Portiforce.SAA.Application.Exceptions;
 
 public sealed record ResultError(
 	string Code,
 	string Message,
 	IReadOnlyDictionary<string, object?>? Details = null)
 {
+	public static ResultError InvalidTenantId(string message = "Invalid tenant ID.")
+		=> new("invalid_tenant_id", message);
+
 	public static ResultError Validation(string message, IReadOnlyDictionary<string, object?>? details = null)
 		=> new("validation_error", message, details);
 

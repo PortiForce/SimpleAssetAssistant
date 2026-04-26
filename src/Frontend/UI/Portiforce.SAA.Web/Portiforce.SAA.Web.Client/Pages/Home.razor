@@ -1,8 +1,9 @@
-﻿@page "/"
+@page "/"
 @inject ITenantUrlContext TenantUrlContext
 
 @using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.Contexts
+@using Portiforce.SAA.Contracts.Models.Client
 @inject IStringLocalizer<Home> L
 
 <PageTitle>@L["PageTitle"]</PageTitle>
@@ -11,6 +12,7 @@
 {
     <div class="hero">
         <div class="hero-card">
+            <div class="tenant-brand">@TenantBrandName</div>
             <h1>@L["TitleProductName"]</h1>
             <p class="lead">
                 @L["SubtitleTenantResolvedLead"]
@@ -107,16 +109,12 @@ else
 }
 
 @code {
-    private string baseDomain { get; set; }
+    [CascadingParameter]
+    private TenantInfo Tenant { get; set; } = new();
 
-    protected override void OnInitialized()
-    {
-        baseDomain = ResolveBaseDomain();
-    }
+    private string baseDomain => Tenant.BaseDomain;
 
-    private string ResolveBaseDomain()
-    {
-        var parts = TenantUrlContext.GetDomainParts();
-        return parts.Length > 2 ? parts.Last() : string.Empty;
-    }
+    private string TenantBrandName => string.IsNullOrWhiteSpace(Tenant.BrandName)
+        ? Tenant.Prefix ?? L["TitleProductName"].Value
+        : Tenant.BrandName;
 }

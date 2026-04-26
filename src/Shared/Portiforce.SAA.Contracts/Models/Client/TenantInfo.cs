@@ -4,5 +4,9 @@ public sealed class TenantInfo
 {
 	public string? Prefix { get; set; }
 
+	public string? BrandName { get; set; }
+
 	public bool IsLanding { get; set; }
+
+	public string BaseDomain { get; set; } = string.Empty;
 }

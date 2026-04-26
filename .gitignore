@@ -29,6 +29,8 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
+/build/
+/.build/
 
 ####################################
 # User-specific Visual Studio files
@@ -67,6 +69,7 @@ packages/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+/.dotnet-cli/
 ScaffoldingReadMe.txt
 
 ####################################
@@ -87,5 +90,5 @@ CodeCoverage/
 [Bb]uild[Ll]og.*
 
 *.txt
-src/_Infra/.env
+src/Backend/_Infra/.env
 /src/Frontend/UI/Portiforce.SAA.Web/Portiforce.SAA.Web/Certs

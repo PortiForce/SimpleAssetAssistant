@@ -24,6 +24,69 @@ public sealed class InviteTargetTests
     }
 
     [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Email_WhenLocaleIsEmpty_ShouldThrow(string? locale)
+    {
+        Func<InviteTarget> act = () => InviteTarget.Email("user@example.com", locale!);
+
+        _ = act.Should()
+            .Throw<ArgumentException>()
+            .Which.ParamName.Should()
+            .Be("locale");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Restore_WhenLocaleIsEmpty_ShouldThrow(string? locale)
+    {
+        Func<InviteTarget> act = () => InviteTarget.Restore(
+            "user@example.com",
+            InviteChannel.Email,
+            InviteTargetKind.Email,
+            locale!);
+
+        _ = act.Should()
+            .Throw<ArgumentException>()
+            .Which.ParamName.Should()
+            .Be("locale");
+    }
+
+    [Fact]
+    public void Email_WhenLocaleTooLong_ShouldThrow()
+    {
+        Func<InviteTarget> act = () => InviteTarget.Email("user@example.com", "en-USTOO");
+
+        _ = act.Should()
+            .Throw<ArgumentException>()
+            .Which.ParamName.Should()
+            .Be("locale");
+    }
+
+    [Fact]
+    public void Email_WhenLocaleProvided_ShouldStoreLocale()
+    {
+        InviteTarget target = InviteTarget.Email("user@example.com", "uk-UA");
+
+        _ = target.Locale.Should().Be("uk-UA");
+    }
+
+    [Fact]
+    public void Restore_WhenLocaleProvided_ShouldStoreLocale()
+    {
+        InviteTarget target = InviteTarget.Restore(
+            "user@example.com",
+            InviteChannel.Email,
+            InviteTargetKind.Email,
+            "uk-UA");
+
+        _ = target.Locale.Should().Be("uk-UA");
+    }
+
+    [Theory]
     [InlineData(InviteChannel.Email, InviteTargetKind.None)]
     [InlineData(InviteChannel.Email, InviteTargetKind.Phone)]
     [InlineData(InviteChannel.Email, InviteTargetKind.TelegramUserName)]

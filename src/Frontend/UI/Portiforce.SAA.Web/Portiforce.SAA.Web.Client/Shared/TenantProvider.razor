@@ -1,37 +1,19 @@
-﻿@using Portiforce.SAA.Contracts.Models.Client
-@inject NavigationManager Nav
+@using Portiforce.SAA.Contracts.Models.Client
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+@inject ITenantApiClient TenantApiClient
 
 <CascadingValue Value="Tenant">
     @ChildContent
 </CascadingValue>
 
 @code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 
-    private TenantInfo Tenant = new();
+    private TenantInfo Tenant { get; set; } = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var uri = new Uri(Nav.Uri);
-        var host = uri.Host;
-
-        // todo tech: baseDomain = portiforce.ai (todo: read from config later)
-        const string baseDomain = "portiforce.ai";
-        var suffix = "." + baseDomain;
-
-        if (string.Equals(host, baseDomain, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(host, "www." + baseDomain, StringComparison.OrdinalIgnoreCase))
-        {
-            Tenant.IsLanding = true;
-            Tenant.Prefix = null;
-            return;
-        }
-
-        if (host.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
-        {
-            Tenant.IsLanding = false;
-            Tenant.Prefix = host[..^suffix.Length];
-            if (Tenant.Prefix.Contains('.')) Tenant.Prefix = null;
-        }
+        Tenant = await TenantApiClient.GetTenantAsync() ?? new TenantInfo();
     }
 }

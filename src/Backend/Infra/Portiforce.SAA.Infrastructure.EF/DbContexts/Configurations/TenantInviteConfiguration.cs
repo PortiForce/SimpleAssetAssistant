@@ -60,6 +60,11 @@ public sealed class TenantInviteConfiguration : IEntityTypeConfiguration<TenantI
 					.HasColumnName("InviteTargetChannel")
 					.IsRequired()
 					.HasConversion<byte>();
+
+				_ = cb.Property(x => x.Locale)
+					.HasColumnName("InviteTargetLocale")
+					.HasMaxLength(6)
+					.IsRequired();
 			});
 
 		_ = builder.Property(x => x.Alias)

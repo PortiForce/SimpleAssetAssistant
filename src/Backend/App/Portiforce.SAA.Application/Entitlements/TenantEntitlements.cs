@@ -1,4 +1,4 @@
-﻿namespace Portiforce.SAA.Application.Entitlements;
+namespace Portiforce.SAA.Application.Entitlements;
 
 public sealed record TenantEntitlements(
 	int MaxActiveUsers,
@@ -7,5 +7,4 @@ public sealed record TenantEntitlements(
 	int MaxDistinctAssets,
 	int MaxImportRows,
 	bool AllowProjections,
-	bool AllowAdvancedAnalytics
-);
+	bool AllowAdvancedAnalytics);

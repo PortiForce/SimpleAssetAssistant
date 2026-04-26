@@ -5,6 +5,7 @@
 @using Portiforce.SAA.Contracts.Models.Client.Invite
 @using Portiforce.SAA.Web.Client.Extensions
 @using Portiforce.SAA.Web.Client.Services.Interfaces
+@using Portiforce.SAA.Web.Client.Shared
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
@@ -17,7 +18,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h3 class="mb-0">@L["PageTitle"]</h3>
-            <div>@L["PageTitleDescription"]</div>
+            @if (invite is { State: InviteStatus.Pending })
+            {
+                <div>@L["PageTitleDescription"]</div>
+            }
         </div>
     </div>
 
@@ -60,40 +64,43 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="h5 mb-1">@invite.InviteTargetValue</div>
-                        <div class="text-muted">
-                            <div>
-                                <span>@L["LabelChannel"]:</span>
-                                @invite.InviteChannel.ToDisplayName(SharedEnumL)
-                            </div>
-                            <div>
-                                <span>@L["LabelRole"]:</span>
-                                @invite.InviteRole.ToDisplayName(SharedEnumL)
-                            </div>
-                            <div>
-                                <span>@L["LabelTier"]:</span>
-                                @invite.InviteTier.ToDisplayName(SharedEnumL)
+                    @if (invite.State == InviteStatus.Pending)
+                    {
+                        <div>
+                            <div class="h5 mb-1">@invite.InviteTargetValue</div>
+                            <div class="text-muted">
+                                <div>
+                                    <span>@L["LabelChannel"]:</span>
+                                    @invite.InviteChannel.ToDisplayName(SharedEnumL)
+                                </div>
+                                <div>
+                                    <span>@L["LabelRole"]:</span>
+                                    @invite.InviteRole.ToDisplayName(SharedEnumL)
+                                </div>
+                                <div>
+                                    <span>@L["LabelTier"]:</span>
+                                    @invite.InviteTier.ToDisplayName(SharedEnumL)
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    }
                     <span class="badge @invite.State.ToCssBadgeClass()">
                         @invite.State.ToDisplayName(SharedEnumL)
                     </span>
                 </div>
 
                 <hr />
-
                 <dl class="row mb-0">
-                    <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
-                    <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
-
-                    <dt class="col-sm-3">@L["LabelSendCount"]</dt>
-                    <dd class="col-sm-9">@invite.SendTimesCount</dd>
-
-                    <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
-                    <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+                    @if (invite.State == InviteStatus.Pending)
+                    {
+                        <dt class="col-sm-3">@L["LabelExpiresAt"]</dt>
+                        <dd class="col-sm-9">@invite.ExpiresAtUtc.ToUiDateTime()</dd>
+                    }
+                    else if (invite.State == InviteStatus.Accepted)
+                    {
+                        <dt class="col-sm-3">@L["LabelAcceptedAt"]</dt>
+                        <dd class="col-sm-9">@(invite.AcceptedAtUtc?.ToUiDateTime() ?? L["EmptyValue"])</dd>
+                    }
                 </dl>
             </div>
 
@@ -104,9 +111,9 @@
                     {
                         <button type="button"
                                 class="btn btn-primary"
-                                disabled="@isSubmitting"
+                                disabled="@(isAccepting || isDeclining)"
                                 @onclick="AcceptAsync">
-                            @(isSubmitting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
+                            @(isAccepting ? L["MessageInviteAcceptInProgress"] : L["ActionInviteAccept"])
                         </button>
                     }
 
@@ -114,9 +121,9 @@
                     {
                         <button type="button"
                                 class="btn btn-outline-danger"
-                                disabled="@isSubmitting"
+                                disabled="@(isAccepting || isDeclining)"
                                 @onclick="DeclineAsync">
-                            @(isSubmitting ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
+                            @(isDeclining ? L["MessageInviteDeclineInProgress"] : L["ActionInviteDecline"])
                         </button>
                     }
                 </div>
@@ -125,13 +132,21 @@
     }
 </div>
 
+<ConfirmPopup @ref="declineInviteConfirm"
+              Title="@L["ConfirmDeclineInviteTitle"].Value"
+              Description="@L["ConfirmDeclineInviteDescription"].Value"
+              ConfirmButtonText="@L["ActionInviteDecline"].Value"
+              ConfirmButtonClass="btn-danger" />
+
 @code {
     [Parameter]
     public string InviteToken { get; set; } = string.Empty;
 
+    private ConfirmPopup? declineInviteConfirm;
     private OverviewInviteDetailsResponse? invite;
     private bool isLoading = true;
-    private bool isSubmitting;
+    private bool isAccepting;
+    private bool isDeclining;
     private string? error;
     private string? successMessage;
 
@@ -170,7 +185,7 @@
 
         try
         {
-            this.isSubmitting = true;
+            this.isAccepting = true;
             this.error = null;
             this.successMessage = null;
 
@@ -190,7 +205,7 @@
         }
         finally
         {
-            this.isSubmitting = false;
+            this.isAccepting = false;
         }
     }
 
@@ -201,9 +216,14 @@
             return;
         }
 
+        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync())
+        {
+            return;
+        }
+
         try
         {
-            this.isSubmitting = true;
+            this.isDeclining = true;
             this.error = null;
 
             await this.ManageInviteApiClient.DeclineInviteAsync(this.InviteToken);
@@ -217,7 +237,7 @@
         }
         finally
         {
-            this.isSubmitting = false;
+            this.isDeclining = false;
         }
     }
 

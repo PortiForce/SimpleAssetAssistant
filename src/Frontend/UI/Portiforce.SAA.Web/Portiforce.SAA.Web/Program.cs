@@ -10,6 +10,7 @@ using Portiforce.SAA.Contracts.Services;
 using Portiforce.SAA.Contracts.UiSetup;
 using Portiforce.SAA.Core.Identity;
 using Portiforce.SAA.Infrastructure;
+using Portiforce.SAA.Infrastructure.Configuration;
 using Portiforce.SAA.Infrastructure.EF;
 using Portiforce.SAA.Infrastructure.Services.Time;
 using Portiforce.SAA.Web.Client.Services;
@@ -39,7 +40,12 @@ public class Program
 		}
 
 		// Tenancy
-		_ = builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
+		_ = builder.Services.AddOptions<TenancyOptions>()
+			.Bind(builder.Configuration.GetSection(TenancyOptions.SectionName))
+			.Validate(
+				o => IsConfiguredValue(o.BaseDomain),
+				"Tenancy:BaseDomain must be configured.")
+			.ValidateOnStart();
 		_ = builder.Services.AddScoped<TenantContext>();
 		_ = builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
 
@@ -53,7 +59,18 @@ public class Program
 										  "TenantApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
-		});
+		})
+			.ConfigurePrimaryHttpMessageHandler(() => CreateTenantApiClientHandler(builder.Environment));
+
+		_ = builder.Services.AddHttpClient<ITenantApiClient, TenantApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+									  ?? throw new InvalidOperationException(
+										  "TenantApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		})
+			.ConfigurePrimaryHttpMessageHandler(() => CreateTenantApiClientHandler(builder.Environment));
 
 		_ = builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>((sp, http) =>
 		{
@@ -94,6 +111,11 @@ public class Program
 			{
 				options.LoginPath = "/auth/login";
 				options.AccessDeniedPath = "/auth/access-denied";
+				options.Cookie.HttpOnly = true;
+				options.Cookie.SameSite = SameSiteMode.Lax;
+				options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+				options.ExpireTimeSpan = TimeSpan.FromHours(8);
+				options.SlidingExpiration = false;
 
 				options.Events.OnRedirectToLogin = ctx =>
 				{
@@ -121,17 +143,25 @@ public class Program
 				};
 			}).AddGoogle(options =>
 			{
-				options.ClientId = builder.Configuration["GoogleClientSettings:ClientId"]
-								   ?? throw new InvalidOperationException("Google ClientId is missing.");
+				string? clientId = builder.Configuration["GoogleClientSettings:ClientId"];
+				if (!IsConfiguredValue(clientId))
+				{
+					throw new InvalidOperationException("Google ClientId is missing.");
+				}
 
-				options.ClientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"]
-									   ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+				string? clientSecret = builder.Configuration["GoogleClientSettings:ClientSecret"];
+				if (!IsConfiguredValue(clientSecret))
+				{
+					throw new InvalidOperationException("Google ClientSecret is missing.");
+				}
+
+				options.ClientId = clientId;
+				options.ClientSecret = clientSecret;
 
 				// Explicitly set the callback path (where Google redirects)
 				options.CallbackPath = "/signin-google";
 
-				// Save tokens for later use
-				options.SaveTokens = true;
+				options.SaveTokens = false;
 
 				// Request additional scopes
 				options.Scope.Add("profile");
@@ -185,6 +215,11 @@ public class Program
 		_ = builder.Services.AddInfrastructure(builder.Configuration);
 		_ = builder.Services.AddEfInfrastructure(builder.Configuration);
 
+		_ = builder.Services.AddOptions<TokenHashingOptions>()
+			.BindConfiguration("TokenHashingOptions")
+			.Validate(o => IsConfiguredValue(o.Pepper), "TokenHashingOptions:Pepper must be configured.")
+			.ValidateOnStart();
+
 		_ = builder.Services.AddSingleton<IClock, SystemClock>();
 
 		_ = builder.Services.AddAntiforgery(options => { options.HeaderName = "RequestVerificationToken"; });
@@ -194,6 +229,12 @@ public class Program
 		_ = builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 		WebApplication app = builder.Build();
+
+		_ = app.Use(async (context, next) =>
+		{
+			context.Response.Headers["Content-Security-Policy"] = BuildContentSecurityPolicy(app.Environment);
+			await next(context);
+		});
 
 		CultureInfo[] supportedCultures = new[]
 		{
@@ -219,10 +260,19 @@ public class Program
 		}
 		else
 		{
-			_ = app.UseExceptionHandler("/Error");
 			_ = app.UseHsts();
 		}
 
+		static bool IsApiPath(HttpContext ctx) =>
+			ctx.Request.Path.StartsWithSegments("/bff") ||
+			ctx.Request.Path.StartsWithSegments("/auth") ||
+			ctx.Request.Path.StartsWithSegments("/public");
+
+		// API/BFF paths → ProblemDetails JSON via GlobalExceptionHandler
+		app.UseWhen(IsApiPath, branch => branch.UseExceptionHandler());
+
+		// UI/Blazor paths → user-friendly error page
+		app.UseWhen(ctx => !IsApiPath(ctx), branch => branch.UseExceptionHandler("/Error"));
 		_ = app.UseHttpsRedirection();
 		_ = app.UseStaticFiles();
 		_ = app.UseRouting();
@@ -249,5 +299,41 @@ public class Program
 			.AddAdditionalAssemblies(typeof(_Imports).Assembly);
 
 		app.Run();
+	}
+
+	private static bool IsConfiguredValue(string? value) =>
+		!string.IsNullOrWhiteSpace(value) &&
+		!value.Contains("{from-configs}", StringComparison.OrdinalIgnoreCase);
+
+	private static string BuildContentSecurityPolicy(IHostEnvironment environment)
+	{
+		string scriptEvalSource = environment.IsDevelopment() ? "'unsafe-eval'" : "'wasm-unsafe-eval'";
+
+		return string.Join(
+			" ",
+			"default-src 'self';",
+			$"script-src 'self' 'unsafe-inline' {scriptEvalSource} https://accounts.google.com https://apis.google.com;",
+			"style-src 'self' 'unsafe-inline' https://accounts.google.com;",
+			"img-src 'self' data: https:;",
+			"font-src 'self' data:;",
+			"connect-src 'self' wss: https://accounts.google.com;",
+			"frame-src 'self' https://accounts.google.com;",
+			"frame-ancestors 'self';",
+			"base-uri 'self';",
+			"form-action 'self';",
+			"object-src 'none';");
+	}
+
+	private static HttpMessageHandler CreateTenantApiClientHandler(IHostEnvironment environment)
+	{
+		HttpClientHandler handler = new();
+
+		if (environment.IsDevelopment())
+		{
+			handler.ServerCertificateCustomValidationCallback =
+				HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+		}
+
+		return handler;
 	}
 }

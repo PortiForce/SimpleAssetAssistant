@@ -225,4 +225,14 @@
   <data name="TitleInviteStatus" xml:space="preserve">
     <value>Invitation status</value>
   </data>
+  <data name="ConfirmDeclineInviteDescription" xml:space="preserve">
+    <value>If you decline this invitation, your onboarding process will stop.
+
+The administrator will be informed that you declined the invite and will not be able to use this invitation again. You may need to contact the administrator if you change your mind later.
+
+Are you sure you want to decline this invitation?</value>
+  </data>
+  <data name="ConfirmDeclineInviteTitle" xml:space="preserve">
+    <value>Decline invitation?</value>
+  </data>
 </root>

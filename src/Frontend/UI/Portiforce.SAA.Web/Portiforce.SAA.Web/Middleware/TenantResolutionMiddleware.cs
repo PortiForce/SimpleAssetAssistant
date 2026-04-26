@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
+
 using Portiforce.SAA.Contracts.Models.Client;
 using Portiforce.SAA.Contracts.Services;
 using Portiforce.SAA.Web.Security;
@@ -13,27 +14,27 @@ public sealed class TenantResolutionMiddleware
 
 	public TenantResolutionMiddleware(RequestDelegate next, IOptions<TenancyOptions> options)
 	{
-		_next = next;
-		_options = options.Value;
+		this._next = next;
+		this._options = options.Value;
 	}
 
 	public async Task InvokeAsync(HttpContext context, TenantContext tenantContext, ITenantResolver tenantResolver)
 	{
-		var host = context.Request.Host.Host;
+		string host = context.Request.Host.Host;
 
 		// 1) Landing host (no tenant)
-		if (IsBaseDomain(host))
+		if (this.IsBaseDomain(host))
 		{
 			tenantContext.IsLanding = true;
-			await _next(context);
+			await this._next(context);
 			return;
 		}
 
 		// 2) Tenant host: {prefix}.{BaseDomain}
-		var suffix = "." + _options.BaseDomain;
+		string suffix = "." + this._options.BaseDomain;
 		if (host.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
 		{
-			var prefix = host[..^suffix.Length];
+			string prefix = host[..^suffix.Length];
 
 			// Basic prefix validation (no nested subdomains)
 			if (string.IsNullOrWhiteSpace(prefix) || prefix.Contains('.'))
@@ -58,7 +59,7 @@ public sealed class TenantResolutionMiddleware
 				tenantContext.TenantId = resolved.TenantId;
 				tenantContext.PublicName = resolved.Name;
 
-				await _next(context);
+				await this._next(context);
 				return;
 			}
 			catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
@@ -74,6 +75,6 @@ public sealed class TenantResolutionMiddleware
 	}
 
 	private bool IsBaseDomain(string host) =>
-		string.Equals(host, _options.BaseDomain, StringComparison.OrdinalIgnoreCase) ||
-		string.Equals(host, $"www.{_options.BaseDomain}", StringComparison.OrdinalIgnoreCase);
+		string.Equals(host, this._options.BaseDomain, StringComparison.OrdinalIgnoreCase) ||
+		string.Equals(host, $"www.{this._options.BaseDomain}", StringComparison.OrdinalIgnoreCase);
 }

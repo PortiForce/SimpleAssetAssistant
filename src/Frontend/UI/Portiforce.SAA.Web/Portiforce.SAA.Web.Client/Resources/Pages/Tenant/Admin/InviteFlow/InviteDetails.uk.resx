@@ -168,4 +168,10 @@
   <data name="LabelAlias" xml:space="preserve">
     <value>Псевдонім</value>
   </data>
+  <data name="ConfirmRevokeInviteTitle" xml:space="preserve">
+    <value>Відкликати запрошення?</value>
+  </data>
+  <data name="ConfirmRevokeInviteDescription" xml:space="preserve">
+    <value>Ви впевнені, що хочете відкликати це запрошення?</value>
+  </data>
 </root>

@@ -1,9 +1,6 @@
-﻿@implements IDisposable
-
 @using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Contracts.UiSetup
 
-@inject NavigationManager NavigationManager
 @inject IStringLocalizer<NavMenu> L
 
 <input type="checkbox" title="@L["Nav_ToggleTitle"]" class="navbar-toggler" />
@@ -126,8 +123,5 @@
 </div>
 
 @code {
-    public void Dispose()
-    {
-        // no-op currently; keep IDisposable only if you'll add handlers back
-    }
+   
 }

@@ -9,5 +9,5 @@ namespace Portiforce.SAA.Web.Client.Services.ApiClients;
 public sealed class TenantApiClient(HttpClient http) : ITenantApiClient
 {
 	public Task<TenantInfo?> GetTenantAsync()
-		=> http.GetFromJsonAsync<TenantInfo>(ApiRoutes.BffRoot);
+		=> http.GetFromJsonAsync<TenantInfo>(ApiRoutes.Tenant);
 }

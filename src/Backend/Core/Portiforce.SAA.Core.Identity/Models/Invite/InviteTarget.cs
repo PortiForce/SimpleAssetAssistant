@@ -5,6 +5,8 @@ namespace Portiforce.SAA.Core.Identity.Models.Invite;
 
 public sealed record InviteTarget
 {
+	private const int MaxLocaleLength = 6;
+
 	// Private empty constructor for EF Core
 	private InviteTarget()
 	{
@@ -14,11 +16,26 @@ public sealed record InviteTarget
 	private InviteTarget(
 		string value,
 		InviteChannel channel,
-		InviteTargetKind kind)
+		InviteTargetKind kind,
+		string locale = "en-GB")
 	{
 		if (string.IsNullOrWhiteSpace(value))
 		{
 			throw new ArgumentException("Value is required.", nameof(value));
+		}
+
+		string trimmedLocale = (locale ?? string.Empty).Trim();
+
+		if (string.IsNullOrEmpty(trimmedLocale))
+		{
+			throw new ArgumentException("Locale is required.", nameof(locale));
+		}
+
+		if (trimmedLocale.Length > MaxLocaleLength)
+		{
+			throw new ArgumentException(
+				$"Locale cannot exceed {MaxLocaleLength} characters.",
+				nameof(locale));
 		}
 
 		ValidateCombination(channel, kind);
@@ -26,6 +43,7 @@ public sealed record InviteTarget
 		this.Channel = channel;
 		this.Kind = kind;
 		this.Value = Normalize(kind, value);
+		this.Locale = trimmedLocale;
 	}
 
 	public string Value { get; init; }
@@ -36,26 +54,29 @@ public sealed record InviteTarget
 
 	public InviteTargetKind Kind { get; init; }
 
-	public static InviteTarget Email(string email) =>
-		new(email, InviteChannel.Email, InviteTargetKind.Email);
+	public string Locale { get; init; } = "en-GB";
 
-	public static InviteTarget TelegramUserName(string username) =>
-		new(username, InviteChannel.Telegram, InviteTargetKind.TelegramUserName);
+	public static InviteTarget Email(string email, string locale = "en-GB") =>
+		new(email, InviteChannel.Email, InviteTargetKind.Email, locale);
 
-	public static InviteTarget TelegramUserId(string userId) =>
-		new(userId, InviteChannel.Telegram, InviteTargetKind.TelegramUserId);
+	public static InviteTarget TelegramUserName(string username, string locale = "en-GB") =>
+		new(username, InviteChannel.Telegram, InviteTargetKind.TelegramUserName, locale);
 
-	public static InviteTarget AppleEmail(string email) =>
-		new(email, InviteChannel.AppleAccount, InviteTargetKind.Email);
+	public static InviteTarget TelegramUserId(string userId, string locale = "en-GB") =>
+		new(userId, InviteChannel.Telegram, InviteTargetKind.TelegramUserId, locale);
 
-	public static InviteTarget ApplePhone(string phone) =>
-		new(phone, InviteChannel.AppleAccount, InviteTargetKind.Phone);
+	public static InviteTarget AppleEmail(string email, string locale = "en-GB") =>
+		new(email, InviteChannel.AppleAccount, InviteTargetKind.Email, locale);
+
+	public static InviteTarget ApplePhone(string phone, string locale = "en-GB") =>
+		new(phone, InviteChannel.AppleAccount, InviteTargetKind.Phone, locale);
 
 	public static InviteTarget Restore(
 		string value,
 		InviteChannel channel,
-		InviteTargetKind kind) =>
-		new(value, channel, kind);
+		InviteTargetKind kind,
+		string locale = "en-GB") =>
+		new(value, channel, kind, locale);
 
 	private static void ValidateCombination(
 		InviteChannel channel,

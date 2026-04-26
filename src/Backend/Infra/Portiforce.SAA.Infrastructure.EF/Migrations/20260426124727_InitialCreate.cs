@@ -24,6 +24,9 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 			_ = migrationBuilder.EnsureSchema(
 				name: "pf");
 
+			_ = migrationBuilder.EnsureSchema(
+				name: "inf");
+
 			_ = migrationBuilder.CreateTable(
 				name: "Assets",
 				schema: "core",
@@ -110,6 +113,37 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 					_ = table.PrimaryKey("PK_Accounts", x => x.Id);
 					_ = table.ForeignKey(
 						name: "FK_Accounts_Tenants_TenantId",
+						column: x => x.TenantId,
+						principalSchema: "core",
+						principalTable: "Tenants",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Restrict);
+				});
+
+			_ = migrationBuilder.CreateTable(
+				name: "OutboxMessages",
+				schema: "inf",
+				columns: table => new
+				{
+					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					Type = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+					PayloadJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+					State = table.Column<byte>(type: "tinyint", nullable: false),
+					CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+					PublishedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					ProcessedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					AttemptCount = table.Column<int>(type: "int", nullable: false),
+					NextAttemptAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					LastError = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
+					IdempotencyKey = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+				},
+				constraints: table =>
+				{
+					_ = table.PrimaryKey("PK_OutboxMessages", x => x.Id);
+					_ = table.ForeignKey(
+						name: "FK_OutboxMessages_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
 						principalTable: "Tenants",
@@ -244,6 +278,7 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
 					InviteTargetChannel = table.Column<byte>(type: "tinyint", nullable: false),
 					InviteTargetKind = table.Column<byte>(type: "tinyint", nullable: false),
+					InviteTargetLocale = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
 					InviteTargetValue = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
 				},
 				constraints: table =>
@@ -559,6 +594,25 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				column: "InvitedByAccountId");
 
 			_ = migrationBuilder.CreateIndex(
+				name: "IX_Outbox_State_NextAttempt_Type",
+				schema: "inf",
+				table: "OutboxMessages",
+				columns: new[] { "State", "NextAttemptAtUtc", "Type" });
+
+			_ = migrationBuilder.CreateIndex(
+				name: "IX_Outbox_TenantId",
+				schema: "inf",
+				table: "OutboxMessages",
+				column: "TenantId");
+
+			_ = migrationBuilder.CreateIndex(
+				name: "UX_Outbox_IdempotencyKey",
+				schema: "inf",
+				table: "OutboxMessages",
+				column: "IdempotencyKey",
+				unique: true);
+
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_PassKeyCredentials_AccountId",
 				schema: "auth",
 				table: "PassKeyCredentials",
@@ -730,6 +784,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 			_ = migrationBuilder.DropTable(
 				name: "Invites",
 				schema: "pf");
+
+			_ = migrationBuilder.DropTable(
+				name: "OutboxMessages",
+				schema: "inf");
 
 			_ = migrationBuilder.DropTable(
 				name: "PassKeyCredentials",

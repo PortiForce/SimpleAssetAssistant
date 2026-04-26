@@ -1,5 +1,7 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@using Microsoft.Extensions.Localization
 @using Portiforce.SAA.Web.Client.Shared
+@inject IStringLocalizer<MainLayout> L
 
 <div class="page">
     <div class="sidebar">
@@ -8,7 +10,7 @@
                 <a class="navbar-brand" href="">
                     <div class="brand-text">
                         <div class="brand-title">PortiForce</div>
-                        <div class="brand-subtitle">Simple Asset Assistant</div>
+                        <div class="brand-subtitle">@L["BrandSubtitle"]</div>
                     </div>
                 </a>
             </div>
@@ -29,7 +31,7 @@
             <div class="top-row-right">
                 <AuthorizeView>
                     <Authorized>
-                        <a href="tenant/user/portfolio" class="btn btn-link">
+                        <a href="tenant/user/portfolio" class="btn btn-link" title="@L["HomeLinkTitle"]" aria-label="@L["HomeLinkTitle"]">
                             <span class="bi bi-house-door"></span>
                         </a>
                     </Authorized>
@@ -42,6 +44,16 @@
                 @Body
             </TenantProvider>
         </article>
+
+        <footer class="site-footer px-4">
+            <span>@string.Format(L["Copyright"], DateTimeOffset.UtcNow.Year)</span>
+            <a href="https://github.com/PortiForce/SimpleAssetAssistant" target="_blank" rel="noopener noreferrer">
+                @L["GitHubLink"]
+            </a>
+            <NavLink href="/about">@L["AboutLink"]</NavLink>
+            <NavLink href="/terms">@L["TermsLink"]</NavLink>
+            <NavLink href="/disclaimer">@L["DisclaimerLink"]</NavLink>
+        </footer>
     </main>
 </div>
 
