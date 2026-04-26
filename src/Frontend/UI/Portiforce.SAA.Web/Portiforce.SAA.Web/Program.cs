@@ -252,19 +252,16 @@ public class Program
 			_ = app.UseHsts();
 		}
 
+		static bool IsApiPath(HttpContext ctx) =>
+			ctx.Request.Path.StartsWithSegments("/bff") ||
+			ctx.Request.Path.StartsWithSegments("/auth") ||
+			ctx.Request.Path.StartsWithSegments("/public");
+
 		// API/BFF paths → ProblemDetails JSON via GlobalExceptionHandler
-		app.UseWhen(
-			ctx => ctx.Request.Path.StartsWithSegments("/bff") ||
-				   ctx.Request.Path.StartsWithSegments("/auth") ||
-				   ctx.Request.Path.StartsWithSegments("/public"),
-			branch => branch.UseExceptionHandler());
+		app.UseWhen(IsApiPath, branch => branch.UseExceptionHandler());
 
 		// UI/Blazor paths → user-friendly error page
-		app.UseWhen(
-			ctx => !ctx.Request.Path.StartsWithSegments("/bff") &&
-				   !ctx.Request.Path.StartsWithSegments("/auth") &&
-				   !ctx.Request.Path.StartsWithSegments("/public"),
-			branch => branch.UseExceptionHandler("/Error"));
+		app.UseWhen(ctx => !IsApiPath(ctx), branch => branch.UseExceptionHandler("/Error"));
 		_ = app.UseHttpsRedirection();
 		_ = app.UseStaticFiles();
 		_ = app.UseRouting();
