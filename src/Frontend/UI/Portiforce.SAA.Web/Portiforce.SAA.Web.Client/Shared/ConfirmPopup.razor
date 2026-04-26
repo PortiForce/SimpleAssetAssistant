@@ -1,10 +1,14 @@
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 
 @inject IStringLocalizer<SharedActionResources> SharedActionL
+@inject IJSRuntime JS
+@implements IAsyncDisposable
 
 @if (isOpen)
 {
     <div class="modal fade show d-block"
+         @ref="modalElement"
          tabindex="-1"
          role="dialog"
          aria-modal="true"
@@ -40,7 +44,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
+    <div class="modal-backdrop fade show" @onclick="CancelAsync"></div>
 }
 
 <style>
@@ -53,8 +57,12 @@
     private readonly string titleElementId = $"confirm-popup-title-{Guid.NewGuid():N}";
     private readonly string descriptionElementId = $"confirm-popup-description-{Guid.NewGuid():N}";
 
+    private ElementReference modalElement;
+    private IJSObjectReference? jsModule;
+    private DotNetObjectReference<ConfirmPopup>? dotNetRef;
     private TaskCompletionSource<bool>? pendingConfirmation;
     private bool isOpen;
+    private bool justOpened;
     private string? activeTitle;
     private string? activeDescription;
 
@@ -85,10 +93,30 @@
         activeTitle = title;
         activeDescription = description;
         pendingConfirmation = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        justOpened = true;
         isOpen = true;
         await InvokeAsync(StateHasChanged);
 
         return await pendingConfirmation.Task;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isOpen && justOpened)
+        {
+            justOpened = false;
+            jsModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Shared/ConfirmPopup.razor.js");
+            dotNetRef ??= DotNetObjectReference.Create(this);
+            await jsModule.InvokeVoidAsync("openModal", modalElement, dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task CancelFromJs()
+    {
+        await CloseWithResultAsync(false);
+        await InvokeAsync(StateHasChanged);
     }
 
     private string DisplayTitle => activeTitle ?? Title;
@@ -105,24 +133,46 @@
             ? SharedActionL["ButtonCancel"].Value
             : CancelButtonText;
 
-    private Task ConfirmAsync()
+    private async Task ConfirmAsync()
     {
-        Complete(true);
-        return Task.CompletedTask;
+        await CloseWithResultAsync(true);
     }
 
-    private Task CancelAsync()
+    private async Task CancelAsync()
     {
-        Complete(false);
-        return Task.CompletedTask;
+        await CloseWithResultAsync(false);
     }
 
-    private void Complete(bool result)
+    private async Task CloseWithResultAsync(bool result)
     {
+        if (jsModule is not null)
+        {
+            await jsModule.InvokeVoidAsync("closeModal");
+        }
+
         isOpen = false;
         activeTitle = null;
         activeDescription = null;
         pendingConfirmation?.TrySetResult(result);
         pendingConfirmation = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (jsModule is not null)
+        {
+            try
+            {
+                await jsModule.InvokeVoidAsync("closeModal");
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit disconnected; skip JS cleanup
+            }
+
+            await jsModule.DisposeAsync();
+        }
+
+        dotNetRef?.Dispose();
     }
 }
