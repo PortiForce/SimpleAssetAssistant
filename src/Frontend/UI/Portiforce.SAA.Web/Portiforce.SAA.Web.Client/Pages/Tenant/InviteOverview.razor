@@ -133,8 +133,8 @@
 </div>
 
 <ConfirmPopup @ref="declineInviteConfirm"
-              Title="@L["TitleConfirmDeclineInvite"].Value"
-              Description="@L["DescriptionConfirmDeclineInvite"].Value"
+              Title="@L["ConfirmDeclineInviteTitle"].Value"
+              Description="@L["ConfirmDeclineInviteDescription"].Value"
               ConfirmButtonText="@L["ActionInviteDecline"].Value"
               ConfirmButtonClass="btn-danger" />
 
@@ -216,7 +216,7 @@
             return;
         }
 
-        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync(L["ConfirmDeclineInviteTitle"].Value, L["ConfirmDeclineInviteDescription"].Value))
+        if (declineInviteConfirm is null || !await declineInviteConfirm.ShowAsync())
         {
             return;
         }

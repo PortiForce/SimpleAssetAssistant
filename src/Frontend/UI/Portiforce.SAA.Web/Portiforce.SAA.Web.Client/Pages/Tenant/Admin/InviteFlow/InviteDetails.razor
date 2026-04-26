@@ -171,7 +171,7 @@ else
             return;
         }
 
-        if (revokeInviteConfirm is null || !await revokeInviteConfirm.ShowAsync(L["ConfirmRevokeInviteTitle"].Value, L["ConfirmRevokeInviteDescription"].Value))
+        if (revokeInviteConfirm is null || !await revokeInviteConfirm.ShowAsync())
         {
             return;
         }
