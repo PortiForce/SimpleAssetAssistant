@@ -29,7 +29,9 @@ internal sealed class OutboxMessageReadRepository(AssetAssistantDbContext db) : 
 
 		if (publishedLeaseTimeout <= TimeSpan.Zero)
 		{
-			throw new ArgumentOutOfRangeException(nameof(publishedLeaseTimeout), "Published lease timeout must be positive.");
+			throw new ArgumentOutOfRangeException(
+				nameof(publishedLeaseTimeout),
+				"Published lease timeout must be positive.");
 		}
 
 		DateTimeOffset leaseExpiredBeforeUtc = nowUtc - publishedLeaseTimeout;
@@ -38,15 +40,18 @@ internal sealed class OutboxMessageReadRepository(AssetAssistantDbContext db) : 
 			.Where(x =>
 				x.Type == type &&
 				(
+
 					// Normal retry path: Pending or Failed messages due for processing
 					((x.State == OutboxMessageState.Pending || x.State == OutboxMessageState.Failed) &&
 					 x.NextAttemptAtUtc != null &&
 					 x.NextAttemptAtUtc <= nowUtc) ||
+
 					// Lease recovery path: Published messages whose claim has expired (worker crashed)
 					(x.State == OutboxMessageState.Published &&
 					 x.PublishedAtUtc != null &&
 					 x.PublishedAtUtc <= leaseExpiredBeforeUtc)
 				))
+
 			// Order Pending/Failed by their due time; order lease-expired Published by when they were claimed
 			.OrderBy(x => x.State == OutboxMessageState.Published ? x.PublishedAtUtc : x.NextAttemptAtUtc)
 			.ThenBy(x => x.CreatedAtUtc)

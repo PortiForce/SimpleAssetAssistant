@@ -52,6 +52,8 @@ internal static class DbConstants
 			{
 				public const string SchemaName = "inf";
 
+				public const string InboxMessageTableName = "InboxMessages";
+
 				public const string OutboxMessageTableName = "OutboxMessages";
 			}
 

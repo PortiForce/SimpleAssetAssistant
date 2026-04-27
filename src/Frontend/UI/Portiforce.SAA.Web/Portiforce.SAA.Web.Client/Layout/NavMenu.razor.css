@@ -1,45 +1,32 @@
-/* Mobile toggler (kept, but styled for light sidebar) */
 .navbar-toggler {
     appearance: none;
     cursor: pointer;
-    width: 3.25rem;
-    height: 2.5rem;
+    height: 1px;
+    opacity: 0;
     position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background-color: rgba(255, 255, 255, 0.4);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.65%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 1.25rem;
-    z-index: 3;
+    width: 1px;
 }
 
-.navbar-toggler:checked {
-    background-color: rgba(0, 0, 0, 0.04);
+.navbar-toggler:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 3px;
 }
 
-/* Scroll container */
 .nav-scrollable {
     display: block;
     padding: 0.75rem 0;
 }
 
-/* Hide nav when toggled (mobile) */
-.navbar-toggler:checked ~ .nav-scrollable {
+.navbar-toggler:not(:checked) ~ .nav-scrollable {
     display: none;
 }
 
-/* typography */
 nav {
     font-size: 0.9rem;
     line-height: 1.25rem;
     color: #212529;
 }
 
-/* section */
 .nav-section {
     margin-top: 0.75rem;
 }
@@ -65,7 +52,6 @@ nav {
     opacity: 0.7;
 }
 
-/* items */
 .nav-section-items {
     padding: 0.15rem 0;
 }
@@ -99,7 +85,6 @@ nav {
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-/* icons smaller + tighter (ChatGPT-like) */
 .bi {
     display: inline-block;
     width: 1.15rem;
@@ -109,10 +94,13 @@ nav {
     opacity: 0.85;
 }
 
-/* Desktop: real scrolling, subtle scrollbar */
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
+    }
+
+    .navbar-toggler:not(:checked) ~ .nav-scrollable {
+        display: block;
     }
 
     .nav-scrollable {

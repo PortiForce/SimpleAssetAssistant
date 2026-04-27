@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using Portiforce.SAA.Application.Models.Common.Messaging;
 using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Core.StaticResources;
 using Portiforce.SAA.Infrastructure.EF.Configuration;
 using Portiforce.SAA.Infrastructure.EF.Converters;
 
@@ -26,7 +27,7 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
 			.IsRequired();
 
 		_ = builder.Property(x => x.Type)
-			.HasMaxLength(300)
+			.HasMaxLength(EntityConstraints.Domain.InfrastructureMessage.TypeMaxLength)
 			.IsRequired();
 
 		_ = builder.Property(x => x.PayloadJson)
@@ -49,10 +50,10 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
 		_ = builder.Property(x => x.NextAttemptAtUtc);
 
 		_ = builder.Property(x => x.LastError)
-			.HasMaxLength(4_000);
+			.HasMaxLength(EntityConstraints.Domain.InfrastructureMessage.LastErrorMaxLength);
 
 		_ = builder.Property(x => x.IdempotencyKey)
-			.HasMaxLength(500)
+			.HasMaxLength(EntityConstraints.Domain.InfrastructureMessage.IdempotencyKeyMaxLength)
 			.IsRequired();
 
 		// Concurrency (shadow)

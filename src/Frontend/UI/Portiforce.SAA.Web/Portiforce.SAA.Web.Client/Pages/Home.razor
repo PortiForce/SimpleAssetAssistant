@@ -13,39 +13,60 @@
     <div class="hero">
         <div class="hero-card">
             <div class="tenant-brand">@TenantBrandName</div>
-            <h1>@L["TitleProductName"]</h1>
-            <p class="lead">
-                @L["SubtitleTenantResolvedLead"]
-            </p>
+            @if (IsDemoTenant)
+            {
+                <h1>@L["DemoTenantTitle"]</h1>
+                <p class="lead">
+                    @L["DemoTenantLead"]
+                </p>
 
-            <AuthorizeView>
-                <Authorized>
-                    <div class="badge ok">@L["StatusSignedIn"]</div>
-                    <p class="mt">@L["InfoNavigateToTenantFeatures"]</p>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="badge warn">@L["StatusInviteOnlyAccess"]</div>
-                    <p class="mt">
-                        @L["InfoOpenInvitationLinkToJoinTenant"]
+                <div class="section info-box">
+                    <h2>@L["DemoAccountTitle"]</h2>
+                    <p>
+                        @L["DemoAccountText"]
                     </p>
-                    <a class="btn btn-primary" href="@AuthRoutes.Login">@L["ActionLogIn"]</a>
-                </NotAuthorized>
-            </AuthorizeView>
+                    <div class="actions">
+                        <a class="btn btn-primary" href="@DemoAccountRequestHref">@L["ActionRequestDemoAccount"]</a>
+                        <a class="btn btn-secondary" href="@AuthRoutes.Login">@L["ActionLogIn"]</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h1>@L["RealTenantTitle"]</h1>
+                <p class="lead">
+                    @L["RealTenantLead"]
+                </p>
 
-            <div class="tiles">
-                <div class="tile">
-                    <div class="tile-title">@L["TileTitleTenantIsolation"]</div>
-                    <div class="tile-text">@L["TileTextTenantIsolation"]</div>
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="badge ok">@L["StatusSignedIn"]</div>
+                        <p class="mt">@L["InfoNavigateToTenantFeatures"]</p>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="badge warn">@L["StatusInviteOnlyAccess"]</div>
+                        <p class="mt">
+                            @L["InfoOpenInvitationLinkToJoinTenant"]
+                        </p>
+                        <a class="btn btn-primary" href="@AuthRoutes.Login">@L["ActionLogIn"]</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+                <div class="tiles">
+                    <div class="tile">
+                        <div class="tile-title">@L["TileTitlePortfolioClarity"]</div>
+                        <div class="tile-text">@L["TileTextPortfolioClarity"]</div>
+                    </div>
+                    <div class="tile">
+                        <div class="tile-title">@L["TileTitleTenantIsolation"]</div>
+                        <div class="tile-text">@L["TileTextTenantIsolation"]</div>
+                    </div>
+                    <div class="tile">
+                        <div class="tile-title">@L["TileTitleInviteOnlyOnboarding"]</div>
+                        <div class="tile-text">@L["TileTextInviteOnlyOnboarding"]</div>
+                    </div>
                 </div>
-                <div class="tile">
-                    <div class="tile-title">@L["TileTitleInviteOnlyOnboarding"]</div>
-                    <div class="tile-text">@L["TileTextInviteOnlyOnboarding"]</div>
-                </div>
-                <div class="tile">
-                    <div class="tile-title">@L["TileTitleExternalLogin"]</div>
-                    <div class="tile-text">@L["TileTextExternalLogin"]</div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 }
@@ -59,49 +80,32 @@ else
             </p>
 
             <div class="section">
-                <h2>@L["SectionTitleWhatIsPortiForce"]</h2>
+                <h2>@L["SectionTitleTenantBasedPlatform"]</h2>
                 <p>
-                    @L["SectionTextWhatIsPortiForce"]
+                    @L["SectionTextTenantBasedPlatform"]
                 </p>
             </div>
 
             <div class="section">
-                <h2>@L["SectionTitleKeyFeatures"]</h2>
-                <ul class="features-list">
-                    <li>
-                        <strong>@L["FeatureTenantIsolationTitle"]</strong>
-                        @L["FeatureTenantIsolationText"]
-                    </li>
-                    <li>
-                        <strong>@L["FeatureActivityTrackingTitle"]</strong>
-                        @L["FeatureActivityTrackingText"]
-                    </li>
-                    <li>
-                        <strong>@L["FeatureAssetManagementTitle"]</strong>
-                        @L["FeatureAssetManagementText"]
-                    </li>
-                    <li>
-                        <strong>@L["FeatureSecureAuthenticationTitle"]</strong>
-                        @L["FeatureSecureAuthenticationText"]
-                    </li>
-                    <li>
-                        <strong>@L["FeatureInviteOnlyAccessTitle"]</strong>
-                        @L["FeatureInviteOnlyAccessText"]
-                    </li>
-                </ul>
+                <h2>@L["SectionTitleDemoTenant"]</h2>
+                <p>
+                    @L["SectionTextDemoTenant", DemoTenantHost]
+                </p>
+                <a class="btn btn-secondary" href="@DemoTenantUrl">@DemoTenantHost</a>
             </div>
 
             <div class="section">
-                <h2>@L["SectionTitleHowItWorks"]</h2>
+                <h2>@L["SectionTitleRequestAccess"]</h2>
                 <p>
-                    @L["SectionTextHowItWorks", $"yourcompany.{baseDomain}"]
+                    @L["SectionTextRequestAccess"]
                 </p>
+                <a class="btn btn-primary" href="@ContactMeHref">@L["ActionContactSupport"]</a>
             </div>
 
             <div class="section info-box">
-                <h3>@L["InfoBoxTitleNeedAccess"]</h3>
+                <h3>@L["InfoBoxTitleSandboxTenant"]</h3>
                 <p>
-                    @L["InfoBoxTextNeedAccess"]
+                    @L["InfoBoxTextSandboxTenant"]
                 </p>
             </div>
         </div>
@@ -112,7 +116,15 @@ else
     [CascadingParameter]
     private TenantInfo Tenant { get; set; } = new();
 
-    private string baseDomain => Tenant.BaseDomain;
+    private string DemoTenantHost => L["DemoTenantHost"].Value;
+
+    private string DemoTenantUrl => $"https://{DemoTenantHost}";
+
+    private string ContactMeHref => "/contact-me";
+
+    private string DemoAccountRequestHref => $"{ContactMeHref}?request=demo-account";
+
+    private bool IsDemoTenant => string.Equals(Tenant.Prefix, "demo", StringComparison.OrdinalIgnoreCase);
 
     private string TenantBrandName => string.IsNullOrWhiteSpace(Tenant.BrandName)
         ? Tenant.Prefix ?? L["TitleProductName"].Value
