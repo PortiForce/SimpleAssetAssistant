@@ -1,0 +1,9 @@
+.content-page .btn {
+    margin-top: 4px;
+}
+
+@media (min-width: 641px) {
+    .content-page .btn {
+        width: auto;
+    }
+}

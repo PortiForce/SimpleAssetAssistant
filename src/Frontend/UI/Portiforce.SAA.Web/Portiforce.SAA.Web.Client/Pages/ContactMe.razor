@@ -1,0 +1,47 @@
+@page "/contact-me"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<ContactMe> L
+
+<PageTitle>@L["PageTitle"]</PageTitle>
+
+<section class="content-page">
+    <h1>@L["Heading"]</h1>
+    <p>
+        @IntroText
+    </p>
+    <p>
+        @L["ResponseText"]
+    </p>
+    <p>
+        <a class="btn btn-primary" href="@MailToHref">@L["ActionSendRequest"]</a>
+    </p>
+</section>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "request")]
+    public string? RequestType { get; set; }
+
+    private bool IsDemoAccountRequest => string.Equals(RequestType, "demo-account", StringComparison.OrdinalIgnoreCase);
+
+    private string IntroText => IsDemoAccountRequest
+        ? L["DemoAccountIntro"].Value
+        : L["GeneralIntro"].Value;
+
+    private string MailToHref
+    {
+        get
+        {
+            string subject = Uri.EscapeDataString(IsDemoAccountRequest
+                ? L["DemoAccountSubject"].Value
+                : L["GeneralSubject"].Value);
+
+            string body = Uri.EscapeDataString(IsDemoAccountRequest
+                ? L["DemoAccountBody"].Value
+                : L["GeneralBody"].Value);
+
+            return $"mailto:{L["SupportEmail"].Value}?subject={subject}&body={body}";
+        }
+    }
+}
