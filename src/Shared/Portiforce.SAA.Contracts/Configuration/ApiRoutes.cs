@@ -16,6 +16,8 @@ public static class ApiRoutes
 
 	public const string Platform = "/bff/platform";
 
+	public const string Contact = "/bff/contact";
+
 	public static class AdminInviteRoutes
 	{
 		public const string Root = $"{BffRoot}/admin/invites";

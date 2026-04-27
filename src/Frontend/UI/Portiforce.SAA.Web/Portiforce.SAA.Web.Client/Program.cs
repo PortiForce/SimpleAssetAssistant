@@ -79,6 +79,13 @@ internal class Program
 			.AddHttpMessageHandler<BrowserCredentialsHandler>()
 			.AddHttpMessageHandler<AntiforgeryHandler>();
 
+		_ = builder.Services.AddHttpClient<IContactApiClient, ContactApiClient>(client =>
+			{
+				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+			})
+			.AddHttpMessageHandler<BrowserCredentialsHandler>()
+			.AddHttpMessageHandler<AntiforgeryHandler>();
+
 		_ = builder.Services.AddHttpClient<ITenantApiClient, TenantApiClient>(client =>
 			{
 				client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);

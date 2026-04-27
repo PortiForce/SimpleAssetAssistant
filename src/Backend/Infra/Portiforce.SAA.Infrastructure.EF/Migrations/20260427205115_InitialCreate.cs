@@ -22,10 +22,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				name: "ledger");
 
 			_ = migrationBuilder.EnsureSchema(
-				name: "pf");
+				name: "inf");
 
 			_ = migrationBuilder.EnsureSchema(
-				name: "inf");
+				name: "pf");
 
 			_ = migrationBuilder.CreateTable(
 				name: "Assets",
@@ -113,6 +113,43 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 					_ = table.PrimaryKey("PK_Accounts", x => x.Id);
 					_ = table.ForeignKey(
 						name: "FK_Accounts_Tenants_TenantId",
+						column: x => x.TenantId,
+						principalSchema: "core",
+						principalTable: "Tenants",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Restrict);
+				});
+
+			_ = migrationBuilder.CreateTable(
+				name: "InboxMessages",
+				schema: "inf",
+				columns: table => new
+				{
+					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+					PublicReference = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+					Type = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+					PayloadJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+					Source = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+					RequestPath = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
+					HttpMethod = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+					RemoteIpAddress = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
+					UserAgent = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
+					State = table.Column<byte>(type: "tinyint", nullable: false),
+					ReceivedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+					ProcessingStartedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					ProcessedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					AttemptCount = table.Column<int>(type: "int", nullable: false),
+					NextAttemptAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+					LastError = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
+					IdempotencyKey = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+					RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+				},
+				constraints: table =>
+				{
+					_ = table.PrimaryKey("PK_InboxMessages", x => x.Id);
+					_ = table.ForeignKey(
+						name: "FK_InboxMessages_Tenants_TenantId",
 						column: x => x.TenantId,
 						principalSchema: "core",
 						principalTable: "Tenants",
@@ -564,6 +601,32 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 				unique: true);
 
 			_ = migrationBuilder.CreateIndex(
+				name: "IX_Inbox_State_NextAttempt_Type",
+				schema: "inf",
+				table: "InboxMessages",
+				columns: new[] { "State", "NextAttemptAtUtc", "Type" });
+
+			_ = migrationBuilder.CreateIndex(
+				name: "IX_Inbox_TenantId_ReceivedAt",
+				schema: "inf",
+				table: "InboxMessages",
+				columns: new[] { "TenantId", "ReceivedAtUtc" });
+
+			_ = migrationBuilder.CreateIndex(
+				name: "UX_Inbox_IdempotencyKey",
+				schema: "inf",
+				table: "InboxMessages",
+				column: "IdempotencyKey",
+				unique: true);
+
+			_ = migrationBuilder.CreateIndex(
+				name: "UX_Inbox_PublicReference",
+				schema: "inf",
+				table: "InboxMessages",
+				column: "PublicReference",
+				unique: true);
+
+			_ = migrationBuilder.CreateIndex(
 				name: "IX_Invite_State",
 				schema: "pf",
 				table: "Invites",
@@ -780,6 +843,10 @@ namespace Portiforce.SAA.Infrastructure.EF.Migrations
 			_ = migrationBuilder.DropTable(
 				name: "ExternalIdentities",
 				schema: "auth");
+
+			_ = migrationBuilder.DropTable(
+				name: "InboxMessages",
+				schema: "inf");
 
 			_ = migrationBuilder.DropTable(
 				name: "Invites",

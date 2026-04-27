@@ -106,6 +106,42 @@
   <value>PortiForce — Simple Asset Assistant</value>
 </data>
 
+<data name="DemoTenantHost" xml:space="preserve">
+  <value>demo.portiforce.ai</value>
+</data>
+
+<data name="RealTenantTitle" xml:space="preserve">
+  <value>Портфельні операції для вашого тенанта</value>
+</data>
+
+<data name="RealTenantLead" xml:space="preserve">
+  <value>PortiForce допомагає кожній організації тримати активності з активами, портфельні представлення, користувачів і запрошення ізольованими у власному тенант-просторі.</value>
+</data>
+
+<data name="DemoTenantTitle" xml:space="preserve">
+  <value>Демо-тенант</value>
+</data>
+
+<data name="DemoTenantLead" xml:space="preserve">
+  <value>Цей тенант призначений для оцінки PortiForce. Після авторизації ви зможете увійти й переглянути логіку платформи, портфельні сценарії, ізоляцію тенантів та онбординг через запрошення.</value>
+</data>
+
+<data name="DemoAccountTitle" xml:space="preserve">
+  <value>Запитати демо-акаунт</value>
+</data>
+
+<data name="DemoAccountText" xml:space="preserve">
+  <value>Демо-акаунти активні протягом двох тижнів. Якщо вам потрібно більше часу, надішліть запит на продовження команді підтримки.</value>
+</data>
+
+<data name="ActionRequestDemoAccount" xml:space="preserve">
+  <value>Запитати демо-акаунт</value>
+</data>
+
+<data name="ActionContactSupport" xml:space="preserve">
+  <value>Зв'язатися з підтримкою</value>
+</data>
+
 <data name="SubtitleTenantResolvedLead" xml:space="preserve">
   <value>Імпортуйте угоди, звіряйте активності та краще розумійте свій портфель.</value>
 </data>
@@ -138,6 +174,14 @@
   <value>Кожен тенант працює у власному піддомені. Без перемикання.</value>
 </data>
 
+<data name="TileTitlePortfolioClarity" xml:space="preserve">
+  <value>Прозорість портфеля</value>
+</data>
+
+<data name="TileTextPortfolioClarity" xml:space="preserve">
+  <value>Відстежуйте активності та розумійте, як кожна зміна впливає на портфель акаунта.</value>
+</data>
+
 <data name="TileTitleInviteOnlyOnboarding" xml:space="preserve">
   <value>Онбординг лише за запрошенням</value>
 </data>
@@ -155,7 +199,39 @@
 </data>
 
 <data name="SubtitleLandingLead" xml:space="preserve">
-  <value>Багатотенантна платформа керування портфелем, яка допомагає відстежувати, звіряти та розуміти ваші інвестиційні активності.</value>
+  <value>Тенант-орієнтована платформа керування портфелем для ізольованого відстеження активів, сценаріїв акаунтів і доступу лише за запрошенням.</value>
+</data>
+
+<data name="SectionTitleTenantBasedPlatform" xml:space="preserve">
+  <value>Тенантна модель за задумом</value>
+</data>
+
+<data name="SectionTextTenantBasedPlatform" xml:space="preserve">
+  <value>PortiForce розділяє кожну організацію у власний контекст тенанта. Якщо URL не відповідає жодному тенанту, ця сторінка показує загальну інформацію про платформу замість інструментів конкретного тенанта.</value>
+</data>
+
+<data name="SectionTitleDemoTenant" xml:space="preserve">
+  <value>Спробуйте демо-тенант</value>
+</data>
+
+<data name="SectionTextDemoTenant" xml:space="preserve">
+  <value>Спільний демо-тенант доступний за адресою {0}. Щоб скористатися демо-акаунтом, зверніться до команди розробки через сторінку контактів, і ми надішлемо вам запрошення. Демо-акаунти активні протягом двох тижнів.</value>
+</data>
+
+<data name="SectionTitleRequestAccess" xml:space="preserve">
+  <value>Доступ і sandbox-тенанти</value>
+</data>
+
+<data name="SectionTextRequestAccess" xml:space="preserve">
+  <value>Скористайтеся сторінкою контактів, щоб запитати демо-доступ, запросити запрошення для демо-акаунта або попросити окремий sandbox-тенант для приватної оцінки.</value>
+</data>
+
+<data name="InfoBoxTitleSandboxTenant" xml:space="preserve">
+  <value>Потрібен ізольований sandbox?</value>
+</data>
+
+<data name="InfoBoxTextSandboxTenant" xml:space="preserve">
+  <value>Окремий sandbox-тенант можна підготувати за запитом. Надішліть запит команді підтримки через сторінку контактів, щоб ми підтвердили обсяг і запросили потрібних користувачів.</value>
 </data>
 
 <data name="SectionTitleWhatIsPortiForce" xml:space="preserve">

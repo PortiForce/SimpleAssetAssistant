@@ -3,17 +3,12 @@ using Portiforce.SAA.Application.Interfaces.Projections;
 using Portiforce.SAA.Core.Extensions;
 using Portiforce.SAA.Core.Interfaces;
 using Portiforce.SAA.Core.Primitives.Ids;
+using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Application.Models.Common.Messaging;
 
 public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 {
-	private const int MaxTypeLength = 300;
-
-	private const int MaxIdempotencyKeyLength = 500;
-
-	private const int MaxLastErrorLength = 4_000;
-
 	// EF Core constructor
 	private OutboxMessage()
 	{
@@ -42,9 +37,12 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 			throw new ArgumentException("CreatedAtUtc is not defined.", nameof(createdAtUtc));
 		}
 
-		this.Type = NormalizeRequired(type, nameof(type), MaxTypeLength);
+		this.Type = NormalizeRequired(type, nameof(type), EntityConstraints.Domain.InfrastructureMessage.TypeMaxLength);
 		this.PayloadJson = NormalizeRequired(payloadJson, nameof(payloadJson));
-		this.IdempotencyKey = NormalizeRequired(idempotencyKey, nameof(idempotencyKey), MaxIdempotencyKeyLength);
+		this.IdempotencyKey = NormalizeRequired(
+			idempotencyKey,
+			nameof(idempotencyKey),
+			EntityConstraints.Domain.InfrastructureMessage.IdempotencyKeyMaxLength);
 
 		this.Id = id;
 		this.TenantId = tenantId;
@@ -175,7 +173,7 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 		this.LastError = Truncate(
 			NormalizeRequired(error, nameof(error)),
-			MaxLastErrorLength);
+			EntityConstraints.Domain.InfrastructureMessage.LastErrorMaxLength);
 
 		if (this.AttemptCount >= maxAttempts)
 		{

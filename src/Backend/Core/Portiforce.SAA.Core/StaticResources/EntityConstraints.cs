@@ -99,5 +99,18 @@ public static class EntityConstraints
 			public const int UserAgentMaxLength = 256;
 			public const int UserAgentFingerprint = 32;
 		}
+
+		public static class InfrastructureMessage
+		{
+			public const int PublicReferenceMaxLength = 32;
+			public const int TypeMaxLength = 300;
+			public const int SourceMaxLength = 200;
+			public const int RequestPathMaxLength = 2_048;
+			public const int HttpMethodMaxLength = 16;
+			public const int RemoteIpAddressMaxLength = 64;
+			public const int UserAgentMaxLength = 512;
+			public const int IdempotencyKeyMaxLength = 500;
+			public const int LastErrorMaxLength = 4_000;
+		}
 	}
 }

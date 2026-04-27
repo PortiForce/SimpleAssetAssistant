@@ -106,6 +106,42 @@
   <value>PortiForce — Simple Asset Assistant</value>
 </data>
 
+<data name="DemoTenantHost" xml:space="preserve">
+  <value>demo.portiforce.ai</value>
+</data>
+
+<data name="RealTenantTitle" xml:space="preserve">
+  <value>Portfolio operations for your tenant</value>
+</data>
+
+<data name="RealTenantLead" xml:space="preserve">
+  <value>PortiForce helps each organization keep asset activity, portfolio views, users, and invitation flows isolated inside its own tenant workspace.</value>
+</data>
+
+<data name="DemoTenantTitle" xml:space="preserve">
+  <value>Demo tenant</value>
+</data>
+
+<data name="DemoTenantLead" xml:space="preserve">
+  <value>This tenant is reserved for evaluating PortiForce. Once authorized, you can sign in and explore the platform logic, portfolio workflows, tenant isolation, and invite-based onboarding.</value>
+</data>
+
+<data name="DemoAccountTitle" xml:space="preserve">
+  <value>Request a demo account</value>
+</data>
+
+<data name="DemoAccountText" xml:space="preserve">
+  <value>Demo accounts are active for two weeks. If you need more time, send an extension request to the support team.</value>
+</data>
+
+<data name="ActionRequestDemoAccount" xml:space="preserve">
+  <value>Request demo account</value>
+</data>
+
+<data name="ActionContactSupport" xml:space="preserve">
+  <value>Contact support</value>
+</data>
+
 <data name="SubtitleTenantResolvedLead" xml:space="preserve">
   <value>Import trades, reconcile activity, and understand your portfolio with clarity.</value>
 </data>
@@ -138,6 +174,14 @@
   <value>Each tenant lives in its own subdomain. No switching.</value>
 </data>
 
+<data name="TileTitlePortfolioClarity" xml:space="preserve">
+  <value>Portfolio clarity</value>
+</data>
+
+<data name="TileTextPortfolioClarity" xml:space="preserve">
+  <value>Track activity and understand how every change affects the account portfolio.</value>
+</data>
+
 <data name="TileTitleInviteOnlyOnboarding" xml:space="preserve">
   <value>Invite-only onboarding</value>
 </data>
@@ -155,7 +199,39 @@
 </data>
 
 <data name="SubtitleLandingLead" xml:space="preserve">
-  <value>A multi-tenant portfolio management platform that helps you track, reconcile, and understand your investment activities.</value>
+  <value>A tenant-based portfolio management platform for isolated asset tracking, account workflows, and invite-only access.</value>
+</data>
+
+<data name="SectionTitleTenantBasedPlatform" xml:space="preserve">
+  <value>Tenant-based by design</value>
+</data>
+
+<data name="SectionTextTenantBasedPlatform" xml:space="preserve">
+  <value>PortiForce separates every organization into its own tenant context. If the URL does not resolve to a tenant, this page shows general platform information instead of tenant-specific tools.</value>
+</data>
+
+<data name="SectionTitleDemoTenant" xml:space="preserve">
+  <value>Try the demo tenant</value>
+</data>
+
+<data name="SectionTextDemoTenant" xml:space="preserve">
+  <value>The shared demo tenant is available at {0}. To use a demo account, contact the development team from the contact page and we will send you an invite. Demo accounts stay active for two weeks.</value>
+</data>
+
+<data name="SectionTitleRequestAccess" xml:space="preserve">
+  <value>Access and sandbox tenants</value>
+</data>
+
+<data name="SectionTextRequestAccess" xml:space="preserve">
+  <value>Use the contact page to request demo access, ask for a demo account invite, or request an individual sandbox tenant for private evaluation.</value>
+</data>
+
+<data name="InfoBoxTitleSandboxTenant" xml:space="preserve">
+  <value>Need an isolated sandbox?</value>
+</data>
+
+<data name="InfoBoxTextSandboxTenant" xml:space="preserve">
+  <value>A dedicated sandbox tenant can be prepared on request. Send the request to the support team through the contact page so we can confirm the scope and invite the right users.</value>
 </data>
 
 <data name="SectionTitleWhatIsPortiForce" xml:space="preserve">

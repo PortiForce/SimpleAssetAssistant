@@ -53,6 +53,8 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 	public DbSet<TenantInvite> Invites => this.Set<TenantInvite>();
 
 	// Infra
+	public DbSet<InboxMessage> InboxMessages => this.Set<InboxMessage>();
+
 	public DbSet<OutboxMessage> OutboxMessages => this.Set<OutboxMessage>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -99,6 +101,7 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 		_ = modelBuilder.ApplyConfiguration(new TenantInviteConfiguration());
 
 		// infra
+		_ = modelBuilder.ApplyConfiguration(new InboxMessageConfiguration());
 		_ = modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 
 		// relationships
@@ -227,6 +230,13 @@ public class AssetAssistantDbContext(DbContextOptions<AssetAssistantDbContext> o
 
 		// Tenant -> Outbox messages
 		_ = modelBuilder.Entity<OutboxMessage>()
+			.HasOne<Tenant>()
+			.WithMany()
+			.HasForeignKey(x => x.TenantId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		// Tenant -> Inbox messages
+		_ = modelBuilder.Entity<InboxMessage>()
 			.HasOne<Tenant>()
 			.WithMany()
 			.HasForeignKey(x => x.TenantId)

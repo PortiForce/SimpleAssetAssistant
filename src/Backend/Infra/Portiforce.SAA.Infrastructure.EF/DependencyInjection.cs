@@ -8,6 +8,7 @@ using Portiforce.SAA.Application.Interfaces.Persistence;
 using Portiforce.SAA.Application.Interfaces.Persistence.Activity;
 using Portiforce.SAA.Application.Interfaces.Persistence.Asset;
 using Portiforce.SAA.Application.Interfaces.Persistence.Auth;
+using Portiforce.SAA.Application.Interfaces.Persistence.BackgroundTasks.Inbox;
 using Portiforce.SAA.Application.Interfaces.Persistence.BackgroundTasks.Outbox;
 using Portiforce.SAA.Application.Interfaces.Persistence.Client;
 using Portiforce.SAA.Application.Interfaces.Persistence.Invite;
@@ -22,6 +23,7 @@ using Portiforce.SAA.Infrastructure.EF.Repositories;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Activity;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Asset;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Auth;
+using Portiforce.SAA.Infrastructure.EF.Repositories.BackgroundTasks.Inbox;
 using Portiforce.SAA.Infrastructure.EF.Repositories.BackgroundTasks.Outbox;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Client;
 using Portiforce.SAA.Infrastructure.EF.Repositories.Invite;
@@ -34,81 +36,83 @@ namespace Portiforce.SAA.Infrastructure.EF;
 
 public static class DependencyInjection
 {
-	public static IServiceCollection AddEfInfrastructure(
-		this IServiceCollection services,
-		IConfiguration configuration)
-	{
-		services.AddDbContext<AssetAssistantDbContext>(opt =>
-		{
-			opt.UseSqlServer(
-				configuration.GetConnectionString("AssetAssistantSQLDb"),
-				sql =>
-				{
-					sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
-					sql.CommandTimeout(30);
-					sql.EnableRetryOnFailure(
-						5,
-						TimeSpan.FromSeconds(20),
-						null);
-				});
-			opt.EnableDetailedErrors();
+    public static IServiceCollection AddEfInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddDbContext<AssetAssistantDbContext>(opt =>
+        {
+            opt.UseSqlServer(
+                configuration.GetConnectionString("AssetAssistantSQLDb"),
+                sql =>
+                {
+                    sql.MigrationsAssembly(typeof(AssetAssistantDbContext).Assembly.FullName);
+                    sql.CommandTimeout(30);
+                    sql.EnableRetryOnFailure(
+                        5,
+                        TimeSpan.FromSeconds(20),
+                        null);
+                });
+            opt.EnableDetailedErrors();
 
 #if DEBUG
 
-			// only for local debugging
-			opt.EnableSensitiveDataLogging();
+            // only for local debugging
+            opt.EnableSensitiveDataLogging();
 #endif
-		});
+        });
 
-		// for seeded functionality
-		services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
-		services.AddSingleton<IHashingService, TokenHashingService>();
+        // for seeded functionality
+        services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+        services.AddSingleton<IHashingService, TokenHashingService>();
 
-		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+        services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
-		// data seeders:
-		services.AddScoped<DbUserSeeder>();
-		services.AddScoped<SystemAccountSeeder>();
-		services.AddScoped<InviteSeeder>();
+        // data seeders:
+        services.AddScoped<DbUserSeeder>();
+        services.AddScoped<SystemAccountSeeder>();
+        services.AddScoped<InviteSeeder>();
 
-		// Repositories
-		services.AddScoped<ITenantReadRepository, TenantReadRepository>();
-		services.AddScoped<ITenantWriteRepository, TenantWriteRepository>();
+        // Repositories
+        services.AddScoped<ITenantReadRepository, TenantReadRepository>();
+        services.AddScoped<ITenantWriteRepository, TenantWriteRepository>();
 
-		services.AddScoped<IInviteReadRepository, InviteReadRepository>();
-		services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
-		services.AddScoped<IInviteSummaryRepository, InviteSummaryRepository>();
+        services.AddScoped<IInviteReadRepository, InviteReadRepository>();
+        services.AddScoped<IInviteWriteRepository, InviteWriteRepository>();
+        services.AddScoped<IInviteSummaryRepository, InviteSummaryRepository>();
 
-		services.AddScoped<IAccountReadRepository, AccountReadRepository>();
-		services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();
+        services.AddScoped<IAccountReadRepository, AccountReadRepository>();
+        services.AddScoped<IAccountWriteRepository, AccountWriteRepository>();
 
-		services.AddScoped<ICurrentUserReadRepository, CurrentUserReadRepository>();
-		services.AddScoped<ICurrentUserWriteRepository, CurrentUserWriteRepository>();
+        services.AddScoped<ICurrentUserReadRepository, CurrentUserReadRepository>();
+        services.AddScoped<ICurrentUserWriteRepository, CurrentUserWriteRepository>();
 
-		services.AddScoped<IPlatformReadRepository, PlatformReadRepository>();
-		services.AddScoped<IPlatformWriteRepository, PlatformWriteRepository>();
+        services.AddScoped<IPlatformReadRepository, PlatformReadRepository>();
+        services.AddScoped<IPlatformWriteRepository, PlatformWriteRepository>();
 
-		services.AddScoped<IPlatformAccountReadRepository, PlatformAccountReadRepository>();
-		services.AddScoped<IPlatformAccountWriteRepository, PlatformAccountWriteRepository>();
+        services.AddScoped<IPlatformAccountReadRepository, PlatformAccountReadRepository>();
+        services.AddScoped<IPlatformAccountWriteRepository, PlatformAccountWriteRepository>();
 
-		services.AddScoped<IAssetReadRepository, AssetReadRepository>();
-		services.AddScoped<IAssetWriteRepository, AssetWriteRepository>();
+        services.AddScoped<IAssetReadRepository, AssetReadRepository>();
+        services.AddScoped<IAssetWriteRepository, AssetWriteRepository>();
 
-		services.AddScoped<IActivityReadRepository, ActivityReadRepository>();
-		services.AddScoped<IActivityWriteRepository, ActivityWriteRepository>();
+        services.AddScoped<IActivityReadRepository, ActivityReadRepository>();
+        services.AddScoped<IActivityWriteRepository, ActivityWriteRepository>();
 
-		services.AddScoped<IExternalIdentityReadRepository, ExternalIdentityReadRepository>();
-		services.AddScoped<IExternalIdentityWriteRepository, ExternalIdentityWriteRepository>();
+        services.AddScoped<IExternalIdentityReadRepository, ExternalIdentityReadRepository>();
+        services.AddScoped<IExternalIdentityWriteRepository, ExternalIdentityWriteRepository>();
 
-		services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
-		services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
+        services.AddScoped<IAuthSessionReadRepository, AuthSessionReadRepository>();
+        services.AddScoped<IAuthSessionWriteRepository, AuthSessionWriteRepository>();
 
-		services.AddScoped<IAccountIdentifierReadRepository, AccountIdentifierReadRepository>();
-		services.AddScoped<IAccountIdentifierWriteRepository, AccountIdentifierWriteRepository>();
+        services.AddScoped<IAccountIdentifierReadRepository, AccountIdentifierReadRepository>();
+        services.AddScoped<IAccountIdentifierWriteRepository, AccountIdentifierWriteRepository>();
 
-		services.AddScoped<IOutboxMessageReadRepository, OutboxMessageReadRepository>();
-		services.AddScoped<IOutboxMessageWriteRepository, OutboxMessageWriteRepository>();
+        services.AddScoped<IInboxMessageReadRepository, InboxMessageReadRepository>();
+        services.AddScoped<IInboxMessageWriteRepository, InboxMessageWriteRepository>();
+        services.AddScoped<IOutboxMessageReadRepository, OutboxMessageReadRepository>();
+        services.AddScoped<IOutboxMessageWriteRepository, OutboxMessageWriteRepository>();
 
-		return services;
-	}
+        return services;
+    }
 }

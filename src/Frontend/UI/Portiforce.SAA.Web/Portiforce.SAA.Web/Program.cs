@@ -1,7 +1,9 @@
 using System.Globalization;
+using System.Threading.RateLimiting;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.RateLimiting;
 
 using Portiforce.SAA.Application;
 using Portiforce.SAA.Application.Interfaces.Common.Time;
@@ -86,6 +88,15 @@ public class Program
 			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
 									  ?? throw new InvalidOperationException(
 										  "ManageInvitesApiClient requires an active HttpContext.");
+
+			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+		});
+
+		_ = builder.Services.AddHttpClient<IContactApiClient, ContactApiClient>((sp, http) =>
+		{
+			HttpContext httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+									  ?? throw new InvalidOperationException(
+										  "ContactApiClient requires an active HttpContext.");
 
 			http.BaseAddress = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
 		});
@@ -224,6 +235,21 @@ public class Program
 
 		_ = builder.Services.AddAntiforgery(options => { options.HeaderName = "RequestVerificationToken"; });
 
+		_ = builder.Services.AddRateLimiter(options =>
+		{
+			options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+			options.AddPolicy(
+				"ContactMessages",
+				httpContext => RateLimitPartition.GetFixedWindowLimiter(
+					GetClientRateLimitPartition(httpContext),
+					static _ => new FixedWindowRateLimiterOptions
+					{
+						PermitLimit = 3,
+						Window = TimeSpan.FromMinutes(1),
+						QueueLimit = 0
+					}));
+		});
+
 		_ = builder.Services.AddProblemDetails();
 
 		_ = builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -283,6 +309,7 @@ public class Program
 		// Auth must be before endpoints
 		_ = app.UseAuthentication();
 		_ = app.UseAuthorization();
+		_ = app.UseRateLimiter();
 
 		// allow to the flow define`.DisableAntiforgery()` metadata on your endpoint!
 		_ = app.UseAntiforgery();
@@ -304,6 +331,11 @@ public class Program
 	private static bool IsConfiguredValue(string? value) =>
 		!string.IsNullOrWhiteSpace(value) &&
 		!value.Contains("{from-configs}", StringComparison.OrdinalIgnoreCase);
+
+	private static string GetClientRateLimitPartition(HttpContext httpContext) =>
+		httpContext.Connection.RemoteIpAddress?.ToString()
+		?? httpContext.Request.Headers.Host.ToString()
+		?? "anonymous";
 
 	private static string BuildContentSecurityPolicy(IHostEnvironment environment)
 	{
