@@ -2,6 +2,33 @@
     margin-top: 4px;
 }
 
+.contact-form {
+    max-width: 720px;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+.contact-note {
+    max-width: 720px;
+}
+
+.contact-honeypot {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.validation-message {
+    color: #842029;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
 @media (min-width: 641px) {
     .content-page .btn {
         width: auto;

@@ -45,4 +45,8 @@
     <PackageReference Update="Roslynator.Analyzers" Version="4.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Messaging\Projections\" />
+  </ItemGroup>
+
 </Project>

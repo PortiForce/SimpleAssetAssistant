@@ -1,6 +1,11 @@
 @page "/contact-me"
-@using Microsoft.AspNetCore.Components
+@using System.Globalization
 @using Microsoft.Extensions.Localization
+@using Portiforce.SAA.Contracts.Models.Client.Contact
+@using Portiforce.SAA.Web.Client.Services.Interfaces
+@rendermode InteractiveWebAssembly
+
+@inject IContactApiClient ContactApiClient
 @inject IStringLocalizer<ContactMe> L
 
 <PageTitle>@L["PageTitle"]</PageTitle>
@@ -13,9 +18,75 @@
     <p>
         @L["ResponseText"]
     </p>
-    <p>
-        <a class="btn btn-primary" href="@MailToHref">@L["ActionSendRequest"]</a>
+    <p class="contact-note">
+        @L["SensitiveInformationWarning"]
     </p>
+    <p class="contact-note">
+        @L["ReplyTimeNote"]<br />
+        @L["UrgentBusinessNote"]
+    </p>
+
+    <EditForm Model="@contactModel" OnValidSubmit="HandleSubmitAsync" class="contact-form">
+        <DataAnnotationsValidator />
+
+        <div class="contact-honeypot" aria-hidden="true">
+            <label for="contact-website">Website</label>
+            <InputText id="contact-website"
+                       tabindex="-1"
+                       autocomplete="off"
+                       @bind-Value="contactModel.Website" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="contact-name">@L["LabelName"]</label>
+            <InputText id="contact-name" class="form-control" @bind-Value="contactModel.Name" placeholder=@L["HelpName"] />
+            <ValidationMessage For="@(() => contactModel.Name)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="contact-email">@L["LabelEmailAddress"]</label>
+            <InputText id="contact-email" class="form-control" type="email" @bind-Value="contactModel.EmailAddress" placeholder=@L["HelpEmailAddress"] />
+            <ValidationMessage For="@(() => contactModel.EmailAddress)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="contact-subject">@L["LabelSubject"]</label>
+            <InputText id="contact-subject" class="form-control" @bind-Value="contactModel.Subject" />
+            <div class="form-text">@L["HelpSubject"]</div>
+            <ValidationMessage For="@(() => contactModel.Subject)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="contact-message">@L["LabelMessage"]</label>
+            <InputTextArea id="contact-message" class="form-control" rows="7" @bind-Value="contactModel.Message" />
+            <div class="form-text">@L["HelpMessage"]</div>
+            <ValidationMessage For="@(() => contactModel.Message)" />
+        </div>
+
+        <div class="form-check mb-3">
+            <InputCheckbox id="contact-consent"
+                           class="form-check-input"
+                           @bind-Value="contactModel.AgreeToBeContacted" />
+            <label class="form-check-label" for="contact-consent">
+                @L["LabelAgreeToBeContacted"]
+            </label>
+            <ValidationMessage For="@(() => contactModel.AgreeToBeContacted)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+            @(isSubmitting ? L["ActionSendingMessage"] : L["ActionSendMessage"])
+        </button>
+
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success mt-3 mb-0">@successMessage</div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
+        }
+    </EditForm>
 </section>
 
 @code {
@@ -29,19 +100,66 @@
         ? L["DemoAccountIntro"].Value
         : L["GeneralIntro"].Value;
 
-    private string MailToHref
+    private ContactMessageRequest contactModel = CreateContactModel();
+    private bool isSubmitting;
+    private string? successMessage;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
     {
-        get
+        if (string.IsNullOrWhiteSpace(contactModel.Subject))
         {
-            string subject = Uri.EscapeDataString(IsDemoAccountRequest
+            contactModel.Subject = IsDemoAccountRequest
                 ? L["DemoAccountSubject"].Value
-                : L["GeneralSubject"].Value);
+                : L["GeneralSubject"].Value;
+        }
 
-            string body = Uri.EscapeDataString(IsDemoAccountRequest
+        if (string.IsNullOrWhiteSpace(contactModel.Message))
+        {
+            contactModel.Message = IsDemoAccountRequest
                 ? L["DemoAccountBody"].Value
-                : L["GeneralBody"].Value);
-
-            return $"mailto:{L["SupportEmail"].Value}?subject={subject}&body={body}";
+                : L["GeneralBody"].Value;
         }
     }
+
+    private async Task HandleSubmitAsync()
+    {
+        successMessage = null;
+        errorMessage = null;
+        isSubmitting = true;
+
+        try
+        {
+            ContactMessageResponse response = await ContactApiClient.SendMessageAsync(contactModel);
+            successMessage = string.Format(
+                CultureInfo.CurrentCulture,
+                L["MessageSentWithReference"],
+                response.MessageReference);
+
+            contactModel = new ContactMessageRequest
+            {
+                Subject = IsDemoAccountRequest
+                    ? L["DemoAccountSubject"].Value
+                    : L["GeneralSubject"].Value,
+                Message = IsDemoAccountRequest
+                    ? L["DemoAccountBody"].Value
+                    : L["GeneralBody"].Value,
+                FormStartedAtUtc = DateTimeOffset.UtcNow
+            };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private static ContactMessageRequest CreateContactModel() =>
+        new()
+        {
+            FormStartedAtUtc = DateTimeOffset.UtcNow
+        };
 }

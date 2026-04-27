@@ -7,24 +7,30 @@ using Portiforce.SAA.Core.StaticResources;
 
 namespace Portiforce.SAA.Application.Models.Common.Messaging;
 
-public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
+public sealed class InboxMessage : IDetailsProjection, IEntity<Guid>
 {
 	// EF Core constructor
-	private OutboxMessage()
+	private InboxMessage()
 	{
 	}
 
-	private OutboxMessage(
+	private InboxMessage(
 		Guid id,
 		TenantId tenantId,
+		string publicReference,
 		string type,
 		string payloadJson,
+		string source,
+		string requestPath,
+		string httpMethod,
 		string idempotencyKey,
-		DateTimeOffset createdAtUtc)
+		DateTimeOffset receivedAtUtc,
+		string? remoteIpAddress,
+		string? userAgent)
 	{
 		if (id == Guid.Empty)
 		{
-			throw new ArgumentException("Outbox message id cannot be empty.", nameof(id));
+			throw new ArgumentException("Inbox message id cannot be empty.", nameof(id));
 		}
 
 		if (tenantId.IsEmpty)
@@ -32,42 +38,70 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 			throw new ArgumentException("TenantId is not defined.", nameof(tenantId));
 		}
 
-		if (createdAtUtc == default)
+		if (receivedAtUtc == default)
 		{
-			throw new ArgumentException("CreatedAtUtc is not defined.", nameof(createdAtUtc));
+			throw new ArgumentException("ReceivedAtUtc is not defined.", nameof(receivedAtUtc));
 		}
 
+		this.PublicReference = NormalizeRequired(
+			publicReference,
+			nameof(publicReference),
+			EntityConstraints.Domain.InfrastructureMessage.PublicReferenceMaxLength);
 		this.Type = NormalizeRequired(type, nameof(type), EntityConstraints.Domain.InfrastructureMessage.TypeMaxLength);
 		this.PayloadJson = NormalizeRequired(payloadJson, nameof(payloadJson));
+		this.Source = NormalizeRequired(source, nameof(source), EntityConstraints.Domain.InfrastructureMessage.SourceMaxLength);
+		this.RequestPath = NormalizeRequired(
+			requestPath,
+			nameof(requestPath),
+			EntityConstraints.Domain.InfrastructureMessage.RequestPathMaxLength);
+		this.HttpMethod = NormalizeRequired(
+			httpMethod,
+			nameof(httpMethod),
+			EntityConstraints.Domain.InfrastructureMessage.HttpMethodMaxLength).ToUpperInvariant();
 		this.IdempotencyKey = NormalizeRequired(
 			idempotencyKey,
 			nameof(idempotencyKey),
 			EntityConstraints.Domain.InfrastructureMessage.IdempotencyKeyMaxLength);
+		this.RemoteIpAddress = NormalizeOptional(
+			remoteIpAddress,
+			EntityConstraints.Domain.InfrastructureMessage.RemoteIpAddressMaxLength);
+		this.UserAgent = NormalizeOptional(userAgent, EntityConstraints.Domain.InfrastructureMessage.UserAgentMaxLength);
 
 		this.Id = id;
 		this.TenantId = tenantId;
-		this.CreatedAtUtc = createdAtUtc;
+		this.ReceivedAtUtc = receivedAtUtc;
 
-		this.State = OutboxMessageState.Pending;
+		this.State = InboxMessageState.Received;
 		this.AttemptCount = 0;
-
-		this.PublishedAtUtc = null;
+		this.ProcessingStartedAtUtc = null;
 		this.ProcessedAtUtc = null;
 		this.LastError = null;
-		this.NextAttemptAtUtc = createdAtUtc;
+		this.NextAttemptAtUtc = receivedAtUtc;
 	}
 
 	public TenantId TenantId { get; private set; }
+
+	public string PublicReference { get; private set; } = default!;
 
 	public string Type { get; private set; } = default!;
 
 	public string PayloadJson { get; private set; } = default!;
 
-	public OutboxMessageState State { get; private set; }
+	public string Source { get; private set; } = default!;
 
-	public DateTimeOffset CreatedAtUtc { get; }
+	public string RequestPath { get; private set; } = default!;
 
-	public DateTimeOffset? PublishedAtUtc { get; private set; }
+	public string HttpMethod { get; private set; } = default!;
+
+	public string? RemoteIpAddress { get; private set; }
+
+	public string? UserAgent { get; private set; }
+
+	public InboxMessageState State { get; private set; }
+
+	public DateTimeOffset ReceivedAtUtc { get; }
+
+	public DateTimeOffset? ProcessingStartedAtUtc { get; private set; }
 
 	public DateTimeOffset? ProcessedAtUtc { get; private set; }
 
@@ -81,41 +115,53 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 	public Guid Id { get; }
 
-	public static OutboxMessage Create(
+	public static InboxMessage Create(
 		TenantId tenantId,
+		string publicReference,
 		string type,
 		string payloadJson,
+		string source,
+		string requestPath,
+		string httpMethod,
 		string idempotencyKey,
-		DateTimeOffset createdAtUtc,
+		DateTimeOffset receivedAtUtc,
+		string? remoteIpAddress = null,
+		string? userAgent = null,
 		Guid? id = null)
 	{
-		return new OutboxMessage(
+		return new InboxMessage(
 			id != null && id.Value != Guid.Empty
 				? id.Value
-				: GuidExtensions.New(),
+			: GuidExtensions.New(),
 			tenantId,
+			publicReference,
 			type,
 			payloadJson,
+			source,
+			requestPath,
+			httpMethod,
 			idempotencyKey,
-			createdAtUtc);
+			receivedAtUtc,
+			remoteIpAddress,
+			userAgent);
 	}
 
-	public void MarkPublished(DateTimeOffset publishedAtUtc)
+	public void MarkProcessing(DateTimeOffset processingStartedAtUtc)
 	{
-		this.EnforceDateValidations(publishedAtUtc, nameof(publishedAtUtc));
+		this.EnforceDateValidations(processingStartedAtUtc, nameof(processingStartedAtUtc));
 
-		if (this.State == OutboxMessageState.Processed)
+		if (this.State == InboxMessageState.Processed)
 		{
 			return;
 		}
 
-		if (this.State == OutboxMessageState.Dead)
+		if (this.State == InboxMessageState.Dead)
 		{
-			throw new InvalidOperationException("Dead outbox message cannot be marked as published.");
+			throw new InvalidOperationException("Dead inbox message cannot be marked as processing.");
 		}
 
-		this.State = OutboxMessageState.Published;
-		this.PublishedAtUtc = publishedAtUtc;
+		this.State = InboxMessageState.Processing;
+		this.ProcessingStartedAtUtc = processingStartedAtUtc;
 		this.LastError = null;
 	}
 
@@ -123,17 +169,17 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 	{
 		this.EnforceDateValidations(processedAtUtc, nameof(processedAtUtc));
 
-		if (this.State == OutboxMessageState.Processed)
+		if (this.State == InboxMessageState.Processed)
 		{
 			return;
 		}
 
-		if (this.State == OutboxMessageState.Dead)
+		if (this.State == InboxMessageState.Dead)
 		{
-			throw new InvalidOperationException("Dead outbox message cannot be marked as processed.");
+			throw new InvalidOperationException("Dead inbox message cannot be marked as processed.");
 		}
 
-		this.State = OutboxMessageState.Processed;
+		this.State = InboxMessageState.Processed;
 		this.ProcessedAtUtc = processedAtUtc;
 		this.LastError = null;
 		this.NextAttemptAtUtc = null;
@@ -159,12 +205,12 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 			throw new ArgumentOutOfRangeException(nameof(maxAttempts), "Max attempts must be positive.");
 		}
 
-		if (this.State == OutboxMessageState.Processed)
+		if (this.State == InboxMessageState.Processed)
 		{
 			return;
 		}
 
-		if (this.State == OutboxMessageState.Dead)
+		if (this.State == InboxMessageState.Dead)
 		{
 			return;
 		}
@@ -177,21 +223,21 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 		if (this.AttemptCount >= maxAttempts)
 		{
-			this.State = OutboxMessageState.Dead;
+			this.State = InboxMessageState.Dead;
 			this.NextAttemptAtUtc = null;
 			this.ProcessedAtUtc = null;
 			return;
 		}
 
-		this.State = OutboxMessageState.Failed;
+		this.State = InboxMessageState.Failed;
 		this.NextAttemptAtUtc = nextAttemptAtUtc;
 	}
 
 	public void ResetForRetry(DateTimeOffset nextAttemptAtUtc)
 	{
-		if (this.State is not OutboxMessageState.Failed)
+		if (this.State is not InboxMessageState.Failed)
 		{
-			throw new InvalidOperationException("Only failed outbox messages can be reset for retry.");
+			throw new InvalidOperationException("Only failed inbox messages can be reset for retry.");
 		}
 
 		this.NextAttemptAtUtc = nextAttemptAtUtc;
@@ -199,10 +245,10 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 
 	private void EnforceDateValidations(DateTimeOffset value, string parameterName)
 	{
-		if (value < this.CreatedAtUtc)
+		if (value < this.ReceivedAtUtc)
 		{
 			throw new ArgumentException(
-				$"{parameterName} cannot be before CreatedAtUtc.",
+				$"{parameterName} cannot be before ReceivedAtUtc.",
 				parameterName);
 		}
 	}
@@ -227,6 +273,18 @@ public sealed class OutboxMessage : IDetailsProjection, IEntity<Guid>
 		}
 
 		return normalized;
+	}
+
+	private static string? NormalizeOptional(string? value, int maxLength)
+	{
+		if (string.IsNullOrWhiteSpace(value))
+		{
+			return null;
+		}
+
+		string normalized = value.Trim();
+
+		return Truncate(normalized, maxLength);
 	}
 
 	private static string Truncate(string value, int maxLength)
