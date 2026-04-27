@@ -21,7 +21,6 @@ Instead, please report the issue privately using one of the following options:
 
 - GitHub private vulnerability reporting, if enabled for this repository.
 - A private message to the repository owner.
-- Email: `your-security-email@example.com`
 
 When reporting a vulnerability, please include as much detail as possible:
 
